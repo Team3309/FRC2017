@@ -4,7 +4,7 @@ import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
-import org.team3309.lib.sensors.Sensors;
+import org.usfirst.frc.team339.robot.Sensors;
 
 /**
  * Use this class to drive the robot an exact amount of encoders Uses three PID

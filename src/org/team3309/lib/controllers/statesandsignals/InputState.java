@@ -2,8 +2,6 @@ package org.team3309.lib.controllers.statesandsignals;
 
 import java.util.HashMap;
 
-import org.usfirst.frc.team3309.robot.SensorDoesNotReturnException;
-
 /**
  * An Object used to let a Controller know the current state of a subsystem.
  * Contains methods for default values so keys do not have to be memorized.
@@ -62,7 +60,7 @@ public class InputState extends HashMap<String, Double> {
 		this.put("leftVel", leftVel);
 	}
 
-	public double getLeftVel() throws SensorDoesNotReturnException {
+	public double getLeftVel() {
 		return this.get("leftVel");
 	}
 
@@ -70,7 +68,7 @@ public class InputState extends HashMap<String, Double> {
 		this.put("rightVel", rightVel);
 	}
 
-	public double getRightVel() throws SensorDoesNotReturnException {
+	public double getRightVel() {
 		return this.get("rightVel");
 	}
 
@@ -87,7 +85,7 @@ public class InputState extends HashMap<String, Double> {
 		this.put("leftPos", leftPos);
 	}
 
-	public double getLeftPos() throws SensorDoesNotReturnException {
+	public double getLeftPos() {
 		return this.get("leftPos");
 	}
 
@@ -95,7 +93,7 @@ public class InputState extends HashMap<String, Double> {
 		this.put("rightPos", rightPos);
 	}
 
-	public double getRightPos() throws SensorDoesNotReturnException {
+	public double getRightPos() {
 		return this.get("rightPos");
 	}
 

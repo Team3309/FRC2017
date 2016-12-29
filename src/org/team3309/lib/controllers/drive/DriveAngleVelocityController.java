@@ -22,16 +22,10 @@ public class DriveAngleVelocityController extends Controller {
 	public DriveAngleVelocityController(double aimAngle) {
 		this.setName("DRIVE ANGLE VEL");
 		// System.out.println("LOW GEAR: " + Drive.getInstance().isLowGear());
-		if (Drive.getInstance().isLowGear()) {
-			leftSideController.setConstants(.006, 0, .003, .0003, 0);
-			rightSideController.setConstants(.006, 0, .003, .0003, 0);
-			turningController.setConstants(6, 0, 13.015);
-			System.out.println("LOW GEAR!");
-		} else {
-			leftSideController.setConstants(.006, 0, .009, .001, 0);
-			rightSideController.setConstants(.006, 0, .009, .001, 0);
-			turningController.setConstants(3, 0.5, 16.015);
-		}
+		leftSideController.setConstants(.006, 0, .003, .0003, 0);
+		rightSideController.setConstants(.006, 0, .003, .0003, 0);
+		turningController.setConstants(6, 0, 13.015);
+
 		this.leftSideController.setName("LEFT IDE VEL CONTROLER");
 		this.rightSideController.setName("RIGHT IDE VEL CONTROLER");
 		this.turningController.setName("Turning Angle Controller");

@@ -3,16 +3,14 @@ package org.team3309.lib.controllers.drive;
 import java.util.LinkedList;
 
 import org.team3309.lib.KragerTimer;
+import org.team3309.lib.auto.Operation;
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
-import org.team3309.lib.sensors.Sensors;
-import org.usfirst.frc.team3309.auto.TimedOutException;
-import org.usfirst.frc.team3309.auto.operations.defenses.Operation;
-import org.usfirst.frc.team3309.robot.SensorDoesNotReturnException;
 import org.usfirst.frc.team3309.subsystems.Drive;
+import org.usfirst.frc.team339.robot.Sensors;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,17 +33,12 @@ public class DriveEncodersVelocityController extends Controller {
 	private boolean isRampUp = false;
 
 	public DriveEncodersVelocityController(double encoderGoal) {
-		if (Drive.getInstance().isLowGear()) {
-			encodersController.setConstants(2, 0, 1.015);
-			turningController.setConstants(.06, 0, 0);
-			leftSideController.setConstants(.006, 0, .003, .001, 0);
-			rightSideController.setConstants(.006, 0, .004, .001, 0);
-		} else {
-			encodersController.setConstants(2.9, 0, .215);
-			turningController.setConstants(.04, 0, 0);
-			leftSideController.setConstants(.006, 0, .009, .001, 0);
-			rightSideController.setConstants(.006, 0, .009, .001, 0);
-		}
+
+		encodersController.setConstants(2, 0, 1.015);
+		turningController.setConstants(.06, 0, 0);
+		leftSideController.setConstants(.006, 0, .003, .001, 0);
+		rightSideController.setConstants(.006, 0, .004, .001, 0);
+
 		goalAngle = Sensors.getAngle();
 		this.goalEncoder = encoderGoal;
 		this.setName("DRIVE ENCODER VEL");
@@ -67,6 +60,7 @@ public class DriveEncodersVelocityController extends Controller {
 	}
 
 	Timer time = new Timer();
+
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
 		time.reset();
@@ -102,11 +96,10 @@ public class DriveEncodersVelocityController extends Controller {
 		}
 		System.out.println(" 1 : " + time.get());
 		if (currentOperation != null) {
-			/*try {
-				currentOperation.perform();
-			} catch (InterruptedException | TimedOutException e) {
-				e.printStackTrace();
-			}*/
+			/*
+			 * try { currentOperation.perform(); } catch (InterruptedException |
+			 * TimedOutException e) { e.printStackTrace(); }
+			 */
 		}
 		this.setMAX_ENCODER_VEL(currentVelocityPoint.rightVelocity, currentVelocityPoint.leftVelocity);
 		double error = goalEncoder - currentEncoder;
@@ -164,14 +157,10 @@ public class DriveEncodersVelocityController extends Controller {
 		SmartDashboard.putNumber("DRIVE Encoder VEL Output", outputOfTurningController.getMotor());
 		SmartDashboard.putNumber("DRIVE ENCODER RIGHT", rightAimVel);
 		SmartDashboard.putNumber("DRIVE ENCODER LEFT", leftAimVel);
-		try {
-			System.out.println("LEFT VEL: " + inputState.getLeftVel() + " right vel: " + inputState.getRightVel());
-			System.out.println("Left Error: " + (leftAimVel - inputState.getLeftVel()) + " Right Error: "
-					+ (rightAimVel - inputState.getRightVel()));
-		} catch (SensorDoesNotReturnException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		System.out.println("LEFT VEL: " + inputState.getLeftVel() + " right vel: " + inputState.getRightVel());
+		System.out.println("Left Error: " + (leftAimVel - inputState.getLeftVel()) + " Right Error: "
+				+ (rightAimVel - inputState.getRightVel()));
+
 		System.out.println(" 4 : " + time.get());
 		try { // if encoders are broken
 			leftState.setError(leftAimVel - inputState.getLeftVel());
