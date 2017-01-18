@@ -7,8 +7,8 @@ import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
 import org.team3309.lib.controllers.drive.DriveEncodersVelocityController;
 import org.team3309.lib.controllers.drive.VelocityChangePoint;
+import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
-import org.usfirst.frc.team339.robot.Sensors;
 
 import edu.wpi.first.wpilibj.Timer;
 

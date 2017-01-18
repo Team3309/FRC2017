@@ -4,8 +4,8 @@ import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
-import org.usfirst.frc.team339.robot.RobotMap;
-import org.usfirst.frc.team339.robot.Sensors;
+import org.usfirst.frc.team3309.robot.RobotMap;
+import org.usfirst.frc.team3309.robot.Sensors;
 
 public class Drive extends ControlledSubsystem {
 
