@@ -16,7 +16,7 @@ import org.usfirst.frc.team3309.subsystems.Drive;
  */
 public class DriveEncodersController extends Controller {
 
-	private PIDPositionController linearController = new PIDPositionController(.003, 0, 0);
+	protected PIDPositionController linearController = new PIDPositionController(.003, 0, 0);
 	protected PIDPositionController angController = new PIDPositionController(0.166, 0.001, 0.002);
 	protected double goalEncoder;
 	protected double goalAngle;

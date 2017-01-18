@@ -77,10 +77,10 @@ public class DriveEncodersVelocityController extends Controller {
 		double closestPoint = Integer.MAX_VALUE;
 		VelocityChangePoint currentVelocityPoint = new VelocityChangePoint(MAX_ENCODER_VEL_RIGHT, 0);
 		for (VelocityChangePoint curPoint : encoderChanges) {
-			if (Math.abs(currentEncoder) > Math.abs(curPoint.encoder)) {
-				if (Math.abs(Math.abs(currentEncoder) - Math.abs(curPoint.encoder)) < closestPoint) {
+			if (Math.abs(currentEncoder) > Math.abs(curPoint.encoderValueToChangeAt)) {
+				if (Math.abs(Math.abs(currentEncoder) - Math.abs(curPoint.encoderValueToChangeAt)) < closestPoint) {
 					currentVelocityPoint = curPoint;
-					closestPoint = Math.abs(Math.abs(currentEncoder) - Math.abs(curPoint.encoder));
+					closestPoint = Math.abs(Math.abs(currentEncoder) - Math.abs(curPoint.encoderValueToChangeAt));
 				}
 			}
 		}
@@ -101,7 +101,7 @@ public class DriveEncodersVelocityController extends Controller {
 			 * TimedOutException e) { e.printStackTrace(); }
 			 */
 		}
-		this.setMAX_ENCODER_VEL(currentVelocityPoint.rightVelocity, currentVelocityPoint.leftVelocity);
+		this.setMAX_ENCODER_VEL(currentVelocityPoint.rightVelocityNew, currentVelocityPoint.leftVelocityNew);
 		double error = goalEncoder - currentEncoder;
 		// double dashAimTurnVel = SmartDashboard.getNumber(this.getName() + "
 		// Vel to Go At");

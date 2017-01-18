@@ -5,15 +5,18 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.robot.Sensors;
 
-public class DriveWhileOnADefenseController extends Controller {
+public class DriveWhileUntilInclineController extends Controller {
 
+	/**
+	 * Threshold on the roll
+	 */
 	private final double THRESHOLD = .05;
 	private Controller controllerToRun;
 	private boolean hasBeganGoingOverDefense = false;
 	private boolean hasGoneOverDefense = false;
 	private double countsOfAfter = 0;
 
-	public DriveWhileOnADefenseController(Controller x) {
+	public DriveWhileUntilInclineController(Controller x) {
 		this.controllerToRun = x;
 	}
 
@@ -33,7 +36,6 @@ public class DriveWhileOnADefenseController extends Controller {
 				countsOfAfter++;
 			}
 		}
-
 		if (countsOfAfter > 50) {
 			hasGoneOverDefense = true;
 		}

@@ -51,5 +51,6 @@ public class DriveEncodersControllerBasePower extends DriveEncodersController {
 	@Override
 	public void sendToSmartDash() {
 		angController.sendToSmartDash();
+		linearController.sendToSmartDash();
 	}
 }
