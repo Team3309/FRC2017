@@ -26,10 +26,6 @@ public abstract class PIDController extends Controller {
 	}
 
 	/**
-	 * if small gain, help with smartdash
-	 */
-	private boolean isSmallGain = false;
-	/**
 	 * Gains
 	 */
 	public double kP, kD, kI;
@@ -65,26 +61,15 @@ public abstract class PIDController extends Controller {
 	 * Timer to count how much time the error has been low.
 	 */
 	protected KragerTimer doneTimer = new KragerTimer(TIME_TO_BE_COMPLETE_MILLISECONDS);
-	private double factor = 1;
 
 	public PIDController(double kP, double kI, double kD) {
-		if ((kP < .001 || kI < .001 || kD < .001) && kP != 0 && kI != 0 && kD != 0) {
-			this.isSmallGain = true;
-		} else {
-			this.isSmallGain = false;
-		}
 		this.kP = kP;
 		this.kI = kI;
 		this.kD = kD;
 
-		if (isSmallGain) {
-			factor = 10;
-		} else {
-			factor = 1;
-		}
-		SmartDashboard.putNumber(this.getName() + " kP", kP * Math.pow(factor, 3));
-		SmartDashboard.putNumber(this.getName() + " kI", kI * Math.pow(factor, 3));
-		SmartDashboard.putNumber(this.getName() + " kD", kD * Math.pow(factor, 3));
+		SmartDashboard.putNumber(this.getName() + " kP", kP);
+		SmartDashboard.putNumber(this.getName() + " kI", kI);
+		SmartDashboard.putNumber(this.getName() + " kD", kD);
 	}
 
 	public PIDController(double kP, double kI, double kD, double kILimit) {
@@ -118,8 +103,8 @@ public abstract class PIDController extends Controller {
 		OutputSignal signal = new OutputSignal();
 		previousPValue = (kP * error);
 		previousIValue = (kI * mIntegral);
-		previousDValue = (kD * (error - previousError));
-		double output = (kP * error) + (kI * mIntegral) + (kD * (error - previousError));
+		previousDValue = (kD * (previousError - error));
+		double output = (kP * error) + (kI * mIntegral) + (kD * (previousError - error));
 		// System.out.println("Kp: " + (kP * error) + "kI: " + (kI * mIntegral)
 		// + "kD: " + (kD * (error - previousError)));
 		signal.setMotor(output);
@@ -183,14 +168,13 @@ public abstract class PIDController extends Controller {
 	@Override
 	public void sendToSmartDash() {
 		if (this.useSmartDash) {
-			kP = SmartDashboard.getNumber(this.getName() + " kP", kP) * Math.pow(factor, -3);
-			kI = SmartDashboard.getNumber(this.getName() + " kI", kI) * Math.pow(factor, -3);
-			kD = SmartDashboard.getNumber(this.getName() + " kD", kD) * Math.pow(factor, -3);
-			SmartDashboard.putNumber(this.getName() + " kP", kP * Math.pow(factor, 3));
-			SmartDashboard.putNumber(this.getName() + " kI", kI * Math.pow(factor, 3));
-			SmartDashboard.putNumber(this.getName() + " kD", kD * Math.pow(factor, 3));
+			kP = SmartDashboard.getNumber(this.getName() + " kP", kP);
+			kI = SmartDashboard.getNumber(this.getName() + " kI", kI);
+			kD = SmartDashboard.getNumber(this.getName() + " kD", kD);
+			SmartDashboard.putNumber(this.getName() + " kP", kP);
+			SmartDashboard.putNumber(this.getName() + " kI", kI);
+			SmartDashboard.putNumber(this.getName() + " kD", kD);
 			SmartDashboard.putNumber(this.getName() + " ERROR", this.previousError);
-			SmartDashboard.putNumber(this.getName() + " FACTOR", factor);
 			SmartDashboard.putNumber(this.getName() + " P CONTRIBUTION", this.previousPValue);
 			SmartDashboard.putNumber(this.getName() + " I CONTRIBUTION", this.previousIValue);
 			SmartDashboard.putNumber(this.getName() + " D CONTRIBUTION", this.previousDValue);

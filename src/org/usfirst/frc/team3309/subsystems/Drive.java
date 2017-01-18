@@ -1,7 +1,7 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
-import org.team3309.lib.actuators.TalonSRXMC;
+import org.team3309.lib.actuators.SparkMC;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.robot.RobotMap;
@@ -13,7 +13,7 @@ public class Drive extends ControlledSubsystem {
 	 * Used to give a certain gap that the drive would be ok with being within
 	 * its goal encoder averageÃ�.
 	 */
-	private static final double DRIVE_ENCODER_LENIENCY = 9;
+	private static final double DRIVE_ENCODER_LENIENCY = 20;
 
 	/**
 	 * Used to give a certain gap that the drive would be ok with being within
@@ -21,8 +21,8 @@ public class Drive extends ControlledSubsystem {
 	 */
 	private static final double DRIVE_GYRO_LENIENCY = .5;
 	private static Drive drive;
-	private TalonSRXMC right = new TalonSRXMC(RobotMap.RIGHT_DRIVE);
-	private TalonSRXMC left = new TalonSRXMC(RobotMap.LEFT_DRIVE);
+	private SparkMC right = new SparkMC(RobotMap.RIGHT_DRIVE);
+	private SparkMC left = new SparkMC(RobotMap.LEFT_DRIVE);
 
 	public static Drive getInstance() {
 		if (drive == null)
@@ -95,7 +95,6 @@ public class Drive extends ControlledSubsystem {
 	 *            rightMotorSpeed
 	 */
 	public void setLeftRight(double left, double right) {
-		// System.out.println("Drive CLass LEFT: " + left + " RIht: " + right);
 		setRightLeft(right, left);
 	}
 
@@ -108,7 +107,6 @@ public class Drive extends ControlledSubsystem {
 	 *            leftMotorSpeed
 	 */
 	public void setRightLeft(double right, double left) {
-		// System.out.println("Drive CLass LEFT: " + left + " RIht: " + right);
 		setLeft(left);
 		setRight(right);
 	}
@@ -139,7 +137,7 @@ public class Drive extends ControlledSubsystem {
 	 * @return the average of the left and right to get the distance traveled
 	 */
 	public double getDistanceTraveled() {
-		return (Math.abs(Sensors.getLeftDrive()) + Math.abs(Sensors.getRightDrive())) / 2;
+		return (Sensors.getLeftDrive() + Sensors.getRightDrive()) / 2;
 	}
 
 	/**
@@ -152,13 +150,9 @@ public class Drive extends ControlledSubsystem {
 	 * @return
 	 */
 	public boolean isEncoderCloseTo(double encoderGoal) {
-		double factor = 1;
-		if (encoderGoal < 0) {
-			factor = -1;
-		}
 		try {
-			if (getDistanceTraveled() * factor < encoderGoal + DRIVE_ENCODER_LENIENCY
-					&& factor * getDistanceTraveled() > encoderGoal - DRIVE_ENCODER_LENIENCY) {
+			if (getDistanceTraveled() < encoderGoal + DRIVE_ENCODER_LENIENCY
+					&& getDistanceTraveled() > encoderGoal - DRIVE_ENCODER_LENIENCY) {
 				return true;
 			}
 		} catch (Exception e) {
