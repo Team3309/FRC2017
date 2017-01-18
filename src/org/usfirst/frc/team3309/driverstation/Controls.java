@@ -1,5 +1,7 @@
 package org.usfirst.frc.team3309.driverstation;
 
+import edu.wpi.first.wpilibj.XboxController;
+
 /**
  * Controls that are gotten from the driverstation
  * 
