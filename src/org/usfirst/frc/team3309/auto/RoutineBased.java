@@ -5,10 +5,10 @@ import java.util.LinkedList;
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
+import org.team3309.lib.controllers.drive.DriveEncoderVelocityWithSetPointsController;
 import org.team3309.lib.controllers.drive.DriveEncodersVelocityController;
 import org.team3309.lib.controllers.drive.VelocityChangePoint;
-import org.team3309.lib.sensors.Sensors;
-import org.usfirst.frc.team3309.auto.operations.defenses.Operation;
+import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
 import org.usfirst.frc.team3309.subsystems.shooter.FeedyWheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
@@ -97,10 +97,9 @@ public class RoutineBased {
 		}
 	}
 
-	public void driveEncoder(double goal, double maxEnc, double timeout, LinkedList<VelocityChangePoint> arrayOfVel) {
+	public void driveEncoder(double goal, double timeout, LinkedList<VelocityChangePoint> arrayOfVel) {
 		Sensors.resetDrive();
-		DriveEncodersVelocityController x = new DriveEncodersVelocityController(goal);
-		x.setMAX_ENCODER_VEL(maxEnc);
+		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
 		x.setEncoderChanges(arrayOfVel);
 		Drive.getInstance().setAutoController(x);
 		try {
@@ -155,7 +154,7 @@ public class RoutineBased {
 	public void driveEncoder(double goal, double maxEnc, double timeout, LinkedList<VelocityChangePoint> arrayOfVel,
 			LinkedList<Operation> operations) {
 		Sensors.resetDrive();
-		DriveEncodersVelocityController x = new DriveEncodersVelocityController(goal);
+		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
 		x.setMAX_ENCODER_VEL(maxEnc);
 		x.setEncoderChanges(arrayOfVel);
 		x.setOperations(operations);
@@ -174,97 +173,8 @@ public class RoutineBased {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {
 
-		}
+		}fdas
 		mDrive.stopDrive();
-	}
-	
-	public void toVisionLong(double timeout) throws TimedOutException {
-		Shot shot = Vision.getInstance().getShotToAimTowards();
-		Timer waitTimer = new Timer();
-		waitTimer.start();
-		while (shot == null && DriverStation.getInstance().isAutonomous()) {
-			if (waitTimer.get() > timeout)
-				throw new TimedOutException();
-			shot = Vision.getInstance().getShotToAimTowards();
-			//System.out.println("LOOKING");
-		}
-
-		mDrive.toVision();
-		System.out.println("RPS: " + shot.getGoalRPS() + " angle: " + shot.getGoalHoodAngle());
-
-		try {
-			shot = Vision.getInstance().getShotToAimTowards();
-			Flywheel.getInstance().setAimVelRPSAuto(shot.getGoalRPS());
-			Hood.getInstance().setGoalAngle(shot.getGoalHoodAngle());
-			KragerTimer.delayMS(2000);
-			mDrive.toVision();
-			shot = Vision.getInstance().getShotToAimTowards();
-			Flywheel.getInstance().setAimVelRPSAuto(shot.getGoalRPS());
-			Hood.getInstance().setGoalAngle(shot.getGoalHoodAngle());
-			KragerTimer.delayMS(1000);
-			mDrive.toVision();
-			shot = Vision.getInstance().getShotToAimTowards();
-			Flywheel.getInstance().setAimVelRPSAuto(shot.getGoalRPS());
-			Hood.getInstance().setGoalAngle(shot.getGoalHoodAngle());
-			KragerTimer.delayMS(1000);
-			mDrive.toVision();
-			shot = Vision.getInstance().getShotToAimTowards();
-			Flywheel.getInstance().setAimVelRPSAuto(shot.getGoalRPS());
-			Hood.getInstance().setGoalAngle(shot.getGoalHoodAngle());
-			KragerTimer.delayMS(500);
-			mDrive.toVision();
-			shot = Vision.getInstance().getShotToAimTowards();
-			Flywheel.getInstance().setAimVelRPSAuto(shot.getGoalRPS());
-			Hood.getInstance().setGoalAngle(shot.getGoalHoodAngle());
-		} catch (Exception e) {
-
-		}
-
-		KragerTimer.delayMS(800);
-		System.out.println("BANG BANG");
-		FeedyWheel.getInstance().setFeedyWheel(1);
-
-		KragerTimer.delayMS(500);
-		FeedyWheel.getInstance().setFeedyWheel(0);
-		Flywheel.getInstance().setAimVelRPSAuto(0);
-		Hood.getInstance().setGoalAngle(4);
-	}
-
-	public void toVision(double timeout) throws TimedOutException {
-		Shot shot = Vision.getInstance().getShotToAimTowards();
-		Timer waitTimer = new Timer();
-		waitTimer.start();
-		while (shot == null && DriverStation.getInstance().isAutonomous()) {
-			if (waitTimer.get() > timeout)
-				throw new TimedOutException();
-			shot = Vision.getInstance().getShotToAimTowards();
-			//System.out.println("LOOKING");
-		}
-
-		mDrive.toVision();
-		System.out.println("RPS: " + shot.getGoalRPS() + " angle: " + shot.getGoalHoodAngle());
-
-		try {
-			shot = Vision.getInstance().getShotToAimTowards();
-			Flywheel.getInstance().setAimVelRPSAuto(shot.getGoalRPS());
-			Hood.getInstance().setGoalAngle(shot.getGoalHoodAngle());
-			KragerTimer.delayMS(1000);
-			mDrive.toVision();
-			shot = Vision.getInstance().getShotToAimTowards();
-			Flywheel.getInstance().setAimVelRPSAuto(shot.getGoalRPS());
-			Hood.getInstance().setGoalAngle(shot.getGoalHoodAngle());
-		} catch (Exception e) {
-
-		}
-
-		//KragerTimer.delayMS(1100);
-		//System.out.println("BANG BANG");
-		//FeedyWheel.getInstance().setFeedyWheel(1);
-
-		//KragerTimer.delayMS(500);
-		//FeedyWheel.getInstance().setFeedyWheel(0);
-		//Flywheel.getInstance().setAimVelRPSAuto(0);
-		//Hood.getInstance().setGoalAngle(4);
 	}
 
 	public void waitForEndOfAuto() {

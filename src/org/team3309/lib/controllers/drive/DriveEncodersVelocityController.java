@@ -36,6 +36,7 @@ public class DriveEncodersVelocityController extends Controller {
 	private double pastAim = 0;
 	private final double MAX_ACC = 5;
 	private double MAX_ENCODER_VEL = 100.3309;
+
 	private boolean isRampUp = false;
 
 	public DriveEncodersVelocityController(double encoderGoal) {
@@ -198,6 +199,14 @@ public class DriveEncodersVelocityController extends Controller {
 		rightSideController.sendToSmartDash();
 		encodersController.sendToSmartDash();
 		turningController.sendToSmartDash();
+	}
+
+	public double getMAX_ENCODER_VEL() {
+		return MAX_ENCODER_VEL;
+	}
+
+	public void setMAX_ENCODER_VEL(double mAX_ENCODER_VEL) {
+		MAX_ENCODER_VEL = mAX_ENCODER_VEL;
 	}
 
 }
