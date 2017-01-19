@@ -1,7 +1,6 @@
 package org.team3309.lib.actuators;
 
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.TalonSRX;
+import com.ctre.CANTalon;
 
 public class TalonSRXMC extends Actuator {
 

@@ -10,13 +10,7 @@ import org.team3309.lib.controllers.drive.DriveEncodersVelocityController;
 import org.team3309.lib.controllers.drive.VelocityChangePoint;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
-import org.usfirst.frc.team3309.subsystems.shooter.FeedyWheel;
-import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
-import org.usfirst.frc.team3309.subsystems.shooter.Hood;
-import org.usfirst.frc.team3309.vision.Shot;
-import org.usfirst.frc.team3309.vision.Vision;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 public class RoutineBased {
@@ -134,11 +128,10 @@ public class RoutineBased {
 		mDrive.stopDrive();
 	}
 
-	protected void driveEncoder(double goal, double maxEnc, double timeout, LinkedList<VelocityChangePoint> w,
+	protected void driveEncoder(double goal, double timeout, LinkedList<VelocityChangePoint> w,
 			LinkedList<Operation> operations, boolean rampUp) {
 		Sensors.resetDrive();
-		DriveEncodersVelocityController x = new DriveEncodersVelocityController(goal);
-		x.setMAX_ENCODER_VEL(maxEnc);
+		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
 		x.setRampUp(rampUp);
 		x.setOperations(operations);
 		x.setEncoderChanges(w);
@@ -151,11 +144,10 @@ public class RoutineBased {
 
 	}
 
-	public void driveEncoder(double goal, double maxEnc, double timeout, LinkedList<VelocityChangePoint> arrayOfVel,
+	public void driveEncoder(double goal, double timeout, LinkedList<VelocityChangePoint> arrayOfVel,
 			LinkedList<Operation> operations) {
 		Sensors.resetDrive();
 		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
-		x.setMAX_ENCODER_VEL(maxEnc);
 		x.setEncoderChanges(arrayOfVel);
 		x.setOperations(operations);
 		Drive.getInstance().setAutoController(x);
@@ -173,7 +165,7 @@ public class RoutineBased {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {
 
-		}fdas
+		}
 		mDrive.stopDrive();
 	}
 

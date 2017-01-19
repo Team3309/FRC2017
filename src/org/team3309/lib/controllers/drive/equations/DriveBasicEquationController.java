@@ -5,9 +5,11 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.driverstation.Controls;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+
 /**
- * Meant to be the "Oh Snap! The encoders and gyro don't work!" drive equation. This
- * drive equation simply directly sets the motor values to the throttle and
+ * Meant to be the "Oh Snap! The encoders and gyro don't work!" drive equation.
+ * This drive equation simply directly sets the motor values to the throttle and
  * turn of the two joysticks. Arcade Drive.
  * 
  * @author TheMkrage
@@ -23,8 +25,8 @@ public class DriveBasicEquationController extends Controller {
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
 		OutputSignal signal = new OutputSignal();
-		double throttle = Controls.driverController.getLeftY(), turn = -Controls.driverController
-				.getRightX();
+		double throttle = Controls.driverController.getY(Hand.kLeft),
+				turn = -Controls.driverController.getX(Hand.kRight);
 		double rightPower = throttle + turn;
 		double leftPower = throttle - turn;
 		signal.setLeftRightMotor(leftPower, rightPower);

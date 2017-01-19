@@ -6,6 +6,8 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.driverstation.Controls;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+
 public class DriveAngularVelocityEquationController extends Controller {
 	private double aimAngularVelocity = 0.0;
 	private final double MAX_ANGULAR_VELOCITY = 720;
@@ -18,12 +20,12 @@ public class DriveAngularVelocityEquationController extends Controller {
 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
-		aimAngularVelocity = MAX_ANGULAR_VELOCITY * Controls.driverController.getLeftX();
+		aimAngularVelocity = MAX_ANGULAR_VELOCITY * Controls.driverController.getX(Hand.kLeft);
 		inputState.setError(aimAngularVelocity - inputState.getAngularVel());
 		OutputSignal angularOutput = angController.getOutputSignal(inputState);
 		OutputSignal signal = new OutputSignal();
-		signal.setLeftMotor(Controls.driverController.getLeftY() - angularOutput.getMotor());
-		signal.setRightMotor(Controls.driverController.getLeftY() + angularOutput.getMotor());
+		signal.setLeftMotor(Controls.driverController.getY(Hand.kRight) - angularOutput.getMotor());
+		signal.setRightMotor(Controls.driverController.getY(Hand.kRight) + angularOutput.getMotor());
 		return signal;
 	}
 

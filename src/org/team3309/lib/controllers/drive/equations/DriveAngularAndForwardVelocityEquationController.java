@@ -6,6 +6,8 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.driverstation.Controls;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+
 public class DriveAngularAndForwardVelocityEquationController extends Controller {
 	// Ang Vel Control
 	private double aimAngularVelocity = 0.0;
@@ -28,9 +30,9 @@ public class DriveAngularAndForwardVelocityEquationController extends Controller
 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
-		aimAngularVelocity = MAX_ANGULAR_VELOCITY * Controls.driverController.getRightX();
-		aimRightVelocity = MAX_RIGHT_VELOCITY * Controls.driverController.getLeftY();
-		aimLeftVelocity = MAX_LEFT_VELOCITY * Controls.driverController.getLeftY();
+		aimAngularVelocity = MAX_ANGULAR_VELOCITY * Controls.driverController.getX(Hand.kRight);
+		aimRightVelocity = MAX_RIGHT_VELOCITY * Controls.driverController.getY(Hand.kLeft);
+		aimLeftVelocity = MAX_LEFT_VELOCITY * Controls.driverController.getY(Hand.kLeft);
 		// Input States for the three controllers
 		InputState inputForLeftVel = inputState;
 		InputState inputForRightVel = inputState;
