@@ -31,6 +31,7 @@ public class PIDVelocityController extends PIDController {
 		OutputSignal signal = new OutputSignal();
 		runningVelocity += super.getOutputSignal(inputState).getMotor();
 		signal.setMotor(runningVelocity);
+		previousOutput = runningVelocity;
 		return signal;
 	}
 }

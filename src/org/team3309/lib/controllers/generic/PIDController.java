@@ -61,6 +61,10 @@ public abstract class PIDController extends Controller {
 	 * Timer to count how much time the error has been low.
 	 */
 	protected KragerTimer doneTimer = new KragerTimer(TIME_TO_BE_COMPLETE_MILLISECONDS);
+	/**
+	 * Last Output of this loop
+	 */
+	protected double previousOutput = 0;
 
 	public PIDController(double kP, double kI, double kD) {
 		this.kP = kP;
@@ -108,6 +112,7 @@ public abstract class PIDController extends Controller {
 		// System.out.println("Kp: " + (kP * error) + "kI: " + (kI * mIntegral)
 		// + "kD: " + (kD * (error - previousError)));
 		signal.setMotor(output);
+		previousOutput = output;
 		previousError = error;
 		return signal;
 	}
@@ -178,6 +183,7 @@ public abstract class PIDController extends Controller {
 			SmartDashboard.putNumber(this.getName() + " P CONTRIBUTION", this.previousPValue);
 			SmartDashboard.putNumber(this.getName() + " I CONTRIBUTION", this.previousIValue);
 			SmartDashboard.putNumber(this.getName() + " D CONTRIBUTION", this.previousDValue);
+			SmartDashboard.putNumber(this.getName() + " Last Output", this.previousOutput);
 		}
 
 	}
