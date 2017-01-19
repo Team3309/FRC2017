@@ -2,10 +2,20 @@ package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.actuators.SparkMC;
+import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
+import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
+import org.usfirst.frc.team3309.vision.Vision;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class Drive extends ControlledSubsystem {
 
@@ -23,6 +33,11 @@ public class Drive extends ControlledSubsystem {
 	private static Drive drive;
 	private SparkMC right = new SparkMC(RobotMap.RIGHT_DRIVE);
 	private SparkMC left = new SparkMC(RobotMap.LEFT_DRIVE);
+	private Solenoid sol = new Solenoid(RobotMap.SHIFTER);
+
+	private boolean isLowGear = true;
+	public boolean lowGearInAuto = false;
+	boolean isReset = false;
 
 	public static Drive getInstance() {
 		if (drive == null)
@@ -38,8 +53,27 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		// TODO Auto-generated method stub
+		if (Controls.driverController.getAButton() && !isReset) {
+			DriveAngleVelocityController driveAngleHardCore = new DriveAngleVelocityController(this.getAngle());
+			driveAngleHardCore.setCompletable(false);
+			driveAngleHardCore.turningController.setConstants(6, 0, 16);
+			this.setTeleopController(driveAngleHardCore);
+			isReset = true;
+		} else if (Controls.operatorController.getAButton()) {
 
+		} else {
+			this.setTeleopController(new DriveCheezyDriveEquation());
+		}
+
+		if (Controls.driverController.getBumper(Hand.kLeft)) {
+			isLowGear = true;
+			sol.set(false);
+		} else {
+			isLowGear = false;
+			sol.set(true);
+		}
+		OutputSignal output = teleopController.getOutputSignal(getInputState());
+		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
 	@Override
@@ -56,13 +90,12 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		// TODO Auto-generated method stub
+		teleopController.sendToSmartDash();
 
 	}
 
 	@Override
 	public void manualControl() {
-		// TODO Auto-generated method stub
 
 	}
 

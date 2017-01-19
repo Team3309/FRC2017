@@ -7,6 +7,7 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.driverstation.Controls;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveCheezyDriveEquation extends Controller {
@@ -21,9 +22,9 @@ public class DriveCheezyDriveEquation extends Controller {
 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
-		double throttle = Controls.driverController.getLeftY();
-		double wheel = KragerMath.threshold(Controls.driverController.getRightX());
-		boolean isQuickTurn = Controls.driverController.getRB();
+		double throttle = Controls.driverController.getY(Hand.kLeft);
+		double wheel = KragerMath.threshold(Controls.driverController.getX(Hand.kRight));
+		boolean isQuickTurn = Controls.driverController.getBumper(Hand.kRight);
 		boolean isHighGear = false;
 		OutputSignal signal = new OutputSignal();
 		double wheelNonLinearity;

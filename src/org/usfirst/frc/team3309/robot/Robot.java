@@ -1,6 +1,6 @@
 package org.usfirst.frc.team3309.robot;
 
-import org.team3309.lib.auto.AutoRoutine;
+import org.usfirst.frc.team3309.auto.AutoRoutine;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
