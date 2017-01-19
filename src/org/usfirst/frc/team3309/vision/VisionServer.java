@@ -30,22 +30,18 @@ public class VisionServer implements Runnable {
 	private VisionServer() {
 		try {
 			adb = new AdbBridge();
-
 			serverSocket = new ServerSocket(PORT);
 			adb.start();
 			adb.runCommand("devices");
 			adb.reversePortForward(PORT, PORT);
 			adb.runCommand("devices");
 			System.out.println("RUN");
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void generateFromJsonString(String updateString) {
-
 		try {
 			JSONObject j = new JSONObject(updateString);
 			JSONArray targetsArray = (JSONArray) j.get("targets");
@@ -82,7 +78,6 @@ public class VisionServer implements Runnable {
 		if ("heartbeat".equals(message.getType())) {
 			send(HeartbeatMessage.getInstance());
 		}
-
 	}
 
 	public void run() {
@@ -106,7 +101,6 @@ public class VisionServer implements Runnable {
 					for (String message : messages) {
 						OffWireMessage parsedMessage = new OffWireMessage(message);
 						if (parsedMessage.isValid()) {
-
 							handleMessage(parsedMessage);
 						}
 					}
@@ -128,5 +122,13 @@ public class VisionServer implements Runnable {
 	public void restartAdb() {
 		adb.restartAdb();
 		adb.reversePortForward(PORT, PORT);
+	}
+
+	public List<TargetInfo> getTargets() {
+		return targets;
+	}
+
+	public void setTargets(List<TargetInfo> targets) {
+		this.targets = targets;
 	}
 }

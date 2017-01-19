@@ -84,7 +84,6 @@ public class Flywheel extends ControlledSubsystem {
 			aimVelRPS = 120;
 		} else if (Controls.driverController.getYButton()) {
 			aimVelRPS = SmartDashboard.getNumber("TEST RPS", -1);
-			// aimVelRPS = 120;
 		} else if (Controls.operatorController.getStartButton()) {
 			// TODO Vision Implementation
 		} else if (Controls.operatorController.getPOV() == 0) {
