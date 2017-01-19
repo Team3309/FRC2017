@@ -19,7 +19,6 @@ public class CounterSensor extends Sensor {
 	public double getPeriod() {
 		return lastPeriod;
 	}
-
 	@Override
 	protected void update() {
 		lastPeriod = counter.getPeriod();
