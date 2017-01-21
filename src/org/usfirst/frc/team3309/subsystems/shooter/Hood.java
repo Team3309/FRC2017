@@ -34,12 +34,11 @@ public class Hood extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-
+		
 	}
 
 	@Override
 	public void updateAuto() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -56,7 +55,7 @@ public class Hood extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-
+		
 	}
 
 	@Override
@@ -66,6 +65,7 @@ public class Hood extends ControlledSubsystem {
 
 	@Override
 	public void initAuto() {
+		
 	}
 
 	public double getAngle() {
