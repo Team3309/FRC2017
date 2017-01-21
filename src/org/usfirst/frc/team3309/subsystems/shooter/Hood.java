@@ -1,13 +1,20 @@
 package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.usfirst.frc.team3309.robot.RobotMap;
 
 public class Hood extends ControlledSubsystem {
 	/**
 	 * Shooter for singleton pattern
 	 */
 	private static Hood mHood;
+	private static double aimAngle;
+	private static final double MIN_ANGLE = 0;
+	private static final double DEFAULT_ANGLE = 0;
+	private static final double MAX_ANGLE = 0;
+	private static TalonSRXMC hoodTalon = new TalonSRXMC(RobotMap.HOOD_ID);
 
 	private Hood(String name) {
 		super(name);
@@ -27,14 +34,13 @@ public class Hood extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void updateAuto() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -45,25 +51,24 @@ public class Hood extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void manualControl() {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void initTeleop() {
-		// TODO Auto-generated method stub
-		
+		aimAngle = DEFAULT_ANGLE;
 	}
 
 	@Override
 	public void initAuto() {
-		// TODO Auto-generated method stub
-		
+	}
+
+	public double getAngle() {
+		return hoodTalon.getTalon().getPosition();
 	}
 }

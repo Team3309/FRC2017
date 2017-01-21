@@ -21,4 +21,6 @@ public class RobotMap {
 	public static final int TURRET_ENCODER_A = 5;
 	public static final int TURRET_ENCODER_B = 6;
 	public static final int TURRET_RIGHT_LIMIT = 0;
+	
+	public static final int HOOD_ID = 0;
 }
