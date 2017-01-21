@@ -81,16 +81,12 @@ public class VisionServer implements Runnable {
 	}
 
 	public void run() {
-		System.out.println("Starting Run fmd,ahfkjlx");
 		while (true) {
 			if (serverSocket == null) {
-				System.out.println("BREAK");
 				return;
 			}
 			try {
-				System.out.println("before serverSocket");
 				socket = serverSocket.accept();
-				System.out.println("ACCEPT");
 				InputStream is = socket.getInputStream();
 				byte[] buffer = new byte[2048];
 				int read;

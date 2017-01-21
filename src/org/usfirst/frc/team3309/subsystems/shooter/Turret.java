@@ -6,6 +6,7 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 public class Turret extends ControlledSubsystem {
 
 	private static Turret instance;
+	private static final double TURRET_MAX_DEGREES = 270;
 
 	public static Turret getInstance() {
 		if (instance == null)
@@ -68,6 +69,10 @@ public class Turret extends ControlledSubsystem {
 
 	private void setTurnCounterClockwise(double power) {
 		setTurnClockwise(-power);
+	}
+
+	public double getMaxDegrees() {
+		return TURRET_MAX_DEGREES;
 	}
 
 }

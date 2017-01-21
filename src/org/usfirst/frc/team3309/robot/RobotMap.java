@@ -18,4 +18,7 @@ public class RobotMap {
 	public static final int LEFT_ENCODER_B = 1;
 	public static final int RIGHT_ENCODER_B = 3;
 	public static final int FLYWHEEL_SENSOR = 4;
+	public static final int TURRET_ENCODER_A = 5;
+	public static final int TURRET_ENCODER_B = 6;
+	public static final int TURRET_RIGHT_LIMIT = 0;
 }

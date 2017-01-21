@@ -7,6 +7,9 @@ import org.team3309.lib.sensors.CounterSensor;
 import org.team3309.lib.sensors.EncoderSensor;
 import org.team3309.lib.sensors.NavX;
 import org.team3309.lib.sensors.Sensor;
+import org.usfirst.frc.team3309.subsystems.shooter.Turret;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
  * All the sensors on the robot
@@ -15,12 +18,22 @@ import org.team3309.lib.sensors.Sensor;
  *
  */
 public class Sensors {
+
 	private static List<Sensor> sensors = new LinkedList<Sensor>();
 	private static NavX navX = new NavX();
 	private static EncoderSensor leftDrive = new EncoderSensor(RobotMap.LEFT_ENCODER_A, RobotMap.LEFT_ENCODER_B, true);
 	private static EncoderSensor rightDrive = new EncoderSensor(RobotMap.RIGHT_ENCODER_A, RobotMap.LEFT_ENCODER_B,
 			false);
+	private static EncoderSensor turretSensor = new EncoderSensor(RobotMap.TURRET_ENCODER_A, RobotMap.TURRET_ENCODER_B,
+			false);
 	private static CounterSensor flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
+	private static DigitalInput turretRightLimit = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
+	private static DigitalInput turretLeftLimit = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
+	/**
+	 * Degrees in each encoder count
+	 */
+	private static final double TURRET_DEGREES_PER_ENCODER = .076;
+	private static final double TURRET_MAX_DEGREES = Turret.getInstance().getMaxDegrees();
 	private static double previousFlywheelCounterRPS = 0;
 
 	public static void read() {
@@ -37,17 +50,14 @@ public class Sensors {
 	}
 
 	public static int getLeftDrive() {
-		// TODO Auto-generated method stub
-		return 0;
+		return leftDrive.getPosition();
 	}
 
 	public static int getRightDrive() {
-		// TODO Auto-generated method stub
-		return 0;
+		return rightDrive.getPosition();
 	}
 
 	public static double getRoll() {
-		// TODO Auto-generated method stub
 		return navX.getRoll();
 	}
 
@@ -65,5 +75,28 @@ public class Sensors {
 		}
 		previousFlywheelCounterRPS = curRPS;
 		return curRPS;
+	}
+
+	public static boolean isTurretLeftLimitHit() {
+		return turretLeftLimit.get();
+	}
+
+	public static boolean isTurretRightLimitHit() {
+		return turretRightLimit.get();
+	}
+
+	public static double getTurretAngle() {
+		if (turretRightLimit.get()) {
+
+		} else if (turretLeftLimit.get()) {
+			turretSensor.reset();
+		}
+		double curTurretEncoders = turretSensor.getPosition();
+		double curTurretDegrees = curTurretEncoders * TURRET_DEGREES_PER_ENCODER;
+		return curTurretDegrees;
+	}
+
+	public static double getTurretAngleVelocity() {
+		return turretSensor.getRate();
 	}
 }
