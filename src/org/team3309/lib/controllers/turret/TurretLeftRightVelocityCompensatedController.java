@@ -33,7 +33,6 @@ public class TurretLeftRightVelocityCompensatedController extends FeedForwardWit
 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
-		OutputSignal toBeReturned = new OutputSignal();
 		double factor = 1;
 		checkForHittingSides();
 		if (isGoingLeft)
