@@ -3,9 +3,9 @@ package org.usfirst.frc.team3309.subsystems;
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 
-public class Intake extends ControlledSubsystem{
+public class FuelIntake extends ControlledSubsystem{
 
-	public Intake(String name) {
+	public FuelIntake(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
