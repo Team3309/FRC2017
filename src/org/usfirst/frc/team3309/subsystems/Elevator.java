@@ -1,13 +1,15 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 
 public class Elevator extends ControlledSubsystem {
 
 	public Elevator(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
+		this.teleopController = new FeedForwardWithPIDController(0, 0, 0, 0, 0);
+		this.autoController = new FeedForwardWithPIDController(0, 0, 0, 0, 0);
 	}
 
 	@Override
@@ -30,25 +32,22 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		// TODO Auto-generated method stub
+		this.teleopController.sendToSmartDash();
 
 	}
 
 	@Override
 	public void manualControl() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void initTeleop() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void initAuto() {
-		// TODO Auto-generated method stub
 
 	}
 
