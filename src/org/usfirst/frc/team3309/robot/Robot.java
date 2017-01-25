@@ -1,7 +1,9 @@
 package org.usfirst.frc.team3309.robot;
 
 import org.usfirst.frc.team3309.auto.AutoRoutine;
+import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
+import org.usfirst.frc.team3309.subsystems.Hopper;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -41,6 +43,8 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Sensors.read();
 		Drive.getInstance().updateTeleop();
+		Hopper.getInstance().updateTeleop();
+		Climber.getInstance().updateTeleop();
 		Actuators.actuate();
 	}
 }

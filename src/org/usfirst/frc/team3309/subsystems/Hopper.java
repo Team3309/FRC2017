@@ -6,7 +6,16 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 
 public class Hopper extends ControlledSubsystem {
 
-	public Hopper(String name) {
+	private static Hopper instance;
+
+	public static Hopper getInstance() {
+		if (instance == null) {
+			instance = new Hopper("Hopper");
+		}
+		return instance;
+	}
+
+	private Hopper(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}

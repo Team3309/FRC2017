@@ -45,7 +45,6 @@ public class Drive extends ControlledSubsystem {
 
 	private Drive(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

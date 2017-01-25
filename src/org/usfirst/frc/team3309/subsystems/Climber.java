@@ -3,11 +3,18 @@ package org.usfirst.frc.team3309.subsystems;
 import org.team3309.lib.KragerSystem;
 import org.usfirst.frc.team3309.driverstation.Controls;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-
 public class Climber extends KragerSystem {
 	
-	public Climber(String name) {
+	private static Climber instance;
+
+	public static Climber getInstance() {
+		if (instance == null) {
+			instance = new Climber("Climber");
+		}
+		return instance;
+	}
+	
+	private Climber(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}

@@ -14,8 +14,7 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
