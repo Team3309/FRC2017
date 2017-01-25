@@ -3,6 +3,7 @@ package org.usfirst.frc.team3309.robot;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
+import org.usfirst.frc.team3309.subsystems.GearIntake;
 import org.usfirst.frc.team3309.subsystems.Hopper;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
@@ -45,6 +46,7 @@ public class Robot extends IterativeRobot {
 		Drive.getInstance().updateTeleop();
 		Hopper.getInstance().updateTeleop();
 		Climber.getInstance().updateTeleop();
+		GearIntake.getInstance().updateTeleop();
 		Actuators.actuate();
 	}
 }

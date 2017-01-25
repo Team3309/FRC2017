@@ -22,8 +22,8 @@ public class Hopper extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		boolean operatorXButton = Controls.operatorController.getXButton();
-		if (operatorXButton) {
+		boolean operatorXButton = Controls.operatorController.getXButton(); // sort
+		if (operatorXButton || Shooter.getInstance().isShouldBeShooting()) {
 			setHopper(1);
 		} else {
 			setHopper(0);

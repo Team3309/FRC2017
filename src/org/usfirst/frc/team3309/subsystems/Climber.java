@@ -4,8 +4,9 @@ import org.team3309.lib.KragerSystem;
 import org.usfirst.frc.team3309.driverstation.Controls;
 
 public class Climber extends KragerSystem {
-	
+
 	private static Climber instance;
+	private final double UP_POWER = .8;
 
 	public static Climber getInstance() {
 		if (instance == null) {
@@ -13,10 +14,9 @@ public class Climber extends KragerSystem {
 		}
 		return instance;
 	}
-	
+
 	private Climber(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class Climber extends KragerSystem {
 		boolean operatorStartButton = Controls.operatorController.getStartButton();
 		boolean operatorBackButton = Controls.operatorController.getBackButton();
 		if (operatorStartButton) {
-			setClimber(1);
+			setClimber(UP_POWER);
 		} else if (operatorBackButton) {
 			setClimber(-1);
 		} else {
@@ -32,11 +32,9 @@ public class Climber extends KragerSystem {
 		}
 	}
 
-	
 	@Override
 	public void updateAuto() {
-		// TODO Auto-generated method stub
-
+		// NO CLIMBING IN AUTO
 	}
 
 	@Override
@@ -47,25 +45,22 @@ public class Climber extends KragerSystem {
 
 	@Override
 	public void initAuto() {
-		// TODO Auto-generated method stub
+		// NO CLIMBING IN AUTO
 
 	}
 
 	@Override
 	public void sendToSmartDash() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void manualControl() {
-		// TODO Auto-generated method stub
+		updateTeleop();
 
 	}
 
 	public void setClimber(double power) {
-	
-	}
-	
-}
 
+	}
+
+}
