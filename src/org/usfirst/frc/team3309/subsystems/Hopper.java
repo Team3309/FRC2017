@@ -2,6 +2,7 @@ package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.usfirst.frc.team3309.driverstation.Controls;
 
 public class Hopper extends ControlledSubsystem {
 
@@ -12,8 +13,12 @@ public class Hopper extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		// TODO Auto-generated method stub
-
+		boolean operatorXButton = Controls.operatorController.getXButton();
+		if (operatorXButton) {
+			setHopper(1);
+		} else {
+			setHopper(0);
+		}
 	}
 
 	@Override
@@ -52,4 +57,7 @@ public class Hopper extends ControlledSubsystem {
 
 	}
 
+	public void setHopper(double power) {
+
+	}
 }
