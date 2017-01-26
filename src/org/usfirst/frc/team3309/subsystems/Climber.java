@@ -46,7 +46,6 @@ public class Climber extends KragerSystem {
 	@Override
 	public void initAuto() {
 		// NO CLIMBING IN AUTO
-
 	}
 
 	@Override
@@ -56,7 +55,6 @@ public class Climber extends KragerSystem {
 	@Override
 	public void manualControl() {
 		updateTeleop();
-
 	}
 
 	public void setClimber(double power) {
