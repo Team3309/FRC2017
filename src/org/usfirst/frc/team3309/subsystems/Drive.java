@@ -75,7 +75,6 @@ public class Drive extends ControlledSubsystem {
 	@Override
 	public void updateAuto() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

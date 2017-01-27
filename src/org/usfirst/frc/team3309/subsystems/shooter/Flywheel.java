@@ -8,6 +8,7 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
+import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -20,6 +21,7 @@ public class Flywheel extends ControlledSubsystem {
 	private double aimVelRPS = 0.0;
 	private double aimAccRPS = 0.0;
 	private double curVel = 0;
+	private double lastVisionRPS = 0;
 
 	/**
 	 * Shooter for singleton pattern
@@ -29,7 +31,7 @@ public class Flywheel extends ControlledSubsystem {
 	private Flywheel(String name) {
 		super(name);
 		this.teleopController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
-		this.autoController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00); // .018
+		this.autoController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
 
 		this.teleopController.setName("Flywheel");
 		this.rightSpark.setReversed(true);
@@ -71,29 +73,20 @@ public class Flywheel extends ControlledSubsystem {
 		shootLikeRobie();
 	}
 
-	// In front of batter 140 rps 26 degrees
 	@Override
 	public void updateTeleop() {
 		curVel = this.getRPS();
 		// Find our base aim vel
-		if (Controls.operatorController.getAButton()) {
-			aimVelRPS = 150;
-		} else if (Controls.operatorController.getBButton()) {
-			aimVelRPS = 120;
-		} else if (Controls.operatorController.getXButton()) {
-			aimVelRPS = 120;
-		} else if (Controls.driverController.getYButton()) {
-			aimVelRPS = SmartDashboard.getNumber("TEST RPS", -1);
-		} else if (Controls.operatorController.getStartButton()) {
-			// TODO Vision Implementation
+		if (VisionServer.getInstance().hasTargetsToAimAt()) {
+			aimVelRPS = VisionServer.getInstance().getRPS();
+			lastVisionRPS = aimVelRPS;
 		} else if (Controls.operatorController.getPOV() == 0) {
+			aimVelRPS = lastVisionRPS;
 		} else {
-			// TODO VISION AUTOMATIC MODE
-			aimVelRPS = 0; // change to reflect current vision values
+			aimVelRPS = 0;
 			aimAccRPS = 0;
 		}
 		shootLikeRobie();
-
 	}
 
 	/**
@@ -215,11 +208,6 @@ public class Flywheel extends ControlledSubsystem {
 
 	private void setShooter(double power) {
 		leftSpark.setDesiredOutput(power);
-		if (power < 0) {
-			power = power + .04;
-		} else if (power > 0) {
-			power = power - .04;
-		}
 		rightSpark.setDesiredOutput(power);
 	}
 
