@@ -74,13 +74,33 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		// TODO Auto-generated method stub
+		OutputSignal output = autoController.getOutputSignal(getInputState());
+		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
-	@Override
 	public InputState getInputState() {
-		// TODO Auto-generated method stub
-		return null;
+		InputState input = new InputState();
+		input.setAngularPos(Sensors.getAngle());
+		input.setAngularVel(Sensors.getAngularVel());
+		// Check and send off leftSide
+		try {
+			input.setLeftPos(Sensors.getLeftDrive());
+			input.setLeftVel(Sensors.getLeftDriveVel());
+		} catch (Exception e) {
+			// Way to show that the value is bad
+			input.setLeftPos(Double.MIN_VALUE);
+			input.setLeftVel(Double.MIN_VALUE);
+		}
+		// Check and send off rightSide
+		try {
+			input.setRightVel(Sensors.getRightDriveVel());
+			input.setRightPos(Sensors.getRightDrive());
+		} catch (Exception e) {
+			// Way to show that the value is bad
+			input.setRightVel(Double.MIN_VALUE);
+			input.setRightPos(Double.MIN_VALUE);
+		}
+		return input;
 	}
 
 	@Override

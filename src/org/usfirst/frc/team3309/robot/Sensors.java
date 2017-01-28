@@ -27,13 +27,12 @@ public class Sensors {
 	private static EncoderSensor turretSensor = new EncoderSensor(RobotMap.TURRET_ENCODER_A, RobotMap.TURRET_ENCODER_B,
 			false);
 	private static CounterSensor flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
-	private static DigitalInput turretRightLimit = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
-	private static DigitalInput turretLeftLimit = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
+	private static DigitalInput turretRightHallEffect = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
+	private static DigitalInput turretLeftHallEffect = new DigitalInput(RobotMap.TURRET_LEFT_LIMIT);
 	/**
 	 * Degrees in each encoder count
 	 */
 	private static final double TURRET_DEGREES_PER_ENCODER = .076;
-	private static final double TURRET_MAX_DEGREES = Turret.getInstance().getMaxDegrees();
 	private static double previousFlywheelCounterRPS = 0;
 
 	public static void read() {
@@ -78,17 +77,17 @@ public class Sensors {
 	}
 
 	public static boolean isTurretLeftLimitHit() {
-		return turretLeftLimit.get();
+		return turretLeftHallEffect.get();
 	}
 
 	public static boolean isTurretRightLimitHit() {
-		return turretRightLimit.get();
+		return turretRightHallEffect.get();
 	}
 
 	public static double getTurretAngle() {
-		if (turretRightLimit.get()) {
+		if (turretRightHallEffect.get()) {
 
-		} else if (turretLeftLimit.get()) {
+		} else if (turretLeftHallEffect.get()) {
 			turretSensor.reset();
 		}
 		double curTurretEncoders = turretSensor.getPosition();
@@ -98,5 +97,17 @@ public class Sensors {
 
 	public static double getTurretAngleVelocity() {
 		return turretSensor.getRate();
+	}
+
+	public static double getAngularVel() {
+		return navX.getAngularVel();
+	}
+
+	public static double getLeftDriveVel() {
+		return leftDrive.getRate();
+	}
+
+	public static double getRightDriveVel() {
+		return rightDrive.getRate();
 	}
 }

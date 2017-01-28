@@ -26,4 +26,5 @@ public class RobotMap {
 	public static final int HOOD_ID = 0;
 
 	public static final int ELEVATOR_ID = 0;
+	public static final int TURRET_LEFT_LIMIT = 0;
 }

@@ -2,11 +2,11 @@ package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.usfirst.frc.team3309.vision.VisionServer;
 
 public class Turret extends ControlledSubsystem {
 
 	private static Turret instance;
-	private static final double TURRET_MAX_DEGREES = 270;
 
 	public static Turret getInstance() {
 		if (instance == null)
@@ -33,7 +33,12 @@ public class Turret extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
+		// if you see the goal, aim at it
+		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 
+		} else {
+			searchForGoal();
+		}
 	}
 
 	@Override
@@ -69,10 +74,6 @@ public class Turret extends ControlledSubsystem {
 
 	private void setTurnCounterClockwise(double power) {
 		setTurnClockwise(-power);
-	}
-
-	public double getMaxDegrees() {
-		return TURRET_MAX_DEGREES;
 	}
 
 }
