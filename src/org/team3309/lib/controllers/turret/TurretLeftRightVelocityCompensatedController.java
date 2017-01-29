@@ -10,7 +10,7 @@ public class TurretLeftRightVelocityCompensatedController extends FeedForwardWit
 
 	private boolean isGoingLeft = false;
 	private final double DEGREES_TO_SLOW_DOWN = 25;
-	private static final double TURRET_MAX_DEGREES = Turret.getInstance().getMaxDegrees();
+	private static final double TURRET_MAX_DEGREES = 0;
 	private static final double SLOW_VEL = .2;
 	private static final double FAST_VEL = .35;
 
