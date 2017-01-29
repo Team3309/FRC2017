@@ -2,11 +2,12 @@ package org.usfirst.frc.team3309.subsystems.shooter;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
@@ -15,6 +16,7 @@ public class Turret extends ControlledSubsystem {
 	private static Turret instance;
 	private double currentAngle = getAngle();
 	private double pastAngle = getAngle();
+	private double goalAngle = getAngle();
 	// angle and loops since it last of spotted
 	HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
 
@@ -31,6 +33,7 @@ public class Turret extends ControlledSubsystem {
 		for (int angle = 0; angle <= 360; angle++) {
 			hash.put(angle, 0);
 		}
+		this.teleopController = new FeedForwardWithPIDController(.001, .011, .01, .01, .01);
 	}
 
 	@Override
@@ -55,6 +58,10 @@ public class Turret extends ControlledSubsystem {
 		} else {
 			searchForGoal();
 		}
+		// add 1 loop to all angles
+		for (int angle = 0; angle <= 360; angle++) {
+			hash.replace(angle, hash.get(angle) + 1);
+		}
 	}
 
 	private void updateValuesSeen() {
@@ -66,7 +73,6 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	private void moveTowardsGoal() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -84,6 +90,12 @@ public class Turret extends ControlledSubsystem {
 			}
 			it.remove();
 		}
+		goalAngle = angleToAimTowards;
+		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
+
+	}
+
+	public void searchForGoalOpenLoop() {
 
 	}
 
@@ -95,8 +107,9 @@ public class Turret extends ControlledSubsystem {
 
 	@Override
 	public InputState getInputState() {
-		// TODO Auto-generated method stub
-		return null;
+		InputState s = new InputState();
+		s.setError(goalAngle - getAngle());
+		return s;
 	}
 
 	@Override
