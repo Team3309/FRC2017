@@ -98,7 +98,7 @@ public class Hood extends ControlledSubsystem {
 		return hoodTalon.getTalon().getPosition();
 	}
 
-	public void setHood(double power) {
+	private void setHood(double power) {
 
 	}
 }

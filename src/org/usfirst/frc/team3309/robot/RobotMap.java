@@ -12,7 +12,6 @@ public class RobotMap {
 	public static final int RIGHT_SHOOTER_MOTOR = 9;
 	public static final int RIGHT_DRIVE = 1;
 	public static final int SHIFTER = 0;
-	public static final int GEAR_INTAKE_SOLENOID = 0;
 
 	public static final int LEFT_ENCODER_A = 0;
 	public static final int RIGHT_ENCODER_A = 2;
@@ -27,4 +26,6 @@ public class RobotMap {
 
 	public static final int ELEVATOR_ID = 0;
 	public static final int TURRET_LEFT_LIMIT = 0;
+	public static final int GEAR_INTAKE_PIVOT_SOLENOID = 0;
+	public static final int GEAR_INTAKE_WRIST_SOLENOID = 0;
 }

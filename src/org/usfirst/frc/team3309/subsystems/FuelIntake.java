@@ -36,8 +36,7 @@ public class FuelIntake extends KragerSystem {
 
 	@Override
 	public void updateAuto() {
-		// TODO Auto-generated method stub
-
+		// use the setFuelIntake method to set
 	}
 
 	@Override

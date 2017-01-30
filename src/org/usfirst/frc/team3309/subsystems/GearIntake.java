@@ -12,7 +12,8 @@ public class GearIntake extends KragerSystem {
 	private static final double MIN_VALUE_TO_MOVE = .15;
 	private static GearIntake instance;
 	private boolean hasChangedForThisPress = false;
-	private Solenoid gearIntakePivot = new Solenoid(RobotMap.GEAR_INTAKE_SOLENOID);
+	private Solenoid gearIntakePivot = new Solenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID);
+	private Solenoid gearIntakeWrist = new Solenoid(RobotMap.GEAR_INTAKE_WRIST_SOLENOID);
 
 	public static GearIntake getInstance() {
 		if (instance == null) {
@@ -31,7 +32,7 @@ public class GearIntake extends KragerSystem {
 		boolean operatorLB = Controls.operatorController.getBumper(Hand.kLeft);
 		if ((driverStart || operatorLB) && !hasChangedForThisPress) {
 			hasChangedForThisPress = true;
-			toggleGearIntake();
+			togglePivot();
 		} else if ((driverStart || operatorLB)) {
 
 		} else {
@@ -42,9 +43,9 @@ public class GearIntake extends KragerSystem {
 		double operatorLeftTrigger = Controls.operatorController.getTriggerAxis(Hand.kLeft);
 		double driverRightTrigger = Controls.driverController.getTriggerAxis(Hand.kRight);
 		double driverLeftTrigger = Controls.driverController.getTriggerAxis(Hand.kLeft);
-		if (driverRightTrigger > MIN_VALUE_TO_MOVE && this.isExtended()) {
+		if (driverRightTrigger > MIN_VALUE_TO_MOVE && this.isPivotExtended()) {
 			setGearIntakeRoller(driverRightTrigger);
-		} else if (driverLeftTrigger > MIN_VALUE_TO_MOVE && this.isExtended()) {
+		} else if (driverLeftTrigger > MIN_VALUE_TO_MOVE && this.isPivotExtended()) {
 			setGearIntakeRoller(-driverLeftTrigger);
 		} else if (operatorRightTrigger > MIN_VALUE_TO_MOVE) {
 			setGearIntakeRoller(operatorRightTrigger);
@@ -83,15 +84,15 @@ public class GearIntake extends KragerSystem {
 		updateTeleop();
 	}
 
-	public void retractGearIntake() {
+	public void retractPivot() {
 		gearIntakePivot.set(false);
 	}
 
-	public void extendGearIntake() {
+	public void extendPivot() {
 		gearIntakePivot.set(true);
 	}
 
-	public void toggleGearIntake() {
+	public void togglePivot() {
 		gearIntakePivot.set(!gearIntakePivot.get());
 	}
 
@@ -99,11 +100,11 @@ public class GearIntake extends KragerSystem {
 
 	}
 
-	public boolean isRetracted() {
+	public boolean isPivotRetracted() {
 		return !gearIntakePivot.get(); // false = retracted, so flip the output
 	}
 
-	public boolean isExtended() {
+	public boolean isPivotExtended() {
 		return gearIntakePivot.get(); // true = extended
 	}
 

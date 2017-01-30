@@ -64,6 +64,9 @@ public class Turret extends ControlledSubsystem {
 		}
 	}
 
+	/**
+	 * all the values seen in the last loop are set back to 0
+	 */
 	private void updateValuesSeen() {
 		int error = (int) (currentAngle - pastAngle);
 		int factor = (error > 0) ? 1 : -1;
@@ -77,15 +80,18 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	public void searchForGoal() {
-		int largestTimeGap = Integer.MIN_VALUE;
+		double largestHeuristic = Double.MIN_VALUE;
 		int angleToAimTowards = Integer.MIN_VALUE;
 		// find the angle that needs most surveying
 		Iterator<Entry<Integer, Integer>> it = hash.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<Integer, Integer> pair = it.next();
-			if ((Integer) pair.getValue() > largestTimeGap) {
-				// TODO may cause error due to Integer to int casting
-				largestTimeGap = (int) pair.getValue();
+			// current - possibleGoal
+			double degreesAway = Math.abs(getAngle() - pair.getKey());
+			// TODO may cause error due to Integer to int casting
+			double heuristic = largestHeuristic * .95 + (1 - (degreesAway * .5));
+			if (heuristic > largestHeuristic) {
+				largestHeuristic = (int) pair.getValue();
 				angleToAimTowards = (int) pair.getKey();
 			}
 			it.remove();

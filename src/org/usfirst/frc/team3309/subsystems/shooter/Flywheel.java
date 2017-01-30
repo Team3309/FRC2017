@@ -32,7 +32,6 @@ public class Flywheel extends ControlledSubsystem {
 		super(name);
 		this.teleopController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
 		this.autoController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
-
 		this.teleopController.setName("Flywheel");
 		this.rightSpark.setReversed(true);
 		this.autoController.setName("Flywheel");
@@ -70,7 +69,7 @@ public class Flywheel extends ControlledSubsystem {
 	@Override
 	public void updateAuto() {
 		curVel = this.getRPS();
-		shootLikeRobie();
+		updateTeleop(); // uses same vision
 	}
 
 	@Override

@@ -17,7 +17,6 @@ public class Hopper extends ControlledSubsystem {
 
 	private Hopper(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -32,7 +31,7 @@ public class Hopper extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		// TODO Auto-generated method stub
+		// Use setHopper
 
 	}
 
