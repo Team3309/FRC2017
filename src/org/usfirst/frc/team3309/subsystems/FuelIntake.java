@@ -1,12 +1,12 @@
 package org.usfirst.frc.team3309.subsystems;
 
-import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.KragerSystem;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
-public class FuelIntake extends ControlledSubsystem {
+public class FuelIntake extends KragerSystem {
 
 	private double MIN_VALUE_TO_MOVE = .15;
 
@@ -38,12 +38,6 @@ public class FuelIntake extends ControlledSubsystem {
 	public void updateAuto() {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public InputState getInputState() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
