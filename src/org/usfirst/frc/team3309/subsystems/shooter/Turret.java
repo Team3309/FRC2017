@@ -70,13 +70,15 @@ public class Turret extends ControlledSubsystem {
 	private void updateValuesSeen() {
 		int error = (int) (currentAngle - pastAngle);
 		int factor = (error > 0) ? 1 : -1;
-		for (int angle = (int) pastAngle; angle * factor < currentAngle * factor; angle++) {
-			hash.replace(angle, 0);
+		// 30's are for field of vision
+		for (int angle = (int) pastAngle - 30; angle * factor < currentAngle * factor + 30; angle++) {
+			if (angle >= 0)
+				hash.replace(angle, 0);
 		}
 	}
 
 	private void moveTowardsGoal() {
-
+		
 	}
 
 	public void searchForGoal() {
@@ -98,7 +100,7 @@ public class Turret extends ControlledSubsystem {
 		}
 		goalAngle = angleToAimTowards;
 		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
-
+		setTurnClockwise(signal.getMotor());
 	}
 
 	public void searchForGoalOpenLoop() {
