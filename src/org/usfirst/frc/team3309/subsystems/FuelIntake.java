@@ -1,16 +1,25 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
-import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.usfirst.frc.team3309.driverstation.Controls;
+import org.usfirst.frc.team3309.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 public class FuelIntake extends KragerSystem {
 
 	private double MIN_VALUE_TO_MOVE = .15;
+	public static FuelIntake instance;
+	private TalonSRXMC fuel = new TalonSRXMC(RobotMap.FUEL_INTAKE_ID);
 
-	public FuelIntake(String name) {
+	public static FuelIntake getInstance() {
+		if (instance == null)
+			instance = new FuelIntake("FuelIntake");
+		return instance;
+	}
+
+	private FuelIntake(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
@@ -64,7 +73,7 @@ public class FuelIntake extends KragerSystem {
 	}
 
 	public void setFuelIntake(double power) {
-		
+
 	}
 
 }

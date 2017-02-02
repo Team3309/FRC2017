@@ -14,8 +14,15 @@ public class Elevator extends ControlledSubsystem {
 	private final double SHOOTING_VELOCITY = 10;
 	private double aimVel = 0;
 	private TalonSRXMC elevator = new TalonSRXMC(RobotMap.ELEVATOR_ID);
+	private static Elevator instance;
 
-	public Elevator(String name) {
+	public static Elevator getInstance() {
+		if (instance == null)
+			instance = new Elevator("Elevator");
+		return instance;
+	}
+
+	private Elevator(String name) {
 		super(name);
 		this.teleopController = new FeedForwardWithPIDController(0, 0, 0, 0, 0);
 		this.autoController = new FeedForwardWithPIDController(0, 0, 0, 0, 0);
@@ -33,7 +40,6 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-
 		boolean operatorXButton = Controls.operatorController.getXButton(); // sort
 		if (operatorXButton) {
 			aimVel = STAGING_VELOCITY;
@@ -71,8 +77,7 @@ public class Elevator extends ControlledSubsystem {
 	}
 
 	private void setElevator(double power) {
-		// TODO Auto-generated method stub
-
+		this.elevator.setDesiredOutput(power);
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
@@ -14,6 +15,7 @@ public class GearIntake extends KragerSystem {
 	private boolean hasChangedForThisPress = false;
 	private Solenoid gearIntakePivot = new Solenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID);
 	private Solenoid gearIntakeWrist = new Solenoid(RobotMap.GEAR_INTAKE_WRIST_SOLENOID);
+	private TalonSRXMC gearIntake = new TalonSRXMC(RobotMap.GEAR_INTAKE_ID)
 
 	public static GearIntake getInstance() {
 		if (instance == null) {
