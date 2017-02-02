@@ -20,15 +20,26 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Sensors {
 
 	private static List<Sensor> sensors = new LinkedList<Sensor>();
-	private static NavX navX = new NavX();
-	private static EncoderSensor leftDrive = new EncoderSensor(RobotMap.LEFT_ENCODER_A, RobotMap.LEFT_ENCODER_B, true);
-	private static EncoderSensor rightDrive = new EncoderSensor(RobotMap.RIGHT_ENCODER_A, RobotMap.LEFT_ENCODER_B,
-			false);
-	private static EncoderSensor turretSensor = new EncoderSensor(RobotMap.TURRET_ENCODER_A, RobotMap.TURRET_ENCODER_B,
-			false);
-	private static CounterSensor flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
-	private static DigitalInput turretRightHallEffect = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
-	private static DigitalInput turretLeftHallEffect = new DigitalInput(RobotMap.TURRET_LEFT_LIMIT);
+	private static NavX navX;
+	private static EncoderSensor leftDrive;
+	private static EncoderSensor rightDrive;
+	private static EncoderSensor turretSensor;
+	private static CounterSensor flywheelCounter;
+	private static DigitalInput turretRightHallEffect;
+	private static DigitalInput turretLeftHallEffect;
+
+	static {
+		System.out.println("INIT STATIC");
+		navX = new NavX();
+		System.out.println("NAVX");
+		leftDrive = new EncoderSensor(RobotMap.LEFT_ENCODER_A, RobotMap.LEFT_ENCODER_B, true);
+		rightDrive = new EncoderSensor(RobotMap.RIGHT_ENCODER_A, RobotMap.RIGHT_ENCODER_B, false);
+		turretSensor = new EncoderSensor(RobotMap.TURRET_ENCODER_A, RobotMap.TURRET_ENCODER_B, false);
+		System.out.println("Turret");
+		flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
+		turretRightHallEffect = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
+		turretLeftHallEffect = new DigitalInput(RobotMap.TURRET_LEFT_LIMIT);
+	}
 	/**
 	 * Degrees in each encoder count
 	 */
@@ -36,8 +47,13 @@ public class Sensors {
 	private static double previousFlywheelCounterRPS = 0;
 
 	public static void read() {
-		for (Sensor x : sensors)
-			x.read();
+		try {
+			for (Sensor x : sensors) {
+				x.read();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void addSensor(Sensor act) {

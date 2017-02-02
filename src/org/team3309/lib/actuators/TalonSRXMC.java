@@ -7,8 +7,8 @@ public class TalonSRXMC extends Actuator {
 	private CANTalon talon;
 	private boolean isReversed = false;
 	private double desiredOutput = 0.0;
-	private double lastPosition = talon.getPosition();
-	private double lastVelocity = talon.getSpeed();
+	private double lastPosition = 0;
+	private double lastVelocity = 0;
 
 	public TalonSRXMC(int port) {
 		talon = new CANTalon(port);

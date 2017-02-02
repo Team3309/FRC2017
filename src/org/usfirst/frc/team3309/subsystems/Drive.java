@@ -1,7 +1,7 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
-import org.team3309.lib.actuators.SparkMC;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
 import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
@@ -28,9 +28,12 @@ public class Drive extends ControlledSubsystem {
 	 */
 	private static final double DRIVE_GYRO_LENIENCY = .5;
 	private static Drive drive;
-	private SparkMC right = new SparkMC(RobotMap.RIGHT_DRIVE);
-	private SparkMC left = new SparkMC(RobotMap.LEFT_DRIVE);
-	private Solenoid sol = new Solenoid(RobotMap.SHIFTER);
+	private TalonSRXMC right0 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_0_ID);
+	private TalonSRXMC right1 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_1_ID);
+	private TalonSRXMC right2 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_2_ID);
+	private TalonSRXMC left0 = new TalonSRXMC(RobotMap.DRIVE_LEFT_0_ID);
+	private TalonSRXMC left1 = new TalonSRXMC(RobotMap.DRIVE_LEFT_1_ID);
+	private TalonSRXMC left2 = new TalonSRXMC(RobotMap.DRIVE_LEFT_2_ID);
 
 	private boolean isLowGear = true;
 	public boolean lowGearInAuto = false;
@@ -63,10 +66,10 @@ public class Drive extends ControlledSubsystem {
 
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
 			isLowGear = true;
-			sol.set(false);
+
 		} else {
 			isLowGear = false;
-			sol.set(true);
+			// sol.set(true);
 		}
 		OutputSignal output = teleopController.getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
@@ -166,7 +169,10 @@ public class Drive extends ControlledSubsystem {
 	 *            rightMotorSpeed
 	 */
 	public void setRight(double right) {
-		this.right.setDesiredOutput(-right);
+		this.right0.setDesiredOutput(right);
+		this.right1.setDesiredOutput(right);
+		this.right2.setDesiredOutput(right);
+
 	}
 
 	/**
@@ -176,7 +182,9 @@ public class Drive extends ControlledSubsystem {
 	 *            leftMotorSpeed
 	 */
 	public void setLeft(double left) {
-		this.left.setDesiredOutput(left);
+		this.left0.setDesiredOutput(left);
+		this.left1.setDesiredOutput(left);
+		this.left2.setDesiredOutput(left);
 	}
 
 	/**

@@ -9,6 +9,7 @@ public class EncoderSensor extends Sensor {
 	private int lastPosition = 0;
 
 	public EncoderSensor(int a, int b, boolean bool) {
+		System.out.println("FSDAFDSAF");
 		encoder = new Encoder(a, b, bool);
 	}
 
