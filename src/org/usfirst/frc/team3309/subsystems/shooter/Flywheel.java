@@ -1,8 +1,7 @@
 package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
-import org.team3309.lib.KragerTimer;
-import org.team3309.lib.actuators.SparkMC;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
@@ -14,8 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel extends ControlledSubsystem {
 
-	private SparkMC leftSpark = new SparkMC(RobotMap.LEFT_SHOOTER_MOTOR);
-	private SparkMC rightSpark = new SparkMC(RobotMap.RIGHT_SHOOTER_MOTOR);
+	private TalonSRXMC leftSpark = new TalonSRXMC(RobotMap.LEFT_SHOOTER_ID);
+	private TalonSRXMC rightSpark = new TalonSRXMC(RobotMap.RIGHT_SHOOTER_ID);
 
 	private double maxAccRPS = 31.0;
 	private double aimVelRPS = 0.0;

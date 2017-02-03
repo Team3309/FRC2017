@@ -18,7 +18,6 @@ public class Hood extends ControlledSubsystem {
 	private static final double MAX_ANGLE = 0;
 	private double goalAngle = 0;
 	private double lastVisionAngle = 0;
-	private static TalonSRXMC hoodTalon = new TalonSRXMC(RobotMap.HOOD_ID);
 
 	private Hood(String name) {
 		super(name);
@@ -95,7 +94,8 @@ public class Hood extends ControlledSubsystem {
 	}
 
 	public double getAngle() {
-		return hoodTalon.getTalon().getPosition();
+		// TODO get Angle
+		return 0;
 	}
 
 	private void setHood(double power) {

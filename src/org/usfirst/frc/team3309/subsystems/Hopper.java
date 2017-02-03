@@ -1,12 +1,15 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
+import org.usfirst.frc.team3309.robot.RobotMap;
 
 public class Hopper extends ControlledSubsystem {
 
 	private static Hopper instance;
+	private TalonSRXMC hopper = new TalonSRXMC(RobotMap.HOPPER_ID);
 
 	public static Hopper getInstance() {
 		if (instance == null) {
@@ -66,6 +69,6 @@ public class Hopper extends ControlledSubsystem {
 	}
 
 	public void setHopper(double power) {
-
+		hopper.setDesiredOutput(power);
 	}
 }

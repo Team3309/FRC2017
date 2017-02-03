@@ -22,6 +22,7 @@ public class VisionServer implements Runnable {
 	private TargetInfo currentTargetToAimTowards = new TargetInfo(0, 0);
 	private Shot currentShotToAimTowards = new Shot();
 	private static VisionServer instance;
+	public static double FIELD_OF_VIEW_DEGREES = 60;
 
 	private static Shot[] shots = { new Shot(120, 24.85, .59), new Shot(120, 27.85, .346), new Shot(120, 30.85, .227),
 			new Shot(120, 31.95, .09), new Shot(120, 32.95, -.037), new Shot(120, 34.05, -.148),

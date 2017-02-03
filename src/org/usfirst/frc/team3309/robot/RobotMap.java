@@ -13,6 +13,11 @@ public class RobotMap {
 	public static final int DRIVE_LEFT_2_ID = 4;
 	public static final int CLIMBER_ID = 5;
 	public static final int FUEL_INTAKE_ID = 8;
+	public static final int GEAR_INTAKE_ID = 9;
+	public static final int HOPPER_ID = 10;
+	public static final int LEFT_SHOOTER_ID = 0;
+	public static final int RIGHT_SHOOTER_ID = 0;
+	public static final int TURRET_ID = 0;
 
 	public static final int RIGHT_CONTROLLER = 1;
 
@@ -38,6 +43,5 @@ public class RobotMap {
 	public static final int GEAR_INTAKE_PIVOT_SOLENOID = 0;
 	public static final int GEAR_INTAKE_WRIST_SOLENOID = 1;
 	public static final int SHIFTER = 2;
-	public static final int GEAR_INTAKE_ID = 0;
 
 }
