@@ -5,14 +5,19 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.KragerTimer;
 import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
+import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Turret extends ControlledSubsystem {
 
@@ -68,7 +73,7 @@ public class Turret extends ControlledSubsystem {
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 			moveTowardsGoal();
 		} else {
-			searchForGoal();
+			searchForGoalVelControlledSurvey(); // searchForGoal();
 		}
 		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
 		setTurnClockwise(signal.getMotor());
@@ -76,6 +81,8 @@ public class Turret extends ControlledSubsystem {
 		for (int angle = 0; angle <= 360; angle++) {
 			hash.replace(angle, hash.get(angle) + 1);
 		}
+		loopsSinceLastReset++;
+		sumOfOmegaSinceLastReset += Sensors.getAngularVel();
 	}
 
 	/**
@@ -92,9 +99,14 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	private void moveTowardsGoal() {
+		if (!(this.teleopController instanceof PIDPositionController)) {
+			this.teleopController = new PIDPositionController(0.001, 000, 0000);
+		}
 		TargetInfo goal = VisionServer.getInstance().getTargets().get(0);
 		double goalX = goal.getX();
 		double degToTurn = (goalX / 2) * VisionServer.FIELD_OF_VIEW_DEGREES;
+		// TODO make this line more accurate to camera frame
+		sumOfOmegaSinceLastReset / loopsSinceLastReset;
 		goalAngle = this.getAngle() + degToTurn;
 	}
 
@@ -128,6 +140,9 @@ public class Turret extends ControlledSubsystem {
 	private boolean isFirstTimeAccelerating = true;
 
 	public void searchForGoalVelControlledSurvey() {
+		if (!(this.teleopController instanceof FeedForwardWithPIDController)) {
+			this.teleopController = new FeedForwardWithPIDController(.001, .011, .01, .01, .01);
+		}
 		int direction = shouldBeTurningClockwise ? -1 : 1;
 		switch (this.currentState) {
 		case ACCELERATING:
@@ -145,11 +160,21 @@ public class Turret extends ControlledSubsystem {
 			}
 		case DECELERATION:
 			if (Math.abs(currentVelocity) > 5) {
-				goalVel = currentVelocity - MAX_ACC;
+				goalVel = direction * (Math.abs(currentVelocity) - MAX_ACC);
+			}
+			if (Math.abs(currentVelocity) < 3 || this.currentAngle > this.LEFT_LIMIT
+					|| this.currentAngle < this.RIGHT_LIMIT) {
+				goalVel = 0;
+				this.currentState = TurretState.STOPPED;
 			}
 		case CONSTANT:
 			goalVel = MAX_VEL;
+			if (this.getAngle() > degreesToStartSlowing && !shouldBeTurningClockwise
+					|| this.getAngle() < degreesToStartSlowing && shouldBeTurningClockwise) {
+				this.currentState = TurretState.DECELERATION;
+			}
 		case STOPPED:
+			isFirstTimeAccelerating = false;
 			// if stopped,find which way to turn and do so
 			if (this.currentAngle < 180) {
 				shouldBeTurningClockwise = false;
@@ -160,47 +185,47 @@ public class Turret extends ControlledSubsystem {
 		default:
 
 		}
-		int direction = 0;
-		if (shouldBeTurningClockwise) {
-			if (currentVelocity < MAX_VEL - 10) {
-
-			}
-		} else {
-
-		}
-
-	}
-
-	public void searchForGoalOpenLoop() {
-
+		((FeedForwardWithPIDController) this.teleopController).setAimVel(goalVel);
 	}
 
 	@Override
 	public void updateAuto() {
-		// TODO Auto-generated method stub
-
+		updateTeleop();
 	}
 
 	@Override
 	public InputState getInputState() {
 		InputState s = new InputState();
-		s.setError(goalAngle - getAngle());
+		if (this.teleopController instanceof FeedForwardWithPIDController
+				|| this.autoController instanceof FeedForwardWithPIDController)
+			s.setError(goalVel - getVelocity());
+		else
+			s.setError(goalAngle - getAngle());
 		return s;
 	}
 
 	@Override
 	public void sendToSmartDash() {
-
+		this.teleopController.sendToSmartDash();
+		SmartDashboard.putNumber("Angle", getAngle());
+		SmartDashboard.putNumber("Velocity", getVelocity());
+		SmartDashboard.putNumber("Goal Angle", this.goalAngle);
+		SmartDashboard.putNumber("Goal Vel", this.goalVel);
+		SmartDashboard.putNumber("power", this.turretMC.getDesiredOutput());
+		SmartDashboard.putString("STAte", this.currentState.name());
 	}
 
 	@Override
 	public void manualControl() {
-		// TODO Auto-generated method stub
+		if (Controls.driverController.getAButton())
+			setTurnClockwise(.5);
+		else
+			setTurnClockwise(0);
 
 	}
 
 	private void setTurnClockwise(double power) {
-		// TODO MOTOR SETUP
+		turretMC.setDesiredOutput(power);
 	}
 
 	private void setTurnCounterClockwise(double power) {
@@ -208,12 +233,23 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	public double getAngleRelativeToField() {
-		// TODO make this
-		return Sensors.getAngle();
+		return this.getAngle() + Sensors.getAngle();
 	}
 
 	public double getAngle() {
 		return turretMC.getPosition();
+	}
+
+	private KragerTimer timerSinceLastVisionGoalSeen = new KragerTimer(1000);
+	private int loopsSinceLastReset = 0;
+	private double sumOfOmegaSinceLastReset = 0;
+
+	public void resetAngVelocityCounts() {
+		timerSinceLastVisionGoalSeen.stop();
+		timerSinceLastVisionGoalSeen.reset();
+		timerSinceLastVisionGoalSeen.start();
+		loopsSinceLastReset = 0;
+		sumOfOmegaSinceLastReset = 0;
 	}
 
 }

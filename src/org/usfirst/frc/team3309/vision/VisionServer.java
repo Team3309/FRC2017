@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 
 public class VisionServer implements Runnable {
 
@@ -63,6 +64,7 @@ public class VisionServer implements Runnable {
 				targetInfos.add(new TargetInfo(y, z));
 			}
 			targets = targetInfos;
+			Turret.getInstance().resetAngVelocityCounts();
 		} catch (ClassCastException e) {
 			System.err.println("Data type error: " + e);
 			System.err.println(updateString);
