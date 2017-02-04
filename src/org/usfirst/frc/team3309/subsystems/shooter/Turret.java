@@ -118,8 +118,8 @@ public class Turret extends ControlledSubsystem {
 		goalAngle = angleToAimTowards;
 	}
 
-	private final double LEFT_LIMIT = 30;
-	private final double RIGHT_LIMIT = 330;
+	private final double LEFT_LIMIT = 330;
+	private final double RIGHT_LIMIT = 30;
 	private boolean shouldBeTurningClockwise = false;
 	private final double MAX_ACC = 180; // 180 deg/s*s
 	private final double MAX_VEL = 180; // 180 deg/s*s
@@ -128,6 +128,7 @@ public class Turret extends ControlledSubsystem {
 	private boolean isFirstTimeAccelerating = true;
 
 	public void searchForGoalVelControlledSurvey() {
+		int direction = shouldBeTurningClockwise ? -1 : 1;
 		switch (this.currentState) {
 		case ACCELERATING:
 			if (isFirstTimeAccelerating) {
@@ -135,11 +136,12 @@ public class Turret extends ControlledSubsystem {
 				isFirstTimeAccelerating = false;
 			}
 			if (Math.abs(currentVelocity) < MAX_VEL - 5) {
-				goalVel = currentVelocity + MAX_ACC;
+				goalVel = direction * (Math.abs(currentVelocity) + MAX_ACC);
 			} else {
 				this.currentState = TurretState.CONSTANT;
 				double degreesCrossedDuringAcceleration = this.getAngle() - degreesWhichAccelerationStarted;
-				degreesToStartSlowing = degreesCrossedDuringAcceleration;
+				degreesToStartSlowing = (shouldBeTurningClockwise ? RIGHT_LIMIT : LEFT_LIMIT)
+						- degreesCrossedDuringAcceleration;
 			}
 		case DECELERATION:
 			if (Math.abs(currentVelocity) > 5) {
