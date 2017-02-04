@@ -18,6 +18,7 @@ import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Turret extends ControlledSubsystem {
@@ -45,6 +46,7 @@ public class Turret extends ControlledSubsystem {
 
 	private Turret(String name) {
 		super(name);
+		this.teleopController.setName("Turret");
 		// Place the angles and time loops since lastseen into the hashmap
 		// 0 - 360 degrees
 		for (int angle = 0; angle <= 360; angle++) {
@@ -71,11 +73,13 @@ public class Turret extends ControlledSubsystem {
 		currentVelocity = getVelocity();
 		updateValuesSeen();
 		// if you see the goal, aim at it
+
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 			moveTowardsGoal();
 		} else {
-			searchForGoalVelControlledSurvey(); // searchForGoal();
+			testVelControl(); // searchForGoal();
 		}
+
 		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
 		setTurnClockwise(signal.getMotor());
 		// add 1 loop to all angles
@@ -102,6 +106,7 @@ public class Turret extends ControlledSubsystem {
 	private void moveTowardsGoal() {
 		if (!(this.teleopController instanceof PIDPositionController)) {
 			this.teleopController = new PIDPositionController(0.001, 000, 0000);
+			this.teleopController.setName("TurretPOS ");
 		}
 		TargetInfo goal = VisionServer.getInstance().getTargets().get(0);
 		double goalX = goal.getX();
@@ -141,9 +146,15 @@ public class Turret extends ControlledSubsystem {
 	private double degreesWhichAccelerationStarted = 0;
 	private boolean isFirstTimeAccelerating = true;
 
+	public void testVelControl() {
+		goalVel = SmartDashboard.getNumber("aim Turret Vel", 0);
+
+	}
+
 	public void searchForGoalVelControlledSurvey() {
 		if (!(this.teleopController instanceof FeedForwardWithPIDController)) {
-			this.teleopController = new FeedForwardWithPIDController(.001, .011, .01, .01, .01);
+			this.teleopController = new FeedForwardWithPIDController(.001, .011, .01, 0, 0);
+			this.teleopController.setName("TurretVel ");
 		}
 		int direction = shouldBeTurningClockwise ? -1 : 1;
 		switch (this.currentState) {
@@ -223,10 +234,7 @@ public class Turret extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-		if (Controls.driverController.getAButton())
-			setTurnClockwise(.5);
-		else
-			setTurnClockwise(0);
+		setTurnClockwise(Controls.operatorController.getX(Hand.kRight));
 
 	}
 

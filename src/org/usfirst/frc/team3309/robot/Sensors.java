@@ -7,8 +7,8 @@ import org.team3309.lib.sensors.CounterSensor;
 import org.team3309.lib.sensors.EncoderSensor;
 import org.team3309.lib.sensors.NavX;
 import org.team3309.lib.sensors.Sensor;
-import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
@@ -21,8 +21,8 @@ public class Sensors {
 
 	private static List<Sensor> sensors = new LinkedList<Sensor>();
 	private static NavX navX;
-	private static EncoderSensor leftDrive;
-	private static EncoderSensor rightDrive;
+	private static AnalogInput leftDrive;
+	private static AnalogInput rightDrive;
 	private static EncoderSensor turretSensor;
 	private static CounterSensor flywheelCounter;
 	private static DigitalInput turretRightHallEffect;
@@ -32,8 +32,8 @@ public class Sensors {
 		System.out.println("INIT STATIC");
 		navX = new NavX();
 		System.out.println("NAVX");
-		leftDrive = new EncoderSensor(RobotMap.LEFT_ENCODER_A, RobotMap.LEFT_ENCODER_B, true);
-		rightDrive = new EncoderSensor(RobotMap.RIGHT_ENCODER_A, RobotMap.RIGHT_ENCODER_B, false);
+		leftDrive = new AnalogInput(RobotMap.LEFT_ENCODER);
+		rightDrive = new AnalogInput(RobotMap.RIGHT_ENCODER);
 		turretSensor = new EncoderSensor(RobotMap.TURRET_ENCODER_A, RobotMap.TURRET_ENCODER_B, false);
 		System.out.println("Turret");
 		flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
@@ -64,12 +64,12 @@ public class Sensors {
 		return navX.getAngle();
 	}
 
-	public static int getLeftDrive() {
-		return leftDrive.getPosition();
+	public static long getLeftDrive() {
+		return leftDrive.getAccumulatorValue();
 	}
 
-	public static int getRightDrive() {
-		return rightDrive.getPosition();
+	public static long getRightDrive() {
+		return rightDrive.getAccumulatorValue();
 	}
 
 	public static double getRoll() {
@@ -77,8 +77,7 @@ public class Sensors {
 	}
 
 	public static void resetDrive() {
-		rightDrive.reset();
-		leftDrive.reset();
+
 	}
 
 	public static double getFlywheelRPS() {
@@ -120,10 +119,10 @@ public class Sensors {
 	}
 
 	public static double getLeftDriveVel() {
-		return leftDrive.getRate();
+		return leftDrive.getAccumulatorValue() / leftDrive.getAccumulatorCount();
 	}
 
 	public static double getRightDriveVel() {
-		return rightDrive.getRate();
+		return rightDrive.getAccumulatorValue() / rightDrive.getAccumulatorCount();
 	}
 }

@@ -58,7 +58,7 @@ public class Drive extends ControlledSubsystem {
 			driveAngleHardCore.turningController.setConstants(6, 0, 16);
 			this.setTeleopController(driveAngleHardCore);
 			isReset = true;
-		} else if (Controls.operatorController.getAButton()) {
+		} else if (Controls.driverController.getAButton()) {
 
 		} else {
 			this.setTeleopController(new DriveCheezyDriveEquation());
