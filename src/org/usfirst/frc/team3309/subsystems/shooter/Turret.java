@@ -12,6 +12,7 @@ import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.driverstation.Controls;
+import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.vision.TargetInfo;
@@ -106,8 +107,9 @@ public class Turret extends ControlledSubsystem {
 		double goalX = goal.getX();
 		double degToTurn = (goalX / 2) * VisionServer.FIELD_OF_VIEW_DEGREES;
 		// TODO make this line more accurate to camera frame
-		sumOfOmegaSinceLastReset / loopsSinceLastReset;
-		goalAngle = this.getAngle() + degToTurn;
+		double predictionOffset = (sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
+				* (loopsSinceLastReset * (Robot.LOOP_SPEED_MS / 1000));
+		goalAngle = this.getAngle() + degToTurn + predictionOffset;
 	}
 
 	public void searchForGoal() {
@@ -211,8 +213,12 @@ public class Turret extends ControlledSubsystem {
 		SmartDashboard.putNumber("Velocity", getVelocity());
 		SmartDashboard.putNumber("Goal Angle", this.goalAngle);
 		SmartDashboard.putNumber("Goal Vel", this.goalVel);
+		if (VisionServer.getInstance().hasTargetsToAimAt())
+			SmartDashboard.putNumber("hyp", VisionServer.getInstance().getTarget().getHyp());
+		SmartDashboard.putNumber("prediction degrees", (sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
+				* (loopsSinceLastReset * (Robot.LOOP_SPEED_MS / 1000)));
 		SmartDashboard.putNumber("power", this.turretMC.getDesiredOutput());
-		SmartDashboard.putString("STAte", this.currentState.name());
+		SmartDashboard.putString("State", this.currentState.name());
 	}
 
 	@Override
@@ -248,7 +254,7 @@ public class Turret extends ControlledSubsystem {
 		timerSinceLastVisionGoalSeen.stop();
 		timerSinceLastVisionGoalSeen.reset();
 		timerSinceLastVisionGoalSeen.start();
-		loopsSinceLastReset = 0;
+		loopsSinceLastReset = 1;
 		sumOfOmegaSinceLastReset = 0;
 	}
 

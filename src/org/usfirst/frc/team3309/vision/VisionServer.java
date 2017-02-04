@@ -189,6 +189,12 @@ public class VisionServer implements Runnable {
 		return targets;
 	}
 
+	public TargetInfo getTarget() {
+		if (this.hasTargetsToAimAt())
+			return targets.get(0);
+		return null;
+	}
+
 	public void setTargets(List<TargetInfo> targets) {
 		this.targets = targets;
 	}

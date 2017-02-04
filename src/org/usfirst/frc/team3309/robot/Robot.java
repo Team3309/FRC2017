@@ -14,6 +14,7 @@ public class Robot extends IterativeRobot {
 
 	private SendableChooser<AutoRoutine> mainAutoChooser = new SendableChooser<AutoRoutine>();
 	private SendableChooser<AutoRoutine> sideAutoChooser = new SendableChooser<AutoRoutine>();
+	public static double LOOP_SPEED_MS = 20;
 
 	public void robotInit() {
 		// Main Auto Chooser

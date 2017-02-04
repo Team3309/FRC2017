@@ -1,10 +1,13 @@
 package org.team3309.lib.controllers.generic;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -173,6 +176,7 @@ public abstract class PIDController extends Controller {
 	@Override
 	public void sendToSmartDash() {
 		if (this.useSmartDash) {
+
 			kP = SmartDashboard.getNumber(this.getName() + " kP", kP);
 			kI = SmartDashboard.getNumber(this.getName() + " kI", kI);
 			kD = SmartDashboard.getNumber(this.getName() + " kD", kD);
@@ -184,7 +188,11 @@ public abstract class PIDController extends Controller {
 			SmartDashboard.putNumber(this.getName() + " I CONTRIBUTION", this.previousIValue);
 			SmartDashboard.putNumber(this.getName() + " D CONTRIBUTION", this.previousDValue);
 			SmartDashboard.putNumber(this.getName() + " Last Output", this.previousOutput);
+
+			
 		}
 
 	}
+
+	
 }
