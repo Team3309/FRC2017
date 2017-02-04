@@ -189,10 +189,9 @@ public abstract class PIDController extends Controller {
 			SmartDashboard.putNumber(this.getName() + " D CONTRIBUTION", this.previousDValue);
 			SmartDashboard.putNumber(this.getName() + " Last Output", this.previousOutput);
 
-			
+			sendConstants();
 		}
 
 	}
 
-	
 }

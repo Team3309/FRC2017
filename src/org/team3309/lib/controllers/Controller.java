@@ -20,6 +20,7 @@ public abstract class Controller {
 	private String name = "Default";
 	protected String subsystemID = "drivetrain";
 	public NetworkTable table = NetworkTable.getTable(subsystemID);
+	private JSONArray JSONArray = new JSONArray();
 
 	public Controller() {
 		table = NetworkTable.getTable(subsystemID);
@@ -57,18 +58,21 @@ public abstract class Controller {
 			JSONObject object = (JSONObject) recievedArray.get(i);
 			SmartDashboard.putNumber(object.getString("label"), object.getDouble("value"));
 		}
+	}
 
-		JSONObject x1 = new JSONObject();
-		x1.put("kP", kP);
-		JSONObject x2 = new JSONObject();
-		x2.put("kI", kI);
-		JSONObject x3 = new JSONObject();
-		x3.put("kD", kD);
+	public void putField(String key, double value) {
+		SmartDashboard.putNumber(key, value);
+	}
 
-		JSONArray array = new JSONArray();
-		array.put(x1).put(x2).put(x3);
+	public void putConstant(String key, double value) {
+		SmartDashboard.putNumber(key, value);
+		JSONObject x = new JSONObject();
+		x.put(key, value);
+		JSONArray.put(x);
+	}
 
-		table.putString("constants", array.toString());
+	public void sendConstants() {
+		table.putString("constants", JSONArray.toString());
 	}
 
 	public String getName() {
