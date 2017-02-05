@@ -52,7 +52,7 @@ public class Turret extends ControlledSubsystem {
 		for (int angle = 0; angle <= 360; angle++) {
 			hash.put(angle, 0);
 		}
-		this.teleopController = new FeedForwardWithPIDController(.015, 0.00, -.003, .00, .00);
+		this.teleopController = new FeedForwardWithPIDController(.017, 0.00, .009, .00, .00);
 		this.teleopController.setName("TURRET");
 	}
 
@@ -80,6 +80,7 @@ public class Turret extends ControlledSubsystem {
 		// if you see the goal, aim at it
 
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
+			System.out.println("Vision");
 			moveTowardsGoal();
 		} else {
 
@@ -146,8 +147,8 @@ public class Turret extends ControlledSubsystem {
 	private final double LEFT_LIMIT = 330;
 	private final double RIGHT_LIMIT = 30;
 	private boolean shouldBeTurningClockwise = false;
-	private final double MAX_ACC = 1; // 180 deg/s*s
-	private final double MAX_VEL = 25; // 180 deg/s*s
+	private final double MAX_ACC = .6; // 180 deg/s*s
+	private final double MAX_VEL = 10; // 180 deg/s*s
 	private double degreesToStartSlowing = RIGHT_LIMIT - 30;
 	private double degreesWhichAccelerationStarted = 0;
 	private boolean isFirstTimeAccelerating = true;
@@ -165,11 +166,10 @@ public class Turret extends ControlledSubsystem {
 
 	public void searchForGoalVelControlledSurvey() {
 		if (!(this.teleopController instanceof FeedForwardWithPIDController)) {
-			this.teleopController = new FeedForwardWithPIDController(.015, 0.00, -.003, .00, .00);
+			this.teleopController = new FeedForwardWithPIDController(.017, 0.00, .009, .00, .00);
 			this.teleopController.setName("TurretVel ");
 		}
 		int direction = shouldBeTurningClockwise ? -1 : 1;
-		System.out.println("BLEH");
 		if (this.currentState == TurretState.ACCELERATING) {
 			if (isFirstTimeAccelerating) {
 				degreesWhichAccelerationStarted = this.getAngle();
@@ -177,33 +177,38 @@ public class Turret extends ControlledSubsystem {
 			}
 			if (Math.abs(currentVelocity) < MAX_VEL - 5) {
 				goalVel = direction * (Math.abs(currentVelocity) + MAX_ACC);
+				if (Math.abs(goalVel) < 5) {
+					goalVel = direction * 5;
+				}
 				System.out.println("CUR VEL + " + Math.abs(currentVelocity) + " max " + (MAX_VEL - 5));
 			} else {
 				this.currentState = TurretState.CONSTANT;
 				System.out.println("TO CONSTANT CUR VEL + " + Math.abs(currentVelocity) + " max " + (MAX_VEL - 5));
 				double degreesCrossedDuringAcceleration = this.getAngle() - degreesWhichAccelerationStarted;
 				degreesToStartSlowing = (shouldBeTurningClockwise ? RIGHT_LIMIT : LEFT_LIMIT)
-						- degreesCrossedDuringAcceleration;
+						- (degreesCrossedDuringAcceleration * direction);
 			}
 		} else if (this.currentState == TurretState.DECELERATION) {
 			System.out.println("DECEL");
 			if (Math.abs(currentVelocity) > 5) {
 				goalVel = direction * (Math.abs(currentVelocity) - MAX_ACC);
 			}
-			if (Math.abs(currentVelocity) < 3 || this.currentAngle > this.LEFT_LIMIT
+			if (currentVelocity < 3 * direction || this.currentAngle > this.LEFT_LIMIT
 					|| this.currentAngle < this.RIGHT_LIMIT) {
 				goalVel = 0;
 				this.currentState = TurretState.STOPPED;
 			}
 		} else if (this.currentState == TurretState.CONSTANT) {
 			System.out.println("CONSTANT");
-			goalVel = MAX_VEL;
-			if (this.getAngle() > degreesToStartSlowing && !shouldBeTurningClockwise
-					|| this.getAngle() < degreesToStartSlowing && shouldBeTurningClockwise) {
+			goalVel = direction * MAX_VEL;
+			System.out.println("CUR " + this.getAngle() + " TOO DECEL " + degreesToStartSlowing);
+			if ((this.getAngle() < degreesToStartSlowing && shouldBeTurningClockwise)
+					|| (this.getAngle() > degreesToStartSlowing && !shouldBeTurningClockwise)) {
 				System.out.println("DECEL");
 				this.currentState = TurretState.DECELERATION;
 			}
 		} else if (this.currentState == TurretState.STOPPED) {
+
 			System.out.println("STOPPED");
 			isFirstTimeAccelerating = false;
 			// if stopped,find which way to turn and do so
@@ -282,7 +287,7 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	public void resetSensor() {
-		turretMC.getTalon().setEncPosition(0);
+		turretMC.getTalon().setEncPosition(7373);
 	}
 
 	private KragerTimer timerSinceLastVisionGoalSeen = new KragerTimer(1000);
