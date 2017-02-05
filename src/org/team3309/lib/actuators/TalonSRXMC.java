@@ -16,9 +16,10 @@ public class TalonSRXMC extends Actuator {
 
 	@Override
 	protected void output() {
-		talon.set(desiredOutput * (isReversed ? -1 : 1));
-		lastPosition = talon.getPosition();
-		lastVelocity = talon.getSpeed();
+		// System.out.println("DES " + desiredOutput);
+		talon.set(desiredOutput);
+		// if(talon.)
+
 	}
 
 	public double getPosition() {

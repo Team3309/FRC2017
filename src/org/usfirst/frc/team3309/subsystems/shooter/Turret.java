@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.actuators.TalonSRXMC;
+import org.team3309.lib.communications.BlackBox;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
@@ -24,15 +25,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Turret extends ControlledSubsystem {
 
 	private static Turret instance;
+	private TalonSRXMC turretMC = new TalonSRXMC(RobotMap.TURRET_ID);
 	private double currentAngle = getAngle();
 	private double pastAngle = getAngle();
 	private double goalAngle = getAngle();
-	private double goalVel = getAngle();
+	private double goalVel = getVelocity();
 	private double currentVelocity = getVelocity();
 	private TurretState currentState = TurretState.STOPPED;
 	// angle and loops since it last of spotted
 	private HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
-	private TalonSRXMC turretMC = new TalonSRXMC(RobotMap.TURRET_ID);
 
 	public static Turret getInstance() {
 		if (instance == null)
@@ -41,18 +42,18 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	private double getVelocity() {
-		return turretMC.getVelocity();
+		return ((double) turretMC.getTalon().getEncVelocity() / 14745) * 360.0;
 	}
 
 	private Turret(String name) {
 		super(name);
-		this.teleopController.setName("Turret");
 		// Place the angles and time loops since lastseen into the hashmap
 		// 0 - 360 degrees
 		for (int angle = 0; angle <= 360; angle++) {
 			hash.put(angle, 0);
 		}
-		this.teleopController = new FeedForwardWithPIDController(.001, .011, .01, .01, .01);
+		this.teleopController = new FeedForwardWithPIDController(.001, 0.00, .00, .00, .00);
+		this.teleopController.setName("TURRET");
 	}
 
 	@Override
@@ -71,23 +72,27 @@ public class Turret extends ControlledSubsystem {
 	public void updateTeleop() {
 		currentAngle = getAngle();
 		currentVelocity = getVelocity();
-		updateValuesSeen();
-		// if you see the goal, aim at it
 
-		if (VisionServer.getInstance().hasTargetsToAimAt()) {
-			moveTowardsGoal();
-		} else {
-			testVelControl(); // searchForGoal();
-		}
-
+		testVelControl();
 		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
 		setTurnClockwise(signal.getMotor());
-		// add 1 loop to all angles
-		for (int angle = 0; angle <= 360; angle++) {
-			hash.replace(angle, hash.get(angle) + 1);
-		}
-		loopsSinceLastReset++;
-		sumOfOmegaSinceLastReset += Sensors.getAngularVel();
+
+		// updateValuesSeen();
+		// // if you see the goal, aim at it
+		//
+		// if (VisionServer.getInstance().hasTargetsToAimAt()) {
+		// moveTowardsGoal();
+		// } else {
+		// testVelControl(); // searchForGoal();
+		// }
+		//
+		//
+		// // add 1 loop to all angles
+		// for (int angle = 0; angle <= 360; angle++) {
+		// hash.replace(angle, hash.get(angle) + 1);
+		// }
+		// loopsSinceLastReset++;
+		// sumOfOmegaSinceLastReset += Sensors.getAngularVel();
 	}
 
 	/**
@@ -148,12 +153,17 @@ public class Turret extends ControlledSubsystem {
 
 	public void testVelControl() {
 		goalVel = SmartDashboard.getNumber("aim Turret Vel", 0);
+		SmartDashboard.putNumber("aim Turret Vel", goalVel);
+	}
 
+	public void testPosControl() {
+		goalAngle = SmartDashboard.getNumber("aim Turret Pos", 0);
+		SmartDashboard.putNumber("aim Turret Pos", goalAngle);
 	}
 
 	public void searchForGoalVelControlledSurvey() {
 		if (!(this.teleopController instanceof FeedForwardWithPIDController)) {
-			this.teleopController = new FeedForwardWithPIDController(.001, .011, .01, 0, 0);
+			this.teleopController = new FeedForwardWithPIDController(.001, .00, .00, 0, 0);
 			this.teleopController.setName("TurretVel ");
 		}
 		int direction = shouldBeTurningClockwise ? -1 : 1;
@@ -220,22 +230,29 @@ public class Turret extends ControlledSubsystem {
 	@Override
 	public void sendToSmartDash() {
 		this.teleopController.sendToSmartDash();
-		SmartDashboard.putNumber("Angle", getAngle());
-		SmartDashboard.putNumber("Velocity", getVelocity());
-		SmartDashboard.putNumber("Goal Angle", this.goalAngle);
-		SmartDashboard.putNumber("Goal Vel", this.goalVel);
+		SmartDashboard.putNumber("Turret Angle", getAngle());
+		SmartDashboard.putNumber("Turret Velocity", getVelocity());
+		SmartDashboard.putNumber("Turret Goal Angle", this.goalAngle);
+		SmartDashboard.putNumber("Turret Goal Vel", this.goalVel);
 		if (VisionServer.getInstance().hasTargetsToAimAt())
-			SmartDashboard.putNumber("hyp", VisionServer.getInstance().getTarget().getHyp());
-		SmartDashboard.putNumber("prediction degrees", (sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
+			SmartDashboard.putNumber("Turret hyp", VisionServer.getInstance().getTarget().getHyp());
+		SmartDashboard.putNumber("Turret prediction degrees", (sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
 				* (loopsSinceLastReset * (Robot.LOOP_SPEED_MS / 1000)));
-		SmartDashboard.putNumber("power", this.turretMC.getDesiredOutput());
-		SmartDashboard.putString("State", this.currentState.name());
+		SmartDashboard.putNumber("Turret power", this.turretMC.getDesiredOutput());
+		SmartDashboard.putString("Turret State", this.currentState.name());
 	}
 
 	@Override
 	public void manualControl() {
-		setTurnClockwise(Controls.operatorController.getX(Hand.kRight));
-
+		setTurnClockwise(Controls.operatorController.getX(Hand.kRight) / 2);
+		/*if (Controls.operatorController.getAButton()) {
+			resetSensor();
+		} else */
+		if (Controls.operatorController.getBButton()) {
+			setTurnClockwise(.3);
+			BlackBox.logThis("Turret", getAngle());
+			BlackBox.writeLog();
+		}
 	}
 
 	private void setTurnClockwise(double power) {
@@ -251,7 +268,11 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	public double getAngle() {
-		return turretMC.getPosition();
+		return ((double) turretMC.getTalon().getEncPosition() / 14745.6) * 360;
+	}
+
+	public void resetSensor() {
+		turretMC.getTalon().setEncPosition(0);
 	}
 
 	private KragerTimer timerSinceLastVisionGoalSeen = new KragerTimer(1000);

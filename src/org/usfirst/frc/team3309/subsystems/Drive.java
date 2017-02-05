@@ -12,6 +12,7 @@ import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
 
 public class Drive extends ControlledSubsystem {
@@ -48,18 +49,21 @@ public class Drive extends ControlledSubsystem {
 
 	private Drive(String name) {
 		super(name);
+
 	}
 
 	@Override
 	public void updateTeleop() {
+
 		if (Controls.driverController.getAButton() && !isReset) {
+			System.out.println("BAD");
 			DriveAngleVelocityController driveAngleHardCore = new DriveAngleVelocityController(this.getAngle());
 			driveAngleHardCore.setCompletable(false);
 			driveAngleHardCore.turningController.setConstants(6, 0, 16);
 			this.setTeleopController(driveAngleHardCore);
 			isReset = true;
 		} else if (Controls.driverController.getAButton()) {
-
+			System.out.println("BAD");
 		} else {
 			this.setTeleopController(new DriveCheezyDriveEquation());
 		}
@@ -67,12 +71,13 @@ public class Drive extends ControlledSubsystem {
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
 			isLowGear = true;
 
-		} else {
-			isLowGear = false;
-			// sol.set(true);
-		}
+		} else
+			isLowGear = false; // sol.set(true);
+
 		OutputSignal output = teleopController.getOutputSignal(getInputState());
+
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
+
 	}
 
 	@Override
@@ -109,7 +114,8 @@ public class Drive extends ControlledSubsystem {
 	@Override
 	public void sendToSmartDash() {
 		teleopController.sendToSmartDash();
-
+		SmartDashboard.putNumber("right pow", right0.getDesiredOutput());
+		SmartDashboard.putNumber("left pow", left0.getDesiredOutput());
 	}
 
 	@Override
@@ -169,9 +175,9 @@ public class Drive extends ControlledSubsystem {
 	 *            rightMotorSpeed
 	 */
 	public void setRight(double right) {
-		this.right0.setDesiredOutput(right);
-		this.right1.setDesiredOutput(right);
-		this.right2.setDesiredOutput(right);
+		this.right0.setDesiredOutput(-right);
+		this.right1.setDesiredOutput(-right);
+		this.right2.setDesiredOutput(-right);
 
 	}
 

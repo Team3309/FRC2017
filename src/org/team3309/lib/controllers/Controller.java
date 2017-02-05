@@ -53,11 +53,13 @@ public abstract class Controller {
 	 * Sends info of controller to smartdash for looks on data and tuning
 	 */
 	public void sendToSmartDash() {
-		JSONArray recievedArray = new JSONArray(table.getString("constants", ""));
-		for (int i = 0; i < recievedArray.length(); i++) {
-			JSONObject object = (JSONObject) recievedArray.get(i);
-			SmartDashboard.putNumber(object.getString("label"), object.getDouble("value"));
-		}
+		/*
+		 * JSONArray recievedArray = new JSONArray(table.getString("constants",
+		 * "")); for (int i = 0; i < recievedArray.length(); i++) { JSONObject
+		 * object = (JSONObject) recievedArray.get(i);
+		 * SmartDashboard.putNumber(object.getString("label"),
+		 * object.getDouble("value")); }
+		 */
 	}
 
 	public void putField(String key, double value) {
@@ -72,7 +74,7 @@ public abstract class Controller {
 	}
 
 	public void sendConstants() {
-		table.putString("constants", JSONArray.toString());
+		// table.putString("constants", JSONArray.toString());
 	}
 
 	public String getName() {

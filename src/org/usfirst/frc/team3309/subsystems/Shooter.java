@@ -25,7 +25,7 @@ public class Shooter extends KragerSystem {
 	@Override
 	public void updateTeleop() {
 		Flywheel.getInstance().updateTeleop();
-		Turret.getInstance().manualControl();
+		Turret.getInstance().updateTeleop();
 		Hood.getInstance().updateTeleop();
 		if (Controls.operatorController.getAButton()) {
 			shouldBeShooting = true;

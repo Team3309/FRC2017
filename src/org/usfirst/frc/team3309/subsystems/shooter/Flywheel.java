@@ -2,6 +2,7 @@ package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.actuators.TalonSRXMC;
+import org.team3309.lib.communications.BlackBox;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
@@ -95,8 +96,8 @@ public class Flywheel extends ControlledSubsystem {
 		double power = 0;
 		if (Controls.operatorController.getAButton()) {
 			power = .7;
-		} else if (Controls.operatorController.getBButton()) {
-			power = .7;
+			BlackBox.logThis("curRPS", Sensors.getFlywheelRPS());
+			BlackBox.writeLog();
 		} else if (Controls.operatorController.getXButton()) {
 			power = .8;
 		} else if (Controls.operatorController.getYButton()) {

@@ -23,7 +23,6 @@ public class Sensors {
 	private static NavX navX;
 	private static AnalogInput leftDrive;
 	private static AnalogInput rightDrive;
-	private static EncoderSensor turretSensor;
 	private static CounterSensor flywheelCounter;
 	private static DigitalInput turretRightHallEffect;
 	private static DigitalInput turretLeftHallEffect;
@@ -34,7 +33,7 @@ public class Sensors {
 		System.out.println("NAVX");
 		leftDrive = new AnalogInput(RobotMap.LEFT_ENCODER);
 		rightDrive = new AnalogInput(RobotMap.RIGHT_ENCODER);
-		turretSensor = new EncoderSensor(RobotMap.TURRET_ENCODER_A, RobotMap.TURRET_ENCODER_B, false);
+
 		System.out.println("Turret");
 		flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
 		turretRightHallEffect = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
@@ -97,21 +96,6 @@ public class Sensors {
 
 	public static boolean isTurretRightLimitHit() {
 		return turretRightHallEffect.get();
-	}
-
-	public static double getTurretAngle() {
-		if (turretRightHallEffect.get()) {
-
-		} else if (turretLeftHallEffect.get()) {
-			turretSensor.reset();
-		}
-		double curTurretEncoders = turretSensor.getPosition();
-		double curTurretDegrees = curTurretEncoders * TURRET_DEGREES_PER_ENCODER;
-		return curTurretDegrees;
-	}
-
-	public static double getTurretAngleVelocity() {
-		return turretSensor.getRate();
 	}
 
 	public static double getAngularVel() {

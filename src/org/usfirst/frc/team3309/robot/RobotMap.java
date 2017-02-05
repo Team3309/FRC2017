@@ -19,15 +19,6 @@ public class RobotMap {
 	public static final int RIGHT_SHOOTER_ID = 11;
 	public static final int TURRET_ID = 8;
 
-	public static final int RIGHT_CONTROLLER = 1;
-
-	public static final int EXTRA_CONTROLLER = 3;
-	public static final int LEFT_SHOOTER_MOTOR = 4;
-	public static final int FEEDY_WHEEL_MOTOR = 5;
-	public static final int HOOD_MOTOR = 6;
-
-	public static final int RIGHT_SHOOTER_MOTOR = 9;
-
 	public static final int LEFT_ENCODER = 0;
 	public static final int RIGHT_ENCODER = 1;
 	public static final int FLYWHEEL_SENSOR = 4;
