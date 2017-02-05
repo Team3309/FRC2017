@@ -1,49 +1,43 @@
-package org.team3309.lib.Tunable;
+package org.team3309.lib.tunable;
 
 import java.lang.reflect.Field;
 import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class TunableHelper
-{
-	public static void UpdateTunable(ITunable tunable)
-	{		
+public class TunableHelper {
+	public static void UpdateTunable(ITunable tunable) {
 		Class<?> c = tunable.getClass();
 		Field[] fields = c.getFields();
-		
+
 		// -- Network Table
 		String tableName = tunable.getTableName();
 		boolean useSmartDashboard = false;
 		NetworkTable table = null;
 		if (tableName == "SmartDashboard")
 			useSmartDashboard = true;
-		else	
+		else
 			table = NetworkTable.getTable(tableName);
-		
+
 		// -- Prefix
 		String prefix = "";
 		String objName = tunable.getObjectName();
 		if (objName != null)
 			prefix = objName + "_";
-		
-		try
-		{
-			for (Field f : fields)
-			{
+
+		try {
+			for (Field f : fields) {
 				Tunable annon = f.getAnnotation(Tunable.class);
-				if (annon != null)
-				{
+				if (annon != null) {
 					String dispName = annon.DisplayName();
 					boolean readOnly = annon.ReadOnly();
 					String name = prefix + (dispName != "" ? dispName : f.getName());
-					
+
 					// ---------------------------------------------------------------
 					// -- Set the data
-					
+
 					Class<?> ft = f.getType();
 					// -- Boolean
-					if (ft.isAssignableFrom(boolean.class))
-					{
+					if (ft.isAssignableFrom(boolean.class)) {
 						boolean value = f.getBoolean(tunable);
 						if (useSmartDashboard)
 							value = SmartDashboard.getBoolean(name, value);
@@ -53,8 +47,7 @@ public class TunableHelper
 							f.set(tunable, value);
 					}
 					// -- Number
-					else if (ft.isAssignableFrom(double.class))
-					{
+					else if (ft.isAssignableFrom(double.class)) {
 						double value = f.getDouble(tunable);
 						if (useSmartDashboard)
 							value = SmartDashboard.getNumber(name, value);
@@ -64,9 +57,8 @@ public class TunableHelper
 							f.set(tunable, value);
 					}
 					// -- String
-					else if(ft.isAssignableFrom(String.class))
-					{
-						String value = (String)f.get(tunable);
+					else if (ft.isAssignableFrom(String.class)) {
+						String value = (String) f.get(tunable);
 						if (useSmartDashboard)
 							value = SmartDashboard.getString(name, value);
 						else
@@ -76,8 +68,8 @@ public class TunableHelper
 					}
 				}
 			}
+		} catch (IllegalAccessException ex) {
 		}
-		catch(IllegalAccessException ex){}
-		
+
 	}
 }

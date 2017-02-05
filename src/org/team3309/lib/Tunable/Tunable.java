@@ -1,4 +1,4 @@
-package org.team3309.lib.Tunable;
+package org.team3309.lib.tunable;
 
 import java.lang.annotation.*;
 
