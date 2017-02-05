@@ -170,8 +170,7 @@ public class Turret extends ControlledSubsystem {
 		}
 		int direction = shouldBeTurningClockwise ? -1 : 1;
 		System.out.println("BLEH");
-		switch (this.currentState) {
-		case ACCELERATING:
+		if (this.currentState == TurretState.ACCELERATING) {
 			if (isFirstTimeAccelerating) {
 				degreesWhichAccelerationStarted = this.getAngle();
 				isFirstTimeAccelerating = false;
@@ -186,7 +185,7 @@ public class Turret extends ControlledSubsystem {
 				degreesToStartSlowing = (shouldBeTurningClockwise ? RIGHT_LIMIT : LEFT_LIMIT)
 						- degreesCrossedDuringAcceleration;
 			}
-		case DECELERATION:
+		} else if (this.currentState == TurretState.DECELERATION) {
 			System.out.println("DECEL");
 			if (Math.abs(currentVelocity) > 5) {
 				goalVel = direction * (Math.abs(currentVelocity) - MAX_ACC);
@@ -196,7 +195,7 @@ public class Turret extends ControlledSubsystem {
 				goalVel = 0;
 				this.currentState = TurretState.STOPPED;
 			}
-		case CONSTANT:
+		} else if (this.currentState == TurretState.CONSTANT) {
 			System.out.println("CONSTANT");
 			goalVel = MAX_VEL;
 			if (this.getAngle() > degreesToStartSlowing && !shouldBeTurningClockwise
@@ -204,7 +203,7 @@ public class Turret extends ControlledSubsystem {
 				System.out.println("DECEL");
 				this.currentState = TurretState.DECELERATION;
 			}
-		case STOPPED:
+		} else if (this.currentState == TurretState.STOPPED) {
 			System.out.println("STOPPED");
 			isFirstTimeAccelerating = false;
 			// if stopped,find which way to turn and do so
@@ -214,9 +213,8 @@ public class Turret extends ControlledSubsystem {
 				shouldBeTurningClockwise = true;
 			}
 			this.currentState = TurretState.ACCELERATING;
-		default:
-
 		}
+		System.out.println("CURRENT STATE " + this.currentState);
 		((FeedForwardWithPIDController) this.teleopController).setAimVel(goalVel);
 	}
 
