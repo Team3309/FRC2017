@@ -86,6 +86,10 @@ public class GearIntake extends KragerSystem {
 		updateTeleop();
 	}
 
+	public void setGearIntakeRoller(double power) {
+		gearIntake.setDesiredOutput(power);
+	}
+
 	public void retractPivot() {
 		gearIntakePivot.set(false);
 	}
@@ -98,16 +102,32 @@ public class GearIntake extends KragerSystem {
 		gearIntakePivot.set(!gearIntakePivot.get());
 	}
 
-	public void setGearIntakeRoller(double power) {
-
-	}
-
 	public boolean isPivotRetracted() {
 		return !gearIntakePivot.get(); // false = retracted, so flip the output
 	}
 
 	public boolean isPivotExtended() {
 		return gearIntakePivot.get(); // true = extended
+	}
+
+	public void retractWrist() {
+		gearIntakeWrist.set(false);
+	}
+
+	public void extendWrist() {
+		gearIntakeWrist.set(true);
+	}
+
+	public void toggleWrist() {
+		gearIntakeWrist.set(!gearIntakeWrist.get());
+	}
+
+	public boolean isWristRetracted() {
+		return !gearIntakeWrist.get(); // false = retracted, so flip the output
+	}
+
+	public boolean isWristExtended() {
+		return gearIntakeWrist.get(); // true = extended
 	}
 
 }

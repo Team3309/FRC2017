@@ -34,7 +34,7 @@ public class Hopper extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		// Use setHopper
+		updateTeleop();
 
 	}
 

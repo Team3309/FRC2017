@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.actuators.TalonSRXMC;
-import org.team3309.lib.communications.BlackBox;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
@@ -52,14 +51,14 @@ public class Turret extends ControlledSubsystem {
 		for (int angle = 0; angle <= 360; angle++) {
 			hash.put(angle, 0);
 		}
-		this.teleopController = new FeedForwardWithPIDController(.001, 0.00, .00, .00, .00);
+		this.teleopController = new FeedForwardWithPIDController(.015, 0.00, -.003, .00, .00);
 		this.teleopController.setName("TURRET");
 	}
 
 	@Override
 	public void initTeleop() {
-		// TODO Auto-generated method stub
-
+		this.currentState = TurretState.STOPPED;
+		resetSensor();
 	}
 
 	@Override
@@ -72,27 +71,28 @@ public class Turret extends ControlledSubsystem {
 	public void updateTeleop() {
 		currentAngle = getAngle();
 		currentVelocity = getVelocity();
+		if (Controls.operatorController.getAButton()) {
+			resetSensor();
+		}
 
-		testVelControl();
+		updateValuesSeen();
+		// if you see the goal, aim at it
+
+		if (VisionServer.getInstance().hasTargetsToAimAt()) {
+			moveTowardsGoal();
+		} else {
+
+			searchForGoalVelControlledSurvey(); // searchForGoal();
+		}
+
 		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
 		setTurnClockwise(signal.getMotor());
-
-		// updateValuesSeen();
-		// // if you see the goal, aim at it
-		//
-		// if (VisionServer.getInstance().hasTargetsToAimAt()) {
-		// moveTowardsGoal();
-		// } else {
-		// testVelControl(); // searchForGoal();
-		// }
-		//
-		//
-		// // add 1 loop to all angles
-		// for (int angle = 0; angle <= 360; angle++) {
-		// hash.replace(angle, hash.get(angle) + 1);
-		// }
-		// loopsSinceLastReset++;
-		// sumOfOmegaSinceLastReset += Sensors.getAngularVel();
+		// add 1 loop to all angles
+		for (int angle = 0; angle <= 360; angle++) {
+			hash.replace(angle, hash.get(angle) + 1);
+		}
+		loopsSinceLastReset++;
+		sumOfOmegaSinceLastReset += Sensors.getAngularVel();
 	}
 
 	/**
@@ -145,8 +145,8 @@ public class Turret extends ControlledSubsystem {
 	private final double LEFT_LIMIT = 330;
 	private final double RIGHT_LIMIT = 30;
 	private boolean shouldBeTurningClockwise = false;
-	private final double MAX_ACC = 180; // 180 deg/s*s
-	private final double MAX_VEL = 180; // 180 deg/s*s
+	private final double MAX_ACC = 1; // 180 deg/s*s
+	private final double MAX_VEL = 25; // 180 deg/s*s
 	private double degreesToStartSlowing = RIGHT_LIMIT - 30;
 	private double degreesWhichAccelerationStarted = 0;
 	private boolean isFirstTimeAccelerating = true;
@@ -154,6 +154,7 @@ public class Turret extends ControlledSubsystem {
 	public void testVelControl() {
 		goalVel = SmartDashboard.getNumber("aim Turret Vel", 0);
 		SmartDashboard.putNumber("aim Turret Vel", goalVel);
+
 	}
 
 	public void testPosControl() {
@@ -163,10 +164,11 @@ public class Turret extends ControlledSubsystem {
 
 	public void searchForGoalVelControlledSurvey() {
 		if (!(this.teleopController instanceof FeedForwardWithPIDController)) {
-			this.teleopController = new FeedForwardWithPIDController(.001, .00, .00, 0, 0);
+			this.teleopController = new FeedForwardWithPIDController(.015, 0.00, -.003, .00, .00);
 			this.teleopController.setName("TurretVel ");
 		}
 		int direction = shouldBeTurningClockwise ? -1 : 1;
+		System.out.println("BLEH");
 		switch (this.currentState) {
 		case ACCELERATING:
 			if (isFirstTimeAccelerating) {
@@ -175,13 +177,16 @@ public class Turret extends ControlledSubsystem {
 			}
 			if (Math.abs(currentVelocity) < MAX_VEL - 5) {
 				goalVel = direction * (Math.abs(currentVelocity) + MAX_ACC);
+				System.out.println("CUR VEL + " + Math.abs(currentVelocity) + " max " + (MAX_VEL - 5));
 			} else {
 				this.currentState = TurretState.CONSTANT;
+				System.out.println("TO CONSTANT CUR VEL + " + Math.abs(currentVelocity) + " max " + (MAX_VEL - 5));
 				double degreesCrossedDuringAcceleration = this.getAngle() - degreesWhichAccelerationStarted;
 				degreesToStartSlowing = (shouldBeTurningClockwise ? RIGHT_LIMIT : LEFT_LIMIT)
 						- degreesCrossedDuringAcceleration;
 			}
 		case DECELERATION:
+			System.out.println("DECEL");
 			if (Math.abs(currentVelocity) > 5) {
 				goalVel = direction * (Math.abs(currentVelocity) - MAX_ACC);
 			}
@@ -191,12 +196,15 @@ public class Turret extends ControlledSubsystem {
 				this.currentState = TurretState.STOPPED;
 			}
 		case CONSTANT:
+			System.out.println("CONSTANT");
 			goalVel = MAX_VEL;
 			if (this.getAngle() > degreesToStartSlowing && !shouldBeTurningClockwise
 					|| this.getAngle() < degreesToStartSlowing && shouldBeTurningClockwise) {
+				System.out.println("DECEL");
 				this.currentState = TurretState.DECELERATION;
 			}
 		case STOPPED:
+			System.out.println("STOPPED");
 			isFirstTimeAccelerating = false;
 			// if stopped,find which way to turn and do so
 			if (this.currentAngle < 180) {
@@ -220,9 +228,11 @@ public class Turret extends ControlledSubsystem {
 	public InputState getInputState() {
 		InputState s = new InputState();
 		if (this.teleopController instanceof FeedForwardWithPIDController
-				|| this.autoController instanceof FeedForwardWithPIDController)
-			s.setError(goalVel - getVelocity());
-		else
+				|| this.autoController instanceof FeedForwardWithPIDController) {
+
+			((FeedForwardWithPIDController) this.teleopController).setAimVel(goalVel);
+			s.setError((goalVel - getVelocity()));
+		} else
 			s.setError(goalAngle - getAngle());
 		return s;
 	}
@@ -245,14 +255,13 @@ public class Turret extends ControlledSubsystem {
 	@Override
 	public void manualControl() {
 		setTurnClockwise(Controls.operatorController.getX(Hand.kRight) / 2);
-		/*if (Controls.operatorController.getAButton()) {
+		if (Controls.operatorController.getAButton()) {
 			resetSensor();
-		} else */
-		if (Controls.operatorController.getBButton()) {
-			setTurnClockwise(.3);
-			BlackBox.logThis("Turret", getAngle());
-			BlackBox.writeLog();
 		}
+		/*
+		 * if (Controls.operatorController.getBButton()) { setTurnClockwise(.3);
+		 * BlackBox.logThis("Turret", getAngle()); BlackBox.writeLog(); }
+		 */
 	}
 
 	private void setTurnClockwise(double power) {

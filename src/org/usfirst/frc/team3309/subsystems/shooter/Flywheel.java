@@ -93,20 +93,16 @@ public class Flywheel extends ControlledSubsystem {
 	 */
 	public void manualControl() {
 		curVel = this.getRPS();
-		double power = 0;
-		if (Controls.operatorController.getAButton()) {
-			power = .7;
-			BlackBox.logThis("curRPS", Sensors.getFlywheelRPS());
-			BlackBox.writeLog();
+		if (Controls.operatorController.getBButton()) {
+			aimVelRPS = 80;
 		} else if (Controls.operatorController.getXButton()) {
-			power = .8;
+			aimVelRPS = 100;
 		} else if (Controls.operatorController.getYButton()) {
-			power = .9;
+			aimVelRPS = SmartDashboard.getNumber("Flywheel aim vel", 0);
 		} else {
-			power = 0;
+			aimVelRPS = 0;
 		}
-		this.rightSpark.setDesiredOutput(power);
-		this.leftSpark.setDesiredOutput(power);
+		shootLikeRobie();
 	}
 
 	/**

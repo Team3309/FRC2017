@@ -52,10 +52,10 @@ public class Elevator extends ControlledSubsystem {
 		setElevator(out.getMotor());
 	}
 
+	
 	@Override
 	public void updateAuto() {
-		// TODO Auto-generated method stub
-
+		updateTeleop();
 	}
 
 	@Override

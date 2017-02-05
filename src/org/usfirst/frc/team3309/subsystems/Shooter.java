@@ -37,7 +37,7 @@ public class Shooter extends KragerSystem {
 	@Override
 	public void updateAuto() {
 		Flywheel.getInstance().updateAuto();
-		Turret.getInstance().updateAuto();
+		Turret.getInstance().manualControl();
 		Hood.getInstance().updateAuto();
 	}
 
@@ -67,6 +67,10 @@ public class Shooter extends KragerSystem {
 		Flywheel.getInstance().manualControl();
 		Turret.getInstance().manualControl();
 		Hood.getInstance().manualControl();
+	}
+
+	public void setShouldBeShooting(boolean b) {
+		shouldBeShooting = b;
 	}
 
 	public boolean isShouldBeShooting() {

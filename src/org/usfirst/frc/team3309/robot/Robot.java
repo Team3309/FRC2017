@@ -53,6 +53,7 @@ public class Robot extends IterativeRobot {
 
 	public void teleopInit() {
 		BlackBox.writeString("TELEOP STARTED");
+		Shooter.getInstance().initTeleop();
 	}
 
 	public void teleopPeriodic() {
@@ -60,7 +61,7 @@ public class Robot extends IterativeRobot {
 		Drive.getInstance().updateTeleop();
 		Drive.getInstance().sendToSmartDash();
 		Hopper.getInstance().updateTeleop();
-		Shooter.getInstance().manualControl();
+		Shooter.getInstance().updateTeleop();
 		Shooter.getInstance().sendToSmartDash();
 		Climber.getInstance().updateTeleop();
 		GearIntake.getInstance().updateTeleop();

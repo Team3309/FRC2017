@@ -10,6 +10,10 @@ import org.team3309.lib.controllers.drive.DriveEncodersVelocityController;
 import org.team3309.lib.controllers.drive.VelocityChangePoint;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
+import org.usfirst.frc.team3309.subsystems.Elevator;
+import org.usfirst.frc.team3309.subsystems.FuelIntake;
+import org.usfirst.frc.team3309.subsystems.GearIntake;
+import org.usfirst.frc.team3309.subsystems.Shooter;
 
 import edu.wpi.first.wpilibj.Timer;
 
@@ -167,6 +171,24 @@ public class RoutineBased {
 
 		}
 		mDrive.stopDrive();
+	}
+
+	public void shoot() {
+		Shooter.getInstance().setShouldBeShooting(true);
+	}
+
+	public void deployGearIntake() {
+		GearIntake.getInstance().extendPivot();
+		GearIntake.getInstance().extendWrist();
+	}
+
+	public void retractGearIntake() {
+		GearIntake.getInstance().retractPivot();
+		GearIntake.getInstance().retractWrist();
+	}
+
+	public void setFuelIntake(double power) {
+		FuelIntake.getInstance().setFuelIntake(power);
 	}
 
 	public void waitForEndOfAuto() {
