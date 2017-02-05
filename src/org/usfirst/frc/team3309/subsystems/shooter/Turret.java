@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.actuators.TalonSRXMC;
+import org.team3309.lib.communications.BlackBox;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
@@ -258,10 +259,12 @@ public class Turret extends ControlledSubsystem {
 		if (Controls.operatorController.getAButton()) {
 			resetSensor();
 		}
-		/*
-		 * if (Controls.operatorController.getBButton()) { setTurnClockwise(.3);
-		 * BlackBox.logThis("Turret", getAngle()); BlackBox.writeLog(); }
-		 */
+		if (Controls.operatorController.getBButton()) {
+			setTurnClockwise(.3);
+			BlackBox.logThis("Turret", getAngle());
+			BlackBox.writeLog();
+		}
+
 	}
 
 	private void setTurnClockwise(double power) {

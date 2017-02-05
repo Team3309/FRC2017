@@ -95,6 +95,8 @@ public class Flywheel extends ControlledSubsystem {
 		curVel = this.getRPS();
 		if (Controls.operatorController.getBButton()) {
 			aimVelRPS = 80;
+			BlackBox.logThis("rps", curVel);
+			BlackBox.writeLog();
 		} else if (Controls.operatorController.getXButton()) {
 			aimVelRPS = 100;
 		} else if (Controls.operatorController.getYButton()) {
