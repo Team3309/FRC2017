@@ -33,9 +33,9 @@ public class Robot extends IterativeRobot {
 		mainAutoChooser.addObject("Straight 1 Gear", null);
 
 		// Start the Vision (connect to server)
-		new Thread(VisionServer.getInstance()).start();
+		(new Thread(VisionServer.getInstance())).start();
 
-		BlackBox.initializeLog(LOG_HEADER, getMatch(), false); // starts logging
+		//BlackBox.initializeLog(LOG_HEADER, getMatch(), false); // starts logging
 																// values
 	}
 
