@@ -92,19 +92,28 @@ public class Flywheel extends ControlledSubsystem {
 	 * Raw power values
 	 */
 	public void manualControl() {
-		curVel = this.getRPS();
-		if (Controls.operatorController.getBButton()) {
-			aimVelRPS = 80;
-			BlackBox.logThis("rps", curVel);
-			BlackBox.writeLog();
-		} else if (Controls.operatorController.getXButton()) {
-			aimVelRPS = 100;
+		if (Controls.operatorController.getAButton()) {
+			this.setShooter(.9);
+		} else if (Controls.operatorController.getBButton()) {
+			this.setShooter(.7);
 		} else if (Controls.operatorController.getYButton()) {
-			aimVelRPS = SmartDashboard.getNumber("Flywheel aim vel", 0);
+			this.setShooter(.5);
 		} else {
-			aimVelRPS = 0;
+			this.setShooter(0);
 		}
-		shootLikeRobie();
+		// curVel = this.getRPS();
+		// if (Controls.operatorController.getBButton()) {
+		// aimVelRPS = 80;
+		// BlackBox.logThis("rps", curVel);
+		// BlackBox.writeLog();
+		// } else if (Controls.operatorController.getXButton()) {
+		// aimVelRPS = 100;
+		// } else if (Controls.operatorController.getYButton()) {
+		// aimVelRPS = SmartDashboard.getNumber("Flywheel aim vel", 0);
+		// } else {
+		// aimVelRPS = 0;
+		// }
+		// shootLikeRobie();
 	}
 
 	/**

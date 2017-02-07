@@ -35,8 +35,13 @@ public class Robot extends IterativeRobot {
 		// Start the Vision (connect to server)
 		(new Thread(VisionServer.getInstance())).start();
 
-		//BlackBox.initializeLog(LOG_HEADER, getMatch(), false); // starts logging
-																// values
+		// BlackBox.initializeLog(LOG_HEADER, getMatch(), false); // starts
+		// logging
+		// values
+	}
+
+	public void disabledInit() {
+		Turret.getInstance().logger.close();
 	}
 
 	public void disabledPeriodic() {
@@ -54,21 +59,20 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void teleopInit() {
-		BlackBox.writeString("TELEOP STARTED");
 		Shooter.getInstance().initTeleop();
 	}
 
 	public void teleopPeriodic() {
 		Sensors.read();
-		Drive.getInstance().updateTeleop();
+
+		// Drive.getInstance().updateTeleop();
 		// Drive.getInstance().sendToSmartDash();
 		Hopper.getInstance().updateTeleop();
-		Shooter.getInstance().updateTeleop();
-		// Shooter.getInstance().sendToSmartDash();
-		Turret.getInstance().sendToSmartDash();
+		Turret.getInstance().manualControl();
+		Shooter.getInstance().sendToSmartDash();
+		// Turret.getInstance().sendToSmartDash();
 		Climber.getInstance().updateTeleop();
 		GearIntake.getInstance().updateTeleop();
 		Actuators.actuate();
-
 	}
 }

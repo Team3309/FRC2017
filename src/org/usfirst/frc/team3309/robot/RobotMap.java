@@ -17,7 +17,7 @@ public class RobotMap {
 	public static final int HOPPER_ID = 10;
 	public static final int LEFT_SHOOTER_ID = 12;
 	public static final int RIGHT_SHOOTER_ID = 11;
-	public static final int TURRET_ID = 2;
+	public static final int TURRET_ID = 8;
 
 	public static final int LEFT_ENCODER = 0;
 	public static final int RIGHT_ENCODER = 1;

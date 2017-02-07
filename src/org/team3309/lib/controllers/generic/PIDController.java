@@ -111,6 +111,7 @@ public abstract class PIDController extends Controller {
 		previousPValue = (kP * error);
 		previousIValue = (kI * mIntegral);
 		previousDValue = (kD * (previousError - error));
+		System.out.println("PREVIOUS ERROR " + (previousError - error));
 		double output = (kP * error) + (kI * mIntegral) + (kD * (previousError - error));
 		// System.out.println("Kp: " + (kP * error) + "kI: " + (kI * mIntegral)
 		// + "kD: " + (kD * (error - previousError)));
