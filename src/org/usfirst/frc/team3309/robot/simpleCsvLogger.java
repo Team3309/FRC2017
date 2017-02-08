@@ -44,7 +44,7 @@ import java.io.BufferedWriter;
  * 
  */
 
-public class simpleCsvLogger {
+public class SimpleCsvLogger {
 
 	long log_write_index;
 	String log_name = null;
