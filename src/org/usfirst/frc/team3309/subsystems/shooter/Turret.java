@@ -14,7 +14,7 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
-import org.usfirst.frc.team3309.robot.simpleCsvLogger;
+import org.usfirst.frc.team3309.robot.SimpleCsvLogger;
 import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
@@ -22,7 +22,9 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Turret extends ControlledSubsystem {
@@ -36,13 +38,15 @@ public class Turret extends ControlledSubsystem {
 	private double goalVel = getVelocity();
 	private double currentVelocity = getVelocity();
 	private TurretState currentState = TurretState.STOPPED;
+	private boolean hasCalibratedSinceEnable = false;
 	// angle and loops since it last of spotted
 	private HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
-	private double RIGHT_ABSOLUTE_LIMIT = -10;
-	private double LEFT_ABSOLUTE_LIMIT = 370;
+	private double RIGHT_ABSOLUTE_LIMIT = -90;
+	private double LEFT_ABSOLUTE_LIMIT = 260; // MEMES
 	String[] data_fields = { "time", "angle" };
 	String[] units_fields = { "ms", "deg" };
-	public simpleCsvLogger logger = new simpleCsvLogger();
+	public SimpleCsvLogger logger = new SimpleCsvLogger();
+	private DigitalInput hallEffectSensor = new DigitalInput(RobotMap.HALL_EFFECT_SENSOR);
 
 	public static Turret getInstance() {
 		if (instance == null)
@@ -62,58 +66,57 @@ public class Turret extends ControlledSubsystem {
 		for (int angle = 0; angle <= 360; angle++) {
 			hash.put(angle, 0);
 		}
-		//turretMC.changeControlMode(TalonControlMode.Position);
+
 		turretMC.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		//turretMC.setPID(.00165, .000001, 0);
+		turretMC.reverseOutput(true);
+		turretMC.reverseSensor(true);
+		// turretMC.setPID(.00165, .000001, 0);
 		this.teleopController = new PIDPositionController(.00190, .009, .00, .1);
 		this.teleopController.setName("TURRET POS");
 	}
 
 	@Override
 	public void initTeleop() {
-		resetSensor();
+		calTimer.start();
 		this.teleopController.reset();
 		logger.init(data_fields, units_fields);
 		goalAngle = getAngle();
+
 	}
 
 	@Override
 	public void initAuto() {
-		// TODO Auto-generated method stub
-
+		calTimer.start();
 	}
 
 	@Override
 	public void updateTeleop() {
 		currentAngle = getAngle();
 		currentVelocity = getVelocity();
-		if (Controls.operatorController.getAButton()) {
-			resetSensor();
+		if (!hasCalibratedSinceEnable) {
+			calibrate();
+			return;
+		}
+		if (isHallEffectHit() && getAngle() < 300) {
+			this.turretMC.setEncPosition(0);
 		}
 
 		// updateValuesSeen();
-		// if you see the goal, aim at it
 
+		// if you see the goal, aim at it
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
-			System.out.println("Vision");
 			moveTowardsGoal();
 		} else {
-			// System.out.println("TESTING POS");
-			testPosControl();
-			// searchForGoalVelControlledSurvey(); // searchForGoal();
+		 searchForGoalVelControlledSurvey(); //
+									// searchForGoal();
 		}
 
 		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
 
-		// turretMC.setPID(((PIDController) this.teleopController).kP,
-		// ((PIDController) this.teleopController).kI, ((PIDController)
-		// this.teleopController).kD);
-		if (this.turretMC
-				.isSensorPresent(FeedbackDevice.QuadEncoder) != CANTalon.FeedbackDeviceStatus.FeedbackStatusPresent) {
-			this.turretMC.changeControlMode(TalonControlMode.PercentVbus);
-			turretMC.set(0);
-		} else {
+		if (turretMC.getControlMode() == TalonControlMode.Position) {
 			turretMC.set((goalAngle / 360) * 14745.6);
+		} else {
+			turretMC.set(signal.getMotor());
 		}
 		// setTurnClockwise(signal.getMotor());
 		// add 1 loop to all angles
@@ -123,6 +126,42 @@ public class Turret extends ControlledSubsystem {
 		loopsSinceLastReset++;
 		sumOfOmegaSinceLastReset += Sensors.getAngularVel();
 		pastGoalAngle = goalAngle;
+	}
+
+	private void changeToPositionMode() {
+		turretMC.changeControlMode(TalonControlMode.Position);
+	}
+
+	private void changeToVelocityMode() {
+		turretMC.changeControlMode(TalonControlMode.PercentVbus);
+		if (!(this.teleopController instanceof FeedForwardWithPIDController)) {
+			this.teleopController = new FeedForwardWithPIDController(.017, 0.00, .009, .00, .00);
+			this.teleopController.setName("TurretVel ");
+		}
+	}
+
+	private double calibrationFactor = 1;
+	private double startingDegrees = getAngle();
+	private Timer calTimer = new Timer();
+
+	private void calibrate() {
+
+		changeToPositionMode();
+		System.out.println("CALIBRATING");
+		if (calTimer.get() < 1)
+			this.turretMC.set((((startingDegrees + 30)) / 360) * 14745.6);
+		else {
+			this.turretMC.set((((startingDegrees - 60)) / 360) * 14745.6);
+		}
+
+		if (calTimer.get() > 2)
+			calTimer.reset();
+		calibrationFactor++;
+		if (this.isHallEffectHit()) {
+			this.turretMC.set(0);
+			hasCalibratedSinceEnable = true;
+			this.turretMC.setEncPosition(0);
+		}
 	}
 
 	/**
@@ -139,18 +178,24 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	private void moveTowardsGoal() {
-		if (!(this.teleopController instanceof PIDPositionController)) {
-			this.teleopController = new PIDPositionController(165, .1, -300, .1);
-			this.teleopController.setName("TURR SLOW PID");
-		}
+		changeToPositionMode();
 		TargetInfo goal = VisionServer.getInstance().getTargets().get(0);
-		double goalX = goal.getX();
+		double goalX = goal.getY();
 		System.out.println("GOAL X " + goalX);
-		double degToTurn = (goalX / 2) * VisionServer.FIELD_OF_VIEW_DEGREES;
+		double degToTurn = (goalX) * (VisionServer.FIELD_OF_VIEW_DEGREES);
 		// TODO make this line more accurate to camera frame
 		double predictionOffset = (sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
 				* (loopsSinceLastReset * (Robot.LOOP_SPEED_MS / 1000));
 		goalAngle = this.getAngle() + degToTurn;
+		System.out.println("deg to turn " + degToTurn);
+		if (goalAngle > 360) {
+			goalAngle -= 360;
+		}
+
+		if (goalAngle < -70) {
+			goalAngle += 360;
+		}
+		System.out.println("GOAL AGLE " + goalAngle + " cur angle " + getAngle());
 	}
 
 	public void searchForGoal() {
@@ -173,8 +218,8 @@ public class Turret extends ControlledSubsystem {
 		goalAngle = angleToAimTowards;
 	}
 
-	private final double LEFT_LIMIT = 240;
-	private final double RIGHT_LIMIT = 120;
+	private final double LEFT_LIMIT = 30;
+	private final double RIGHT_LIMIT = 180;
 	private final double MAX_ACC = .8; // 180 deg/s*s
 	private final double MAX_VEL = 20; // 180 deg/s*s
 
@@ -209,23 +254,22 @@ public class Turret extends ControlledSubsystem {
 	private double desiredAngle = this.RIGHT_LIMIT;
 
 	public void searchForGoalVelControlledSurvey() {
-		if (!(this.teleopController instanceof FeedForwardWithPIDController)) {
-			this.teleopController = new FeedForwardWithPIDController(.017, 0.00, .009, .00, .00);
-			this.teleopController.setName("TurretVel ");
-		}
+		this.changeToVelocityMode();
 		if (desiredVel < desiredVelTarget) {
 			desiredVel += Math.min(desiredVelTarget - desiredVel, MAX_ACC);
 		} else if (desiredVel > desiredVelTarget) {
 			desiredVel -= Math.max(desiredVelTarget - desiredVel, MAX_ACC);
 		}
 
-		if (getAngle() > this.LEFT_LIMIT) {
+		if (getAngle() < this.LEFT_LIMIT) {
 			desiredAngle = RIGHT_LIMIT;
 			desiredVelTarget = -MAX_VEL;
-		} else if (getAngle() < this.RIGHT_LIMIT) {
+		} else if (getAngle() > this.RIGHT_LIMIT) {
 			desiredAngle = LEFT_LIMIT;
 			desiredVelTarget = MAX_VEL;
 		}
+		System.out.println("Targetting: " + desiredAngle + " curAngle " + getAngle() + " goalVel: " + this.desiredVel
+				+ " veltarget: " + this.desiredVelTarget);
 
 		this.goalVel = this.desiredVel;
 		((FeedForwardWithPIDController) this.teleopController).setAimVel(goalVel);
@@ -252,6 +296,7 @@ public class Turret extends ControlledSubsystem {
 	@Override
 	public void sendToSmartDash() {
 		this.teleopController.sendToSmartDash();
+		SmartDashboard.putNumber("Turert power ", this.turretMC.get());
 		SmartDashboard.putNumber("Turret Angle", getAngle());
 		// SmartDashboard.putNumber("Turret Velocity", getVelocity());
 		SmartDashboard.putNumber("Turret Goal Angle", this.turretMC.getSetpoint());
@@ -268,6 +313,8 @@ public class Turret extends ControlledSubsystem {
 		// SmartDashboard.putNumber("Desired Target Vel",
 		// this.desiredVelTarget);
 		SmartDashboard.putNumber("TURRET error", (turretMC.getError() / 147445) * 360);
+		SmartDashboard.putBoolean("hall effect", this.hallEffectSensor.get());
+		// NetworkTable.getTable("turret").putNumber("angle", getAngle());
 	}
 
 	@Override
@@ -275,6 +322,9 @@ public class Turret extends ControlledSubsystem {
 		// logger.writeData(Timer.getFPGATimestamp(), getAngle());
 		// setTurnClockwise(.4);
 		setTurnClockwise(Controls.operatorController.getX(Hand.kRight));
+		if (isHallEffectHit()) { // MAKE MEMES EVERYDAY
+			this.turretMC.setEncPosition(0);
+		}
 		// if (Controls.operatorController.getAButton()) {
 		// resetSensor();
 		// }
@@ -284,6 +334,10 @@ public class Turret extends ControlledSubsystem {
 		// BlackBox.writeLog();
 		// }
 
+	}
+
+	private boolean isHallEffectHit() {
+		return !this.hallEffectSensor.get();
 	}
 
 	private void setTurnClockwise(double power) {
@@ -299,11 +353,15 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	public double getAngle() {
-		return ((double) turretMC.getEncPosition() / 14745.6) * 360;
+		return -((double) turretMC.getEncPosition() / 14745.6) * 360;
 	}
 
 	public void resetSensor() {
-		turretMC.setEncPosition(7373);
+		turretMC.setEncPosition(0);
+	}
+
+	public void myCodesBetter() {
+		System.out.println("Im better than you");
 	}
 
 	private KragerTimer timerSinceLastVisionGoalSeen = new KragerTimer(1000);
@@ -318,4 +376,9 @@ public class Turret extends ControlledSubsystem {
 		sumOfOmegaSinceLastReset = 0;
 	}
 
+	public void callForCalibration() {
+		hasCalibratedSinceEnable = false;
+		startingDegrees = this.getAngle();
+		calibrationFactor = -30;
+	}
 }

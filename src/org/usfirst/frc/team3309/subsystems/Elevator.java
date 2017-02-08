@@ -1,19 +1,21 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
-import org.team3309.lib.actuators.TalonSRXMC;
-import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
+
+import com.ctre.CANTalon;
+import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.TalonControlMode;
 
 public class Elevator extends ControlledSubsystem {
 
 	private final double STAGING_VELOCITY = 2;
 	private final double SHOOTING_VELOCITY = 10;
 	private double aimVel = 0;
-	private TalonSRXMC elevator = new TalonSRXMC(RobotMap.ELEVATOR_ID);
+	private CANTalon elevator = new CANTalon(RobotMap.ELEVATOR_ID);
 	private static Elevator instance;
 
 	public static Elevator getInstance() {
@@ -24,18 +26,18 @@ public class Elevator extends ControlledSubsystem {
 
 	private Elevator(String name) {
 		super(name);
-		this.teleopController = new FeedForwardWithPIDController(0, 0, 0, 0, 0);
-		this.autoController = new FeedForwardWithPIDController(0, 0, 0, 0, 0);
+		elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder); 
+		elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
 	@Override
 	public void initAuto() {
-
+		System.out.println("I would like to be a marketing director at seven eleven.");
 	}
 
 	@Override
 	public void initTeleop() {
-
+		System.out.println("I would like to be a control systems engineer at mcdonalds");
 	}
 
 	@Override
@@ -52,7 +54,6 @@ public class Elevator extends ControlledSubsystem {
 		setElevator(out.getMotor());
 	}
 
-	
 	@Override
 	public void updateAuto() {
 		updateTeleop();
@@ -61,7 +62,7 @@ public class Elevator extends ControlledSubsystem {
 	@Override
 	public InputState getInputState() {
 		InputState s = new InputState();
-		s.setError(aimVel - elevator.getVelocity());
+		s.setError(aimVel - elevator.getEncVelocity());
 		return s;
 	}
 
@@ -77,7 +78,7 @@ public class Elevator extends ControlledSubsystem {
 	}
 
 	private void setElevator(double power) {
-		this.elevator.setDesiredOutput(power);
+		this.elevator.set(power);
 	}
 
 }

@@ -24,8 +24,6 @@ public class Sensors {
 	private static AnalogInput leftDrive;
 	private static AnalogInput rightDrive;
 	private static CounterSensor flywheelCounter;
-	private static DigitalInput turretRightHallEffect;
-	private static DigitalInput turretLeftHallEffect;
 
 	static {
 		System.out.println("INIT STATIC");
@@ -36,8 +34,6 @@ public class Sensors {
 
 		System.out.println("Turret");
 		flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
-		turretRightHallEffect = new DigitalInput(RobotMap.TURRET_RIGHT_LIMIT);
-		turretLeftHallEffect = new DigitalInput(RobotMap.TURRET_LEFT_LIMIT);
 	}
 	/**
 	 * Degrees in each encoder count
@@ -88,14 +84,6 @@ public class Sensors {
 		}
 		previousFlywheelCounterRPS = curRPS;
 		return curRPS;
-	}
-
-	public static boolean isTurretLeftLimitHit() {
-		return turretLeftHallEffect.get();
-	}
-
-	public static boolean isTurretRightLimitHit() {
-		return turretRightHallEffect.get();
 	}
 
 	public static double getAngularVel() {

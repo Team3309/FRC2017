@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel extends ControlledSubsystem {
 
-	private TalonSRXMC leftSpark = new TalonSRXMC(RobotMap.LEFT_SHOOTER_ID);
-	private TalonSRXMC rightSpark = new TalonSRXMC(RobotMap.RIGHT_SHOOTER_ID);
+	private TalonSRXMC leftTalon = new TalonSRXMC(RobotMap.LEFT_SHOOTER_ID);
+	private TalonSRXMC rightTalon = new TalonSRXMC(RobotMap.RIGHT_SHOOTER_ID);
 
 	private double maxAccRPS = 31.0;
 	private double aimVelRPS = 0.0;
@@ -33,7 +33,7 @@ public class Flywheel extends ControlledSubsystem {
 		this.teleopController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
 		this.autoController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
 		this.teleopController.setName("Flywheel");
-		this.rightSpark.setReversed(true);
+		this.rightTalon.setReversed(true);
 		this.autoController.setName("Flywheel");
 		((FeedForwardWithPIDController) this.teleopController).setTHRESHOLD(10);
 		((FeedForwardWithPIDController) this.autoController).setTHRESHOLD(10);
@@ -88,32 +88,23 @@ public class Flywheel extends ControlledSubsystem {
 		shootLikeRobie();
 	}
 
+	// ANGLE CLOCKWISE POSITIV
+	// NEGATIVE POWERGF
 	/**
 	 * Raw power values
 	 */
 	public void manualControl() {
-		if (Controls.operatorController.getAButton()) {
-			this.setShooter(.9);
-		} else if (Controls.operatorController.getBButton()) {
-			this.setShooter(.7);
+		curVel = this.getRPS();
+		if (Controls.operatorController.getBButton()) {
+			aimVelRPS = 80;
+		} else if (Controls.operatorController.getXButton()) {
+			aimVelRPS = 100;
 		} else if (Controls.operatorController.getYButton()) {
-			this.setShooter(.5);
+			aimVelRPS = SmartDashboard.getNumber("Flywheel aim vel testable", 0);
 		} else {
-			this.setShooter(0);
+			aimVelRPS = 0;
 		}
-		// curVel = this.getRPS();
-		// if (Controls.operatorController.getBButton()) {
-		// aimVelRPS = 80;
-		// BlackBox.logThis("rps", curVel);
-		// BlackBox.writeLog();
-		// } else if (Controls.operatorController.getXButton()) {
-		// aimVelRPS = 100;
-		// } else if (Controls.operatorController.getYButton()) {
-		// aimVelRPS = SmartDashboard.getNumber("Flywheel aim vel", 0);
-		// } else {
-		// aimVelRPS = 0;
-		// }
-		// shootLikeRobie();
+		shootLikeRobie();
 	}
 
 	/**
@@ -178,8 +169,8 @@ public class Flywheel extends ControlledSubsystem {
 		SmartDashboard.putNumber(this.getName() + " RPM", curVel * 60);
 		SmartDashboard.putNumber(this.getName() + " RPS", curVel);
 		SmartDashboard.putNumber(this.getName() + " Goal", this.aimVelRPS);
-		SmartDashboard.putNumber(this.getName() + " Left", leftSpark.getDesiredOutput());
-		SmartDashboard.putNumber(this.getName() + " Right", rightSpark.getDesiredOutput());
+		SmartDashboard.putNumber(this.getName() + " Left", leftTalon.getDesiredOutput());
+		SmartDashboard.putNumber(this.getName() + " Right", rightTalon.getDesiredOutput());
 	}
 
 	private double getRPS() {
@@ -213,8 +204,8 @@ public class Flywheel extends ControlledSubsystem {
 	}
 
 	private void setShooter(double power) {
-		leftSpark.setDesiredOutput(power);
-		rightSpark.setDesiredOutput(power);
+		leftTalon.setDesiredOutput(power);
+		rightTalon.setDesiredOutput(power);
 	}
 
 }

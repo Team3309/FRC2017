@@ -5,6 +5,7 @@ import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
+import org.usfirst.frc.team3309.subsystems.Elevator;
 import org.usfirst.frc.team3309.subsystems.GearIntake;
 import org.usfirst.frc.team3309.subsystems.Hopper;
 import org.usfirst.frc.team3309.subsystems.Shooter;
@@ -38,6 +39,7 @@ public class Robot extends IterativeRobot {
 		// BlackBox.initializeLog(LOG_HEADER, getMatch(), false); // starts
 		// logging
 		// values
+		Turret.getInstance().callForCalibration();
 	}
 
 	public void disabledInit() {
@@ -65,12 +67,14 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Sensors.read();
 
-		// Drive.getInstance().updateTeleop();
+		Drive.getInstance().updateTeleop();
 		// Drive.getInstance().sendToSmartDash();
 		Hopper.getInstance().updateTeleop();
-		Turret.getInstance().manualControl();
+		Elevator.getInstance().manualControl();
+		Turret.getInstance().updateTeleop();
+		Flywheel.getInstance().manualControl();
 		Shooter.getInstance().sendToSmartDash();
-		// Turret.getInstance().sendToSmartDash();
+
 		Climber.getInstance().updateTeleop();
 		GearIntake.getInstance().updateTeleop();
 		Actuators.actuate();
