@@ -1,10 +1,8 @@
 package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
-import org.team3309.lib.actuators.TalonSRXMC;
+import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
-import org.usfirst.frc.team3309.driverstation.Controls;
-import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 public class Hood extends ControlledSubsystem {
@@ -43,8 +41,6 @@ public class Hood extends ControlledSubsystem {
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 			goalAngle = VisionServer.getInstance().getHoodAngle();
 			lastVisionAngle = goalAngle;
-		} else if (Controls.operatorController.getPOV() == 0) {
-			goalAngle = lastVisionAngle;
 		} else {
 			goalAngle = DEFAULT_ANGLE;
 		}
@@ -86,6 +82,7 @@ public class Hood extends ControlledSubsystem {
 	@Override
 	public void initTeleop() {
 		aimAngle = DEFAULT_ANGLE;
+		this.teleopController = new PIDPositionController(.001, 0, 0);
 	}
 
 	@Override

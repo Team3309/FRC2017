@@ -1,6 +1,6 @@
 package org.usfirst.frc.team3309.robot;
 
-import org.team3309.lib.communications.BlackBox;
+import org.team3309.lib.actuators.ContinuousRotationServo;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.subsystems.Climber;
@@ -14,7 +14,7 @@ import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class Robot extends IterativeRobot {
@@ -64,9 +64,11 @@ public class Robot extends IterativeRobot {
 		Shooter.getInstance().initTeleop();
 	}
 
+	ContinuousRotationServo x = new ContinuousRotationServo(9);
+
 	public void teleopPeriodic() {
 		Sensors.read();
-
+		x.set(Controls.driverController.getX(Hand.kLeft));
 		Drive.getInstance().updateTeleop();
 		// Drive.getInstance().sendToSmartDash();
 		Hopper.getInstance().updateTeleop();

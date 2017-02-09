@@ -6,11 +6,11 @@ import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
 import org.team3309.lib.controllers.drive.DriveEncoderVelocityWithSetPointsController;
+import org.team3309.lib.controllers.drive.DriveEncodersController;
 import org.team3309.lib.controllers.drive.DriveEncodersVelocityController;
 import org.team3309.lib.controllers.drive.VelocityChangePoint;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
-import org.usfirst.frc.team3309.subsystems.Elevator;
 import org.usfirst.frc.team3309.subsystems.FuelIntake;
 import org.usfirst.frc.team3309.subsystems.GearIntake;
 import org.usfirst.frc.team3309.subsystems.Shooter;
@@ -93,6 +93,16 @@ public class RoutineBased {
 				throw new TimedOutException();
 			KragerTimer.delayMS(100);
 		}
+	}
+
+	public void driveEncoder(double goal, double timeout) {
+		Sensors.resetDrive();
+		DriveEncodersController x = new DriveEncodersController(goal);
+		try {
+			this.waitForController(x, timeout);
+		} catch (Exception e) {
+		}
+		mDrive.stopDrive();
 	}
 
 	public void driveEncoder(double goal, double timeout, LinkedList<VelocityChangePoint> arrayOfVel) {

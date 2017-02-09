@@ -42,11 +42,12 @@ public class Turret extends ControlledSubsystem {
 	// angle and loops since it last of spotted
 	private HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
 	private double RIGHT_ABSOLUTE_LIMIT = -90;
-	private double LEFT_ABSOLUTE_LIMIT = 260; // MEMES
+	private double LEFT_ABSOLUTE_LIMIT = 360;
 	String[] data_fields = { "time", "angle" };
 	String[] units_fields = { "ms", "deg" };
 	public SimpleCsvLogger logger = new SimpleCsvLogger();
 	private DigitalInput hallEffectSensor = new DigitalInput(RobotMap.HALL_EFFECT_SENSOR);
+	private double lastVisionAngle = getAngle();
 
 	public static Turret getInstance() {
 		if (instance == null)
@@ -107,8 +108,12 @@ public class Turret extends ControlledSubsystem {
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 			moveTowardsGoal();
 		} else {
-		 searchForGoalVelControlledSurvey(); //
-									// searchForGoal();
+			if (Controls.driverController.getYButton() || Controls.operatorController.getYButton()) {
+				goalAngle = lastVisionAngle;
+			} else {
+				searchForGoalVelControlledSurvey(); //
+			}
+			// searchForGoal();
 		}
 
 		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
@@ -161,6 +166,8 @@ public class Turret extends ControlledSubsystem {
 			this.turretMC.set(0);
 			hasCalibratedSinceEnable = true;
 			this.turretMC.setEncPosition(0);
+			this.turretMC.setForwardSoftLimit(this.LEFT_ABSOLUTE_LIMIT);
+			this.turretMC.setReverseSoftLimit(this.RIGHT_ABSOLUTE_LIMIT);
 		}
 	}
 
@@ -187,6 +194,7 @@ public class Turret extends ControlledSubsystem {
 		double predictionOffset = (sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
 				* (loopsSinceLastReset * (Robot.LOOP_SPEED_MS / 1000));
 		goalAngle = this.getAngle() + degToTurn;
+
 		System.out.println("deg to turn " + degToTurn);
 		if (goalAngle > 360) {
 			goalAngle -= 360;
@@ -195,6 +203,7 @@ public class Turret extends ControlledSubsystem {
 		if (goalAngle < -70) {
 			goalAngle += 360;
 		}
+		lastVisionAngle = goalAngle;
 		System.out.println("GOAL AGLE " + goalAngle + " cur angle " + getAngle());
 	}
 
