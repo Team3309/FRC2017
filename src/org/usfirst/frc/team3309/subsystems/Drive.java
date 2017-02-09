@@ -11,6 +11,9 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 
+import com.ctre.CANTalon.TalonControlMode;
+
+import edu.wpi.first.wpilibj.CANSpeedController.ControlMode;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -70,7 +73,6 @@ public class Drive extends ControlledSubsystem {
 
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
 			isLowGear = true;
-
 		} else
 			isLowGear = false; // sol.set(true);
 
@@ -78,6 +80,28 @@ public class Drive extends ControlledSubsystem {
 
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 
+	}
+
+	public void changeToVelocityMode() {
+		right0.getTalon().changeControlMode(TalonControlMode.Speed);
+		right1.getTalon().changeControlMode(TalonControlMode.Follower);
+		right2.getTalon().changeControlMode(TalonControlMode.Follower);
+		right1.getTalon().set(RobotMap.DRIVE_RIGHT_0_ID);
+		right2.getTalon().set(RobotMap.DRIVE_RIGHT_0_ID);
+		left0.getTalon().changeControlMode(TalonControlMode.Speed);
+		left1.getTalon().changeControlMode(TalonControlMode.Follower);
+		left2.getTalon().changeControlMode(TalonControlMode.Follower);
+		left1.getTalon().set(RobotMap.DRIVE_LEFT_0_ID);
+		left2.getTalon().set(RobotMap.DRIVE_LEFT_0_ID);
+	}
+
+	public void changeToPercentMode() {
+		right0.getTalon().changeControlMode(TalonControlMode.PercentVbus);
+		right1.getTalon().changeControlMode(TalonControlMode.PercentVbus);
+		right2.getTalon().changeControlMode(TalonControlMode.PercentVbus);
+		left0.getTalon().changeControlMode(TalonControlMode.PercentVbus);
+		left1.getTalon().changeControlMode(TalonControlMode.PercentVbus);
+		left2.getTalon().changeControlMode(TalonControlMode.PercentVbus);
 	}
 
 	@Override
@@ -125,7 +149,7 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
-		// TODO Auto-generated method stub
+		changeToPercentMode();
 
 	}
 
@@ -175,9 +199,13 @@ public class Drive extends ControlledSubsystem {
 	 *            rightMotorSpeed
 	 */
 	public void setRight(double right) {
-		this.right0.setDesiredOutput(-right);
-		this.right1.setDesiredOutput(-right);
-		this.right2.setDesiredOutput(-right);
+		if (this.right0.getTalon().getControlMode() == TalonControlMode.Speed) {
+			this.right0.setDesiredOutput(right);
+		} else {
+			this.right0.setDesiredOutput(-right);
+			this.right1.setDesiredOutput(-right);
+			this.right2.setDesiredOutput(-right);
+		}
 
 	}
 
@@ -188,9 +216,13 @@ public class Drive extends ControlledSubsystem {
 	 *            leftMotorSpeed
 	 */
 	public void setLeft(double left) {
-		this.left0.setDesiredOutput(left);
-		this.left1.setDesiredOutput(left);
-		this.left2.setDesiredOutput(left);
+		if (left0.getTalon().getControlMode() == TalonControlMode.Speed) {
+			this.left0.setDesiredOutput(left);
+		} else {
+			this.left0.setDesiredOutput(left);
+			this.left1.setDesiredOutput(left);
+			this.left2.setDesiredOutput(left);
+		}
 	}
 
 	/**
