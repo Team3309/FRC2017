@@ -29,7 +29,6 @@ public class DriveAngleVelocityController extends Controller {
 		SmartDashboard.putNumber(this.getName() + " Vel to Turn At", 0);
 
 		Drive.getInstance().changeToVelocityMode();
-		// SmartDashboard.putNumber("" , value);
 	}
 
 	@Override

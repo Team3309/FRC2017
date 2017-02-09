@@ -5,6 +5,7 @@ import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.robot.Sensors;
+import org.usfirst.frc.team3309.subsystems.Drive;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -14,6 +15,7 @@ public class DriveAngleController extends PIDPositionController {
 
 	public DriveAngleController(double goal) {
 		super(4.6, 0.2, 3.502);
+		Drive.getInstance().changeToPercentMode();
 		this.setName("Angle");
 		// SmartDashboard.putNumber(this.getName() + " goal(set me)", goal);
 		this.setTHRESHOLD(.5);
