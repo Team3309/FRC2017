@@ -26,12 +26,11 @@ public class DriveEncodersController extends Controller {
 		angController.setName("ang");
 		goalEncoder = goal;
 		goalAngle = Sensors.getAngle();
+		Drive.getInstance().changeToPercentMode();
 	}
 
 	public DriveEncodersController(double goal, double angle) {
-		linearController.setName("linear");
-		angController.setName("ang");
-		goalEncoder = goal;
+		this(goal);
 		goalAngle = angle;
 	}
 

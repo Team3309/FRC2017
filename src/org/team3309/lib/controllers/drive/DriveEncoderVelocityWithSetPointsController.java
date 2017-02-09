@@ -21,9 +21,6 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 	 * Helps turn when both sides have the same aim velocity
 	 */
 	private PIDPositionController turningController = new PIDPositionController(.06, 0, 0);
-	// Controller for each side
-	private FeedForwardWithPIDController leftSideController = new FeedForwardWithPIDController(.006, 0, .003, .001, 0);
-	private FeedForwardWithPIDController rightSideController = new FeedForwardWithPIDController(.006, 0, .004, .001, 0);
 	private KragerTimer doneTimer = new KragerTimer(.5);
 	private LinkedList<VelocityChangePoint> encoderChanges = new LinkedList<VelocityChangePoint>();
 	private LinkedList<Operation> operations = new LinkedList<Operation>();
@@ -35,35 +32,32 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 	private boolean isRampUp = false;
 
 	public DriveEncoderVelocityWithSetPointsController(double encoderGoal) {
-
+		Drive.getInstance().changeToVelocityMode();
 		turningController.setConstants(.06, 0, 0);
-		leftSideController.setConstants(.006, 0, .003, .001, 0);
-		rightSideController.setConstants(.006, 0, .004, .001, 0);
 
 		goalAngle = Sensors.getAngle();
 		this.goalEncoder = encoderGoal;
 		this.setName("DRIVE ENCODER VEL");
-		this.leftSideController.setName("LEFT IDE VEL CONTROLER");
-		this.rightSideController.setName("RIGHT IDE VEL CONTROLER");
-		this.turningController.setName("Turning Controller");
-		SmartDashboard.putNumber(this.getName() + " Vel to Go At", 0);
+		this.turningController.setName("Turning Enc Vel");
 		/*
 		 * add a starting point at the main vel (will continue to run at this
 		 * vel if no other points are added)
 		 */
-		encoderChanges.add(new VelocityChangePoint(DEFAULT_STARTING_VEL, 0));
+
 	}
 
 	@Override
 	public void reset() {
 		goalAngle = Sensors.getAngle();
-		rightSideController.reset();
-		leftSideController.reset();
 		turningController.reset();
 	}
 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
+
+		if (encoderChanges.isEmpty())
+			encoderChanges.add(new VelocityChangePoint(DEFAULT_STARTING_VEL, 0));
+
 		double currentEncoder = Drive.getInstance().getDistanceTraveled();
 		VelocityChangePoint currentVelocityPoint = new VelocityChangePoint(DEFAULT_STARTING_VEL, 0);
 		// Find closest velocity point to travel at
@@ -97,8 +91,8 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 			} catch (TimedOutException e) {
 			}
 		}
-		InputState leftState = new InputState();
-		InputState rightState = new InputState();
+
+		// start setting velocities and turning controllers
 		double rightAimVel = currentVelocityPoint.rightVelocityNew;
 		double leftAimVel = currentVelocityPoint.leftVelocityNew;
 		// used when going from rest to default speed
@@ -113,28 +107,22 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 			}
 			leftAimVel = rightAimVel;
 		}
-		// Use the left and right side PID loops to get the output values
-		leftState.setError(leftAimVel - inputState.getLeftVel());
-		rightState.setError(rightAimVel - inputState.getRightVel());
-		leftSideController.setAimVel(leftAimVel);
-		rightSideController.setAimVel(rightAimVel);
-		double rightSideOutput = rightSideController.getOutputSignal(rightState).getMotor();
-		double leftSideOutput = leftSideController.getOutputSignal(leftState).getMotor();
 		OutputSignal toBeReturnedSignal = new OutputSignal();
 		// if going straight, control angle too
 		if (leftAimVel == rightAimVel) {
-			InputState turningState = new InputState();
-			turningState.setError(goalAngle - inputState.getAngularPos());
 			// if the error is huge (meaning the robot has turned from dif
 			// velocities on each side) then set the current angle to the new
 			// goal
 			if (Math.abs(inputState.getAngularPos() - goalAngle) > 30) {
 				goalAngle = inputState.getAngularPos();
 			}
+			InputState turningState = new InputState();
+			turningState.setError(goalAngle - inputState.getAngularPos());
+
 			double turn = turningController.getOutputSignal(turningState).getMotor();
-			toBeReturnedSignal.setLeftRightMotor(leftSideOutput + turn, rightSideOutput - turn);
+			toBeReturnedSignal.setLeftRightMotor(leftAimVel + turn, rightAimVel - turn);
 		} else {
-			toBeReturnedSignal.setLeftRightMotor(leftSideOutput, rightSideOutput);
+			toBeReturnedSignal.setLeftRightMotor(leftAimVel, rightAimVel);
 		}
 		pastAim = rightAimVel;
 		return toBeReturnedSignal;
@@ -183,8 +171,6 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 	}
 
 	public void sendToSmartDash() {
-		leftSideController.sendToSmartDash();
-		rightSideController.sendToSmartDash();
 		turningController.sendToSmartDash();
 	}
 

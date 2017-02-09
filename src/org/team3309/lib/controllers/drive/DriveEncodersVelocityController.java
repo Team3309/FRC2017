@@ -40,7 +40,7 @@ public class DriveEncodersVelocityController extends Controller {
 	private boolean isRampUp = false;
 
 	public DriveEncodersVelocityController(double encoderGoal) {
-
+		Drive.getInstance().changeToVelocityMode();
 		encodersController.setConstants(2, 0, 1.015);
 		turningController.setConstants(.06, 0, 0);
 		leftSideController.setConstants(.006, 0, .003, .001, 0);

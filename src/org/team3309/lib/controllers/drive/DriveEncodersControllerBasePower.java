@@ -18,6 +18,7 @@ public class DriveEncodersControllerBasePower extends DriveEncodersController {
 
 	public DriveEncodersControllerBasePower(double goal, double basePower) {
 		super(goal);
+		Drive.getInstance().changeToPercentMode();
 		this.basePower = basePower;
 	}
 
@@ -27,6 +28,7 @@ public class DriveEncodersControllerBasePower extends DriveEncodersController {
 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
+
 		// Input States for the controllers
 		InputState inputForAng = inputState;
 		inputForAng.setError(goalAngle - inputState.getAngularPos());
