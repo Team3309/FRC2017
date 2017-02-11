@@ -13,14 +13,13 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
  */
 public abstract class ControlledSubsystem extends KragerSystem {
 	/**
-	 * Controller of Subsystem For Teleop
+	 * Controller of Subsystem
 	 */
-	protected Controller teleopController;
-	protected Controller autoController;
+	protected Controller controller;
 
 	public ControlledSubsystem(String name) {
 		super(name);
-		teleopController = new BlankController();
+		controller = new BlankController();
 	}
 
 	/*
@@ -39,7 +38,7 @@ public abstract class ControlledSubsystem extends KragerSystem {
 	public abstract InputState getInputState();
 
 	public void setTeleopController(Controller mController) {
-		this.teleopController = mController;
+		this.controller = mController;
 	}
 
 	public void setAutoController(Controller mController) {
@@ -52,7 +51,7 @@ public abstract class ControlledSubsystem extends KragerSystem {
 	 * @return
 	 */
 	public boolean isOnTarget() {
-		return teleopController.isCompleted();
+		return controller.isCompleted();
 	}
 
 	/**

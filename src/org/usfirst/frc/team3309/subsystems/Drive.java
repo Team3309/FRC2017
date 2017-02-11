@@ -76,7 +76,7 @@ public class Drive extends ControlledSubsystem {
 		} else
 			isLowGear = false; // sol.set(true);
 
-		OutputSignal output = teleopController.getOutputSignal(getInputState());
+		OutputSignal output = controller.getOutputSignal(getInputState());
 
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 
@@ -106,7 +106,7 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		OutputSignal output = autoController.getOutputSignal(getInputState());
+		OutputSignal output = controller.getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
@@ -137,7 +137,7 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		teleopController.sendToSmartDash();
+		controller.sendToSmartDash();
 		SmartDashboard.putNumber("right pow", right0.getDesiredOutput());
 		SmartDashboard.putNumber("left pow", left0.getDesiredOutput());
 	}
@@ -149,21 +149,21 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
+		controller = new DriveCheezyDriveEquation();
 		changeToPercentMode();
 
 	}
 
 	@Override
 	public void initAuto() {
-		// TODO Auto-generated method stub
-
+		controller = new BlankController();
 	}
 
 	/**
 	 * Stops current running controller and sets motors to zero
 	 */
 	public void stopDrive() {
-		autoController = new BlankController();
+		controller = new BlankController();
 		setLeftRight(0, 0);
 	}
 

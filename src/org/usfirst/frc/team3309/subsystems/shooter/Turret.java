@@ -72,14 +72,14 @@ public class Turret extends ControlledSubsystem {
 		turretMC.reverseOutput(true);
 		turretMC.reverseSensor(true);
 		// turretMC.setPID(.00165, .000001, 0);
-		this.teleopController = new PIDPositionController(.00190, .009, .00, .1);
-		this.teleopController.setName("TURRET POS");
+		this.controller = new PIDPositionController(.00190, .009, .00, .1);
+		this.controller.setName("TURRET POS");
 	}
 
 	@Override
 	public void initTeleop() {
 		calTimer.start();
-		this.teleopController.reset();
+		this.controller.reset();
 		logger.init(data_fields, units_fields);
 		goalAngle = getAngle();
 
@@ -116,7 +116,7 @@ public class Turret extends ControlledSubsystem {
 			// searchForGoal();
 		}
 
-		OutputSignal signal = this.teleopController.getOutputSignal(getInputState());
+		OutputSignal signal = this.controller.getOutputSignal(getInputState());
 
 		if (turretMC.getControlMode() == TalonControlMode.Position) {
 			turretMC.set((goalAngle / 360) * 14745.6);
@@ -139,9 +139,9 @@ public class Turret extends ControlledSubsystem {
 
 	private void changeToVelocityMode() {
 		turretMC.changeControlMode(TalonControlMode.PercentVbus);
-		if (!(this.teleopController instanceof FeedForwardWithPIDController)) {
-			this.teleopController = new FeedForwardWithPIDController(.017, 0.00, .009, .00, .00);
-			this.teleopController.setName("TurretVel ");
+		if (!(this.controller instanceof FeedForwardWithPIDController)) {
+			this.controller = new FeedForwardWithPIDController(.017, 0.00, .009, .00, .00);
+			this.controller.setName("TurretVel ");
 		}
 	}
 
@@ -243,9 +243,9 @@ public class Turret extends ControlledSubsystem {
 		if (goalAngle != pastGoalAngle) {
 
 			// if (Math.abs(this.currentAngle - goalAngle) < 60) {
-			this.teleopController = new PIDPositionController(22.611, .037177, 0, .075);
-			this.teleopController.setName("TURR SLOW PID");
-			this.teleopController.reset();
+			this.controller = new PIDPositionController(22.611, .037177, 0, .075);
+			this.controller.setName("TURR SLOW PID");
+			this.controller.reset();
 
 			// } else {
 			// this.teleopController = new PIDPositionController(27, 1.0, 0,
@@ -255,7 +255,7 @@ public class Turret extends ControlledSubsystem {
 		}
 		SmartDashboard.putNumber("aim Turret Pos", goalAngle);
 		if (Controls.driverController.getYButton())
-			this.teleopController.reset();
+			this.controller.reset();
 	}
 
 	private double desiredVelTarget = -MAX_VEL;
@@ -281,7 +281,7 @@ public class Turret extends ControlledSubsystem {
 				+ " veltarget: " + this.desiredVelTarget);
 
 		this.goalVel = this.desiredVel;
-		((FeedForwardWithPIDController) this.teleopController).setAimVel(goalVel);
+		((FeedForwardWithPIDController) this.controller).setAimVel(goalVel);
 	}
 
 	@Override
@@ -292,10 +292,9 @@ public class Turret extends ControlledSubsystem {
 	@Override
 	public InputState getInputState() {
 		InputState s = new InputState();
-		if (this.teleopController instanceof FeedForwardWithPIDController
-				|| this.autoController instanceof FeedForwardWithPIDController) {
+		if (this.controller instanceof FeedForwardWithPIDController) {
 
-			((FeedForwardWithPIDController) this.teleopController).setAimVel(goalVel);
+			((FeedForwardWithPIDController) this.controller).setAimVel(goalVel);
 			s.setError((goalVel - getVelocity()));
 		} else
 			s.setError((goalAngle - getAngle()) / 10000);
@@ -304,7 +303,7 @@ public class Turret extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		this.teleopController.sendToSmartDash();
+		this.controller.sendToSmartDash();
 		SmartDashboard.putNumber("Turert power ", this.turretMC.get());
 		SmartDashboard.putNumber("Turret Angle", getAngle());
 		// SmartDashboard.putNumber("Turret Velocity", getVelocity());

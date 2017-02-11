@@ -30,13 +30,10 @@ public class Flywheel extends ControlledSubsystem {
 
 	private Flywheel(String name) {
 		super(name);
-		this.teleopController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
-		this.autoController = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
-		this.teleopController.setName("Flywheel");
+		this.controller = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
+		this.controller.setName("Flywheel");
 		this.rightTalon.setReversed(true);
-		this.autoController.setName("Flywheel");
-		((FeedForwardWithPIDController) this.teleopController).setTHRESHOLD(10);
-		((FeedForwardWithPIDController) this.autoController).setTHRESHOLD(10);
+		((FeedForwardWithPIDController) this.controller).setTHRESHOLD(10);
 		SmartDashboard.putNumber("TEST RPS", 140);
 	}
 
@@ -125,11 +122,11 @@ public class Flywheel extends ControlledSubsystem {
 			}
 		}
 		// Send our target velocity to the mController
-		if (this.teleopController instanceof FeedForwardWithPIDController) {
-			((FeedForwardWithPIDController) this.teleopController).setAimAcc(aimAccRPS);
-			((FeedForwardWithPIDController) this.teleopController).setAimVel(aimVelRPS);
+		if (this.controller instanceof FeedForwardWithPIDController) {
+			((FeedForwardWithPIDController) this.controller).setAimAcc(aimAccRPS);
+			((FeedForwardWithPIDController) this.controller).setAimVel(aimVelRPS);
 		}
-		double output = this.teleopController.getOutputSignal(this.getInputState()).getMotor();
+		double output = this.controller.getOutputSignal(this.getInputState()).getMotor();
 		if (output > 1) {
 			output = 1;
 		} else if (output < 0) {
@@ -165,7 +162,7 @@ public class Flywheel extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		teleopController.sendToSmartDash();
+		controller.sendToSmartDash();
 		SmartDashboard.putNumber(this.getName() + " RPM", curVel * 60);
 		SmartDashboard.putNumber(this.getName() + " RPS", curVel);
 		SmartDashboard.putNumber(this.getName() + " Goal", this.aimVelRPS);
