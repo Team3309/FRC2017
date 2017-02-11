@@ -109,7 +109,7 @@ public class RoutineBased {
 		Sensors.resetDrive();
 		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
 		x.setEncoderChanges(arrayOfVel);
-		Drive.getInstance().setAutoController(x);
+		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {
@@ -121,7 +121,7 @@ public class RoutineBased {
 		Sensors.resetDrive();
 		DriveEncodersVelocityController x = new DriveEncodersVelocityController(goal);
 		x.setMAX_ENCODER_VEL(maxEnc);
-		Drive.getInstance().setAutoController(x);
+		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {
@@ -134,7 +134,7 @@ public class RoutineBased {
 		DriveEncodersVelocityController x = new DriveEncodersVelocityController(goal);
 		x.setMAX_ENCODER_VEL(maxEnc);
 		x.setRampUp(rampUp);
-		Drive.getInstance().setAutoController(x);
+		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {
@@ -149,7 +149,7 @@ public class RoutineBased {
 		x.setRampUp(rampUp);
 		x.setOperations(operations);
 		x.setEncoderChanges(w);
-		Drive.getInstance().setAutoController(x);
+		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {
@@ -164,7 +164,7 @@ public class RoutineBased {
 		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
 		x.setEncoderChanges(arrayOfVel);
 		x.setOperations(operations);
-		Drive.getInstance().setAutoController(x);
+		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {
@@ -174,7 +174,7 @@ public class RoutineBased {
 
 	public void turnToAngle(double goal, double timeout) {
 		DriveAngleVelocityController x = new DriveAngleVelocityController(goal);
-		Drive.getInstance().setAutoController(x);
+		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {
