@@ -15,7 +15,7 @@ import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 
 public class VisionServer implements Runnable {
 
-	private AdbBridge adb = new AdbBridge();
+	public AdbBridge adb = new AdbBridge();
 	private ServerSocket serverSocket;
 	private Socket socket;
 	private int PORT = 8254;
@@ -102,8 +102,9 @@ public class VisionServer implements Runnable {
 				InputStream is = socket.getInputStream();
 				byte[] buffer = new byte[2048];
 				int read;
+				//
 				while (socket.isConnected() && (read = is.read(buffer)) != -1) {
-					// System.out.println("Got Connection");
+					System.out.println("Got Connection");
 					String messageRaw = new String(buffer, 0, read);
 					String[] messages = messageRaw.split("\n");
 					for (String message : messages) {
@@ -112,8 +113,10 @@ public class VisionServer implements Runnable {
 							handleMessage(parsedMessage);
 						}
 					}
+					findClosestGoal();
 				}
 				System.out.println("Socket disconnected");
+
 			} catch (IOException e) {
 				System.err.println("Could not talk to socket");
 			}
@@ -124,11 +127,12 @@ public class VisionServer implements Runnable {
 					e.printStackTrace();
 				}
 			}
-			findClosestGoal();
+
 		}
 	}
 
 	private void findClosestGoal() {
+		System.out.println("FIND CLOSEST GOAL PLZ");
 		List<TargetInfo> currentTargets = this.getTargets();
 		// Find the closest preset value to the vision shot
 		if (currentTargets.size() != 0) {

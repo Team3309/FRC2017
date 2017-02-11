@@ -59,7 +59,7 @@ public class AdbBridge {
 
 	public void start() {
 		System.out.println("Starting adb");
-		runCommand("start");
+		runCommand("start-server");
 	}
 
 	public void stop() {
