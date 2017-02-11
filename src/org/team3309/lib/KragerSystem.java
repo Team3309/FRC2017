@@ -1,5 +1,7 @@
 package org.team3309.lib;
 
+import org.usfirst.frc.team3309.robot.Systems;
+
 /**
  * Basic subsystem class
  * 
@@ -17,6 +19,7 @@ public abstract class KragerSystem {
 	 *            Given name of subsystem
 	 */
 	public KragerSystem(String name) {
+		Systems.addSystem(this);
 		this.name = name;
 	}
 

@@ -1,8 +1,10 @@
 package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.actuators.ContinuousRotationServo;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 public class Hood extends ControlledSubsystem {
@@ -16,6 +18,7 @@ public class Hood extends ControlledSubsystem {
 	private static final double MAX_ANGLE = 0;
 	private double goalAngle = 0;
 	private double lastVisionAngle = 0;
+	private ContinuousRotationServo servo = new ContinuousRotationServo(RobotMap.PWM_SERVO);
 
 	private Hood(String name) {
 		super(name);

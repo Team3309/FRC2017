@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerTimer;
+import org.team3309.lib.communications.SimpleCsvLogger;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
@@ -14,7 +15,6 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
-import org.usfirst.frc.team3309.robot.SimpleCsvLogger;
 import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
 

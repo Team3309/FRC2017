@@ -22,8 +22,6 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<AutoRoutine> mainAutoChooser = new SendableChooser<AutoRoutine>();
 	private SendableChooser<AutoRoutine> sideAutoChooser = new SendableChooser<AutoRoutine>();
 	public static double LOOP_SPEED_MS = 20;
-	public String TIMEZONE = "SS"; // to be moved later
-	public String[] LOG_HEADER = { "Timestamp", "RPS" };
 
 	public boolean getMatch() {
 		return false;
@@ -32,13 +30,12 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		// Main Auto Chooser
 		mainAutoChooser.addObject("Straight 1 Gear", null);
+		mainAutoChooser.addObject("", null);
+		mainAutoChooser.addObject("Straight 1 Gear", null);
 
 		// Start the Vision (connect to server)
 		(new Thread(VisionServer.getInstance())).start();
 
-		// BlackBox.initializeLog(LOG_HEADER, getMatch(), false); // starts
-		// logging
-		// values
 		Turret.getInstance().callForCalibration();
 	}
 
@@ -51,34 +48,26 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void autonomousInit() {
-
+		Systems.initAuto();
 	}
 
 	public void autonomousPeriodic() {
 		Sensors.read();
-
+		Systems.upateAuto();
 		Actuators.actuate();
 	}
 
 	public void teleopInit() {
-		Shooter.getInstance().initTeleop();
+		Systems.initTeleop();
 	}
 
-	ContinuousRotationServo x = new ContinuousRotationServo(9);
+	
 
 	public void teleopPeriodic() {
 		Sensors.read();
-		x.set(Controls.driverController.getX(Hand.kLeft));
-		Drive.getInstance().updateTeleop();
-		// Drive.getInstance().sendToSmartDash();
-		Hopper.getInstance().updateTeleop();
+		Systems.updateTeleop();
 		Elevator.getInstance().manualControl();
-		Turret.getInstance().updateTeleop();
-		Flywheel.getInstance().manualControl();
 		Shooter.getInstance().sendToSmartDash();
-
-		Climber.getInstance().updateTeleop();
-		GearIntake.getInstance().updateTeleop();
 		Actuators.actuate();
 	}
 }

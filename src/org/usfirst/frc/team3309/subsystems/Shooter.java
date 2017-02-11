@@ -24,9 +24,6 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void updateTeleop() {
-		Flywheel.getInstance().updateTeleop();
-		Turret.getInstance().updateTeleop();
-		Hood.getInstance().updateTeleop();
 		if (Controls.operatorController.getAButton()) {
 			shouldBeShooting = true;
 		} else {
@@ -36,23 +33,16 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void updateAuto() {
-		Flywheel.getInstance().updateAuto();
-		Turret.getInstance().manualControl();
-		Hood.getInstance().updateAuto();
 	}
 
 	@Override
 	public void initTeleop() {
-		Flywheel.getInstance().initTeleop();
-		Turret.getInstance().initTeleop();
-		Hood.getInstance().initTeleop();
+
 	}
 
 	@Override
 	public void initAuto() {
-		Flywheel.getInstance().initAuto();
-		Turret.getInstance().initAuto();
-		Hood.getInstance().initAuto();
+
 	}
 
 	@Override
@@ -64,9 +54,6 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void manualControl() {
-		Flywheel.getInstance().manualControl();
-		Turret.getInstance().manualControl();
-		Hood.getInstance().manualControl();
 	}
 
 	public void setShouldBeShooting(boolean b) {
