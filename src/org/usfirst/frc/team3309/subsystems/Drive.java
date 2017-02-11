@@ -22,7 +22,7 @@ public class Drive extends ControlledSubsystem {
 
 	/**
 	 * Used to give a certain gap that the drive would be ok with being within
-	 * its goal encoder averageÃ�.
+	 * its goal encoder average.
 	 */
 	private static final double DRIVE_ENCODER_LENIENCY = 20;
 
@@ -40,46 +40,38 @@ public class Drive extends ControlledSubsystem {
 	private TalonSRXMC left2 = new TalonSRXMC(RobotMap.DRIVE_LEFT_2_ID);
 
 	private boolean isLowGear = true;
-	public boolean lowGearInAuto = false;
-	boolean isReset = false;
+	private boolean hasPIDBreakStarted = false;
 
 	public static Drive getInstance() {
 		if (drive == null)
-			drive = new Drive("Drive");
-
+			drive = new Drive();
 		return drive;
 	}
 
-	private Drive(String name) {
-		super(name);
-
+	private Drive() {
+		super("Drive");
 	}
 
 	@Override
 	public void updateTeleop() {
-
-		if (Controls.driverController.getAButton() && !isReset) {
-			System.out.println("BAD");
-			DriveAngleVelocityController driveAngleHardCore = new DriveAngleVelocityController(this.getAngle());
-			driveAngleHardCore.setCompletable(false);
-			driveAngleHardCore.turningController.setConstants(6, 0, 16);
-			this.setTeleopController(driveAngleHardCore);
-			isReset = true;
-		} else if (Controls.driverController.getAButton()) {
-			System.out.println("BAD");
+		if (Controls.driverController.getAButton() && !hasPIDBreakStarted) {
+			DriveAngleVelocityController drivePIDBreak = new DriveAngleVelocityController(this.getAngle());
+			drivePIDBreak.setCompletable(false);
+			drivePIDBreak.turningController.setConstants(6, 0, 16);
+			this.setController(drivePIDBreak);
+			hasPIDBreakStarted = true;
 		} else {
-			this.setTeleopController(new DriveCheezyDriveEquation());
+			if (!Controls.driverController.getAButton())
+				hasPIDBreakStarted = false;
+			this.setController(new DriveCheezyDriveEquation());
 		}
 
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
 			isLowGear = true;
 		} else
-			isLowGear = false; // sol.set(true);
-
+			isLowGear = false;
 		OutputSignal output = controller.getOutputSignal(getInputState());
-
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
-
 	}
 
 	public void changeToVelocityMode() {
@@ -114,32 +106,21 @@ public class Drive extends ControlledSubsystem {
 		InputState input = new InputState();
 		input.setAngularPos(Sensors.getAngle());
 		input.setAngularVel(Sensors.getAngularVel());
-		// Check and send off leftSide
-		try {
-			input.setLeftPos(Sensors.getLeftDrive());
-			input.setLeftVel(Sensors.getLeftDriveVel());
-		} catch (Exception e) {
-			// Way to show that the value is bad
-			input.setLeftPos(Double.MIN_VALUE);
-			input.setLeftVel(Double.MIN_VALUE);
-		}
-		// Check and send off rightSide
-		try {
-			input.setRightVel(Sensors.getRightDriveVel());
-			input.setRightPos(Sensors.getRightDrive());
-		} catch (Exception e) {
-			// Way to show that the value is bad
-			input.setRightVel(Double.MIN_VALUE);
-			input.setRightPos(Double.MIN_VALUE);
-		}
+		input.setLeftPos(Sensors.getLeftDrive());
+		input.setLeftVel(Sensors.getLeftDriveVel());
+		input.setRightVel(Sensors.getRightDriveVel());
+		input.setRightPos(Sensors.getRightDrive());
 		return input;
 	}
 
 	@Override
 	public void sendToSmartDash() {
 		controller.sendToSmartDash();
-		SmartDashboard.putNumber("right pow", right0.getDesiredOutput());
-		SmartDashboard.putNumber("left pow", left0.getDesiredOutput());
+		SmartDashboard.putNumber(this.getName() + " right pow", right0.getTalon().getPosition());
+		SmartDashboard.putNumber(this.getName() + " left pow", left0.getTalon().getPosition());
+		SmartDashboard.putNumber(this.getName() + " angle", getAngle());
+		SmartDashboard.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
+		// SmartDashboard.putNumber(this.getName() + " left pos" )
 	}
 
 	@Override
@@ -151,7 +132,6 @@ public class Drive extends ControlledSubsystem {
 	public void initTeleop() {
 		controller = new DriveCheezyDriveEquation();
 		changeToPercentMode();
-
 	}
 
 	@Override

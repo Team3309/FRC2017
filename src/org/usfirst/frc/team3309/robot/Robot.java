@@ -48,24 +48,22 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void autonomousInit() {
-		Systems.initAuto();
+		Systems.init();
 	}
 
 	public void autonomousPeriodic() {
 		Sensors.read();
-		Systems.upateAuto();
+		Systems.update();
 		Actuators.actuate();
 	}
 
 	public void teleopInit() {
-		Systems.initTeleop();
+		Systems.init();
 	}
-
-	
 
 	public void teleopPeriodic() {
 		Sensors.read();
-		Systems.updateTeleop();
+		Systems.update();
 		Elevator.getInstance().manualControl();
 		Shooter.getInstance().sendToSmartDash();
 		Actuators.actuate();

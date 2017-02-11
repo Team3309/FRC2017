@@ -13,13 +13,13 @@ public class Hopper extends ControlledSubsystem {
 
 	public static Hopper getInstance() {
 		if (instance == null) {
-			instance = new Hopper("Hopper");
+			instance = new Hopper();
 		}
 		return instance;
 	}
 
-	private Hopper(String name) {
-		super(name);
+	private Hopper() {
+		super("Hopper");
 	}
 
 	@Override

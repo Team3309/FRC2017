@@ -18,10 +18,10 @@ public class Hood extends ControlledSubsystem {
 	private static final double MAX_ANGLE = 0;
 	private double goalAngle = 0;
 	private double lastVisionAngle = 0;
-	private ContinuousRotationServo servo = new ContinuousRotationServo(RobotMap.PWM_SERVO);
+	private ContinuousRotationServo servo = new ContinuousRotationServo(RobotMap.SERVO);
 
-	private Hood(String name) {
-		super(name);
+	private Hood() {
+		super("Hood");
 	}
 
 	/**
@@ -31,7 +31,7 @@ public class Hood extends ControlledSubsystem {
 	 */
 	public static Hood getInstance() {
 		if (mHood == null) {
-			mHood = new Hood("Hood");
+			mHood = new Hood();
 		}
 		return mHood;
 	}
@@ -48,7 +48,7 @@ public class Hood extends ControlledSubsystem {
 			goalAngle = DEFAULT_ANGLE;
 		}
 		if (goalAngle >= 0) {
-			output = this.teleopController.getOutputSignal(getInputState()).getMotor();
+			output = this.controller.getOutputSignal(getInputState()).getMotor();
 		}
 
 		if ((curAngle > MAX_ANGLE && output > .2) || (curAngle < MIN_ANGLE
@@ -74,7 +74,7 @@ public class Hood extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		this.teleopController.sendToSmartDash();
+		this.controller.sendToSmartDash();
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class Hood extends ControlledSubsystem {
 	@Override
 	public void initTeleop() {
 		aimAngle = DEFAULT_ANGLE;
-		this.teleopController = new PIDPositionController(.001, 0, 0);
+		this.controller = new PIDPositionController(.001, 0, 0);
 	}
 
 	@Override
@@ -99,6 +99,6 @@ public class Hood extends ControlledSubsystem {
 	}
 
 	private void setHood(double power) {
-
+		servo.set(power);
 	}
 }

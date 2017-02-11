@@ -10,6 +10,8 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Elevator extends ControlledSubsystem {
 
 	private final double STAGING_VELOCITY = 2;
@@ -20,38 +22,35 @@ public class Elevator extends ControlledSubsystem {
 
 	public static Elevator getInstance() {
 		if (instance == null)
-			instance = new Elevator("Elevator");
+			instance = new Elevator();
 		return instance;
 	}
 
-	private Elevator(String name) {
-		super(name);
-		elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder); 
+	private Elevator() {
+		super("Elevator");
+		elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
 	@Override
 	public void initAuto() {
-		System.out.println("I would like to be a marketing director at seven eleven.");
+
 	}
 
 	@Override
 	public void initTeleop() {
-		System.out.println("I would like to be a control systems engineer at mcdonalds");
 	}
 
 	@Override
 	public void updateTeleop() {
-		boolean operatorXButton = Controls.operatorController.getXButton(); // sort
-		if (operatorXButton) {
+		if (Controls.operatorController.getXButton()) {
 			aimVel = STAGING_VELOCITY;
 		} else if (Shooter.getInstance().isShouldBeShooting()) {
 			aimVel = SHOOTING_VELOCITY;
 		} else {
 			aimVel = 0;
 		}
-		OutputSignal out = this.teleopController.getOutputSignal(getInputState());
-		setElevator(out.getMotor());
+		setElevator(aimVel);
 	}
 
 	@Override
@@ -68,8 +67,9 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		this.teleopController.sendToSmartDash();
-
+		this.controller.sendToSmartDash();
+		SmartDashboard.putNumber(this.getName() + " Vel", this.elevator.getEncPosition());
+		SmartDashboard.putNumber(this.getName() + " Pow", this.elevator.getPosition());
 	}
 
 	@Override

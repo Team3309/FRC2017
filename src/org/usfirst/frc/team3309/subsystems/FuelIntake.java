@@ -15,13 +15,12 @@ public class FuelIntake extends KragerSystem {
 
 	public static FuelIntake getInstance() {
 		if (instance == null)
-			instance = new FuelIntake("FuelIntake");
+			instance = new FuelIntake();
 		return instance;
 	}
 
-	private FuelIntake(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
+	private FuelIntake() {
+		super("FuelIntake");
 	}
 
 	@Override

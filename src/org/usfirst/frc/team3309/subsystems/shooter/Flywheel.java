@@ -28,8 +28,8 @@ public class Flywheel extends ControlledSubsystem {
 	 */
 	private static Flywheel mFlywheel;
 
-	private Flywheel(String name) {
-		super(name);
+	private Flywheel() {
+		super("Flywheel");
 		this.controller = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
 		this.controller.setName("Flywheel");
 		this.rightTalon.setReversed(true);
@@ -44,7 +44,7 @@ public class Flywheel extends ControlledSubsystem {
 	 */
 	public static Flywheel getInstance() {
 		if (mFlywheel == null) {
-			mFlywheel = new Flywheel("Flywheel");
+			mFlywheel = new Flywheel();
 		}
 		return mFlywheel;
 	}

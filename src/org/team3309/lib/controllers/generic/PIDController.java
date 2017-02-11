@@ -1,13 +1,10 @@
 package org.team3309.lib.controllers.generic;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -111,7 +108,6 @@ public abstract class PIDController extends Controller {
 		previousPValue = (kP * error);
 		previousIValue = (kI * mIntegral);
 		previousDValue = (kD * (previousError - error));
-		System.out.println("PREVIOUS ERROR " + (previousError - error));
 		double output = (kP * error) + (kI * mIntegral) + (kD * (previousError - error));
 		// System.out.println("Kp: " + (kP * error) + "kI: " + (kI * mIntegral)
 		// + "kD: " + (kD * (error - previousError)));
@@ -140,8 +136,8 @@ public abstract class PIDController extends Controller {
 	 * @param tHRESHOLD
 	 *            gap that
 	 */
-	public void setTHRESHOLD(double tHRESHOLD) {
-		THRESHOLD = tHRESHOLD;
+	public void setTHRESHOLD(double THRESHOLD) {
+		this.THRESHOLD = THRESHOLD;
 	}
 
 	/**

@@ -19,13 +19,13 @@ public class GearIntake extends KragerSystem {
 
 	public static GearIntake getInstance() {
 		if (instance == null) {
-			instance = new GearIntake("GearIntake");
+			instance = new GearIntake();
 		}
 		return instance;
 	}
 
-	public GearIntake(String name) {
-		super(name);
+	public GearIntake() {
+		super("GearIntake");
 	}
 
 	@Override

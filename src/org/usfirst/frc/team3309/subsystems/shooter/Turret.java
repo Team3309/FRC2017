@@ -51,7 +51,7 @@ public class Turret extends ControlledSubsystem {
 
 	public static Turret getInstance() {
 		if (instance == null)
-			instance = new Turret("Turret");
+			instance = new Turret();
 		return instance;
 	}
 
@@ -59,8 +59,8 @@ public class Turret extends ControlledSubsystem {
 		return ((double) turretMC.getEncVelocity() / 14745) * 360.0;
 	}
 
-	private Turret(String name) {
-		super(name);
+	private Turret() {
+		super("Turret");
 
 		// Place the angles and time loops since lastseen into the hashmap
 		// 0 - 360 degrees

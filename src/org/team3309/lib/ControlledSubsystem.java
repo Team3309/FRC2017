@@ -37,12 +37,8 @@ public abstract class ControlledSubsystem extends KragerSystem {
 	 */
 	public abstract InputState getInputState();
 
-	public void setTeleopController(Controller mController) {
+	public void setController(Controller mController) {
 		this.controller = mController;
-	}
-
-	public void setAutoController(Controller mController) {
-		this.autoController = mController;
 	}
 
 	/**

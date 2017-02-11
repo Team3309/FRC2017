@@ -13,13 +13,13 @@ public class Shooter extends KragerSystem {
 
 	public static Shooter getInstance() {
 		if (instance == null) {
-			instance = new Shooter("Shooter");
+			instance = new Shooter();
 		}
 		return instance;
 	}
 
-	private Shooter(String name) {
-		super(name);
+	private Shooter() {
+		super("Shooter");
 	}
 
 	@Override
