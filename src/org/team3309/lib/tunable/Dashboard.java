@@ -3,7 +3,7 @@ package org.team3309.lib.tunable;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Dashboard {
 	public String category() default "Uncategorized";
 

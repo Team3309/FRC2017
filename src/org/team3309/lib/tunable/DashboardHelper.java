@@ -1,75 +1,95 @@
 package org.team3309.lib.tunable;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import edu.wpi.first.wpilibj.networktables.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DashboardHelper {
-	public static void updateTunable(IDashboard tunable) {
-		Class<?> c = tunable.getClass();
-		Field[] fields = c.getFields();
+	public static void updateTunable(IDashboard dashboardObj) {
+		Class<?> c = dashboardObj.getClass();
+		
+		Field[] fields = c.getDeclaredFields();
+		Method[] methods = c.getMethods();
 
-		// -- Network Table
-		String tableName = tunable.getTableName();
-		boolean useSmartDashboard = false;
-		NetworkTable table = null;
-		if (tableName == "SmartDashboard")
-			useSmartDashboard = true;
-		else
-			table = NetworkTable.getTable(tableName);
+		NetworkTable table = NetworkTable.getTable(dashboardObj.getTableName());
 
 		// -- Prefix
 		String prefix = "";
-		String objName = tunable.getObjectName();
+		String objName = dashboardObj.getObjectName();
 		if (objName != null)
 			prefix = objName + "_";
 
 		try {
+			// -- Fields
 			for (Field f : fields) {
 				Dashboard annon = f.getAnnotation(Dashboard.class);
 				if (annon != null) {
-					String dispName = annon.displayName();
-					boolean readOnly = annon.tunable();
-					String name = prefix + (dispName != "" ? dispName : f.getName());
-
-					// ---------------------------------------------------------------
-					// -- Set the data
-
 					Class<?> ft = f.getType();
+					boolean isTunable = annon.tunable();
+					String dispName = annon.displayName();
+					String name = prefix + (dispName != "" ? dispName : f.getName());
+					
 					// -- Boolean
 					if (ft.isAssignableFrom(boolean.class)) {
-						boolean value = f.getBoolean(tunable);
-						if (useSmartDashboard)
-							value = SmartDashboard.getBoolean(name, value);
-						else
+						boolean value = f.getBoolean(dashboardObj);
+						if (isTunable) {
 							value = table.getBoolean(name, value);
-						if (!readOnly)
-							f.set(tunable, value);
+							f.set(dashboardObj, value);
+						}
+						else {
+							table.putBoolean(name, value);
+						}
 					}
 					// -- Number
 					else if (ft.isAssignableFrom(double.class)) {
-						double value = f.getDouble(tunable);
-						if (useSmartDashboard)
-							value = SmartDashboard.getNumber(name, value);
-						else
+						double value = f.getDouble(dashboardObj);
+						if (isTunable) {
 							value = table.getNumber(name, value);
-						if (!readOnly)
-							f.set(tunable, value);
+							f.set(dashboardObj, value);
+						}
+						else {
+							table.putNumber(name, value);
+						}
 					}
 					// -- String
 					else if (ft.isAssignableFrom(String.class)) {
-						String value = (String) f.get(tunable);
-						if (useSmartDashboard)
-							value = SmartDashboard.getString(name, value);
-						else
+						String value = (String) f.get(dashboardObj);
+						if (isTunable) {
 							value = table.getString(name, value);
-						if (!readOnly)
-							f.set(tunable, value);
+							f.set(dashboardObj, value);
+						}
+						else {
+							table.putString(name, value);
+						}
 					}
 				}
 			}
-		} catch (IllegalAccessException ex) {
-		}
+			
+			// -- Methods
+			for (Method m : methods) {
+				Dashboard annon = m.getAnnotation(Dashboard.class);
+				if (annon != null) {					
+					Class<?> ft = m.getReturnType();
+					String dispName = annon.displayName();
+					String name = prefix + (dispName != "" ? dispName : m.getName());
+										
+					// -- Boolean
+					if (ft.isAssignableFrom(boolean.class)) {
+						table.putBoolean(name, (boolean) m.invoke(dashboardObj));
+					}
+					// -- Number
+					else if (ft.isAssignableFrom(double.class)) {
+						table.putNumber(name, (double) m.invoke(dashboardObj));
+					}
+					// -- String
+					else if (ft.isAssignableFrom(String.class)) {
+						table.putString(name, (String) m.invoke(dashboardObj));
+					}
+				}
+			}
+		} catch (IllegalAccessException
+				| IllegalArgumentException
+				| InvocationTargetException ex) { }
+	
 
 	}
 }
