@@ -24,7 +24,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 	private static final double MAX_ANGLE = 200;
 	private double goalAngle = 0;
 	private double lastVisionAngle = 0;
-	@Dashboard(tunable = true)
+	@Dashboard(tunable = false)
 	private double curAngle = 0;
 	private ContinuousRotationServo servo = new ContinuousRotationServo(RobotMap.SERVO);
 

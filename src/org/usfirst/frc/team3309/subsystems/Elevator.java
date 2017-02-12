@@ -37,11 +37,12 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void initAuto() {
-
+		this.elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
 	@Override
 	public void initTeleop() {
+		this.elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
 	@Override
@@ -77,6 +78,7 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
+		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
 		if (Controls.operatorController.getBumper(Hand.kRight)) {
 			setElevator(.5);
 		} else if (Controls.operatorController.getBumper(Hand.kLeft)) {
