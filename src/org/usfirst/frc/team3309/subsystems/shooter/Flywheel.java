@@ -104,9 +104,7 @@ public class Flywheel extends ControlledSubsystem {
 
 	public void testVel() {
 		curVel = this.getRPS();
-		if (Controls.operatorController.getBButton()) {
-			aimVelRPS = 80;
-		} else if (Controls.operatorController.getXButton()) {
+		if (Controls.operatorController.getXButton()) {
 			aimVelRPS = 100;
 		} else if (Controls.operatorController.getYButton()) {
 			aimVelRPS = SmartDashboard.getNumber("Flywheel aim vel testable", 0);

@@ -10,10 +10,6 @@ import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 
 public class Shooter extends KragerSystem {
 
-	private TalonSRXMC leftTalon = new TalonSRXMC(RobotMap.LEFT_SHOOTER_ID);
-	private TalonSRXMC rightTalon = new TalonSRXMC(RobotMap.RIGHT_SHOOTER_ID);
-
-	
 	private boolean shouldBeShooting = false;
 	private static Shooter instance;
 
@@ -60,7 +56,7 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void manualControl() {
-		
+
 	}
 
 	public void setShouldBeShooting(boolean b) {

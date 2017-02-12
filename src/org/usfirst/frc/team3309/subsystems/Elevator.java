@@ -21,6 +21,7 @@ public class Elevator extends ControlledSubsystem {
 	private final double SHOOTING_VELOCITY = 10;
 	private double aimVel = 0;
 	private CANTalon elevator = new CANTalon(RobotMap.ELEVATOR_ID);
+	private CANTalon feedyWheel = new CANTalon(RobotMap.FEEDY_WHEEL_ID);
 	private static Elevator instance;
 
 	public static Elevator getInstance() {
@@ -47,7 +48,7 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		if (Controls.operatorController.getXButton()) {
+		if (Controls.operatorController.getBButton()) {
 			aimVel = STAGING_VELOCITY;
 		} else if (Shooter.getInstance().isShouldBeShooting()) {
 			aimVel = SHOOTING_VELOCITY;

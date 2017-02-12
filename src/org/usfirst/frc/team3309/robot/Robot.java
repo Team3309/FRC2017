@@ -10,6 +10,7 @@ import org.usfirst.frc.team3309.subsystems.GearIntake;
 import org.usfirst.frc.team3309.subsystems.Hopper;
 import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
+import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
@@ -63,7 +64,10 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Sensors.read();
 		// Systems.update();
-		Elevator.getInstance().manualControl();
+		Flywheel.getInstance().testVel();
+		Hood.getInstance().manualControl(); // updateTeleop, check sensor values first
+		Turret.getInstance().manualControl();
+		Elevator.getInstance().manualControl(); 
 		Shooter.getInstance().sendToSmartDash();
 		Actuators.actuate();
 	}

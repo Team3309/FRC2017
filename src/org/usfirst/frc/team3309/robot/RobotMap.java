@@ -5,7 +5,7 @@ public class RobotMap {
 	// TALON ID's
 	public static final int HOOD_ID = 7;
 	public static final int ELEVATOR_ID = 9;
-	public static final int DRIVE_RIGHT_0_ID = 17;
+	public static final int DRIVE_RIGHT_0_ID = 2;
 	public static final int DRIVE_RIGHT_1_ID = 3;
 	public static final int DRIVE_RIGHT_2_ID = 4;
 	public static final int DRIVE_LEFT_0_ID = 14;
@@ -18,6 +18,7 @@ public class RobotMap {
 	public static final int LEFT_SHOOTER_ID = 10;
 	public static final int RIGHT_SHOOTER_ID = 11;
 	public static final int TURRET_ID = 8;
+	public static final int FEEDY_WHEEL_ID = 12;
 
 	// DIO
 	public static final int FLYWHEEL_SENSOR = 4;

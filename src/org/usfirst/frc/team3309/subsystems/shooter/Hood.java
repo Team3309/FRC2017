@@ -56,7 +56,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 		} else {
 			goalAngle = lastVisionAngle;
 		}
-		// testPosControl();
+		testPosControl();
 		if (goalAngle >= 0) {
 			output = this.controller.getOutputSignal(getInputState()).getMotor();
 		}
