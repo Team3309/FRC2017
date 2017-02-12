@@ -1,6 +1,6 @@
 package org.team3309.lib.tunable;
 
-public class TestTunable implements IDashboard {
+public class TestTunable implements ITunable {
 
 	@Override
 	public String getTableName() { return "SmartDashboard"; }
@@ -8,13 +8,13 @@ public class TestTunable implements IDashboard {
 	@Override
 	public String getObjectName() { return "TestTunable"; }
 	
-	@Dashboard
+	@Tunable
 	public int foo = 10;
 	
-	@Dashboard(tunable=true)
+	@Tunable(ReadOnly=true)
 	public int bar = 5;
 	
-	@Dashboard
+	@Tunable
 	public String baz = "bazybaz";
 
 }

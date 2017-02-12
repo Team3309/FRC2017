@@ -125,7 +125,7 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-
+		updateTeleop();
 	}
 
 	@Override

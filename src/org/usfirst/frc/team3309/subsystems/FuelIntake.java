@@ -55,7 +55,7 @@ public class FuelIntake extends KragerSystem {
 
 	@Override
 	public void manualControl() {
-		// TODO Auto-generated method stub
+		updateTeleop();
 
 	}
 
