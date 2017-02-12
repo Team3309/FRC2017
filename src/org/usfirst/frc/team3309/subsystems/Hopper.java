@@ -52,7 +52,7 @@ public class Hopper extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-		// TODO Auto-generated method stub
+		updateTeleop();
 
 	}
 

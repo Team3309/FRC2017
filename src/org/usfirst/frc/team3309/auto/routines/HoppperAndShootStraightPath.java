@@ -21,5 +21,4 @@ public class HoppperAndShootStraightPath extends AutoRoutine {
 		this.driveEncoder(5000, 3, changePoints);
 		this.shoot();
 	}
-
 }

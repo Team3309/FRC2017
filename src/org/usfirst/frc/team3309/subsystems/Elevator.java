@@ -1,5 +1,7 @@
 package org.usfirst.frc.team3309.subsystems;
 
+import java.awt.geom.Ellipse2D;
+
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
@@ -10,6 +12,7 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator extends ControlledSubsystem {
@@ -34,11 +37,12 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void initAuto() {
-
+		this.elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
 	@Override
 	public void initTeleop() {
+		this.elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
 	@Override
@@ -74,7 +78,14 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-
+		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
+		if (Controls.operatorController.getBumper(Hand.kRight)) {
+			setElevator(.5);
+		} else if (Controls.operatorController.getBumper(Hand.kLeft)) {
+			setElevator(-.5);
+		} else {
+			setElevator(0);
+		}
 	}
 
 	private void setElevator(double power) {

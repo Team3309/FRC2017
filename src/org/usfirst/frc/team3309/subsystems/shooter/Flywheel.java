@@ -91,6 +91,18 @@ public class Flywheel extends ControlledSubsystem {
 	 * Raw power values
 	 */
 	public void manualControl() {
+		if (Controls.operatorController.getBButton()) {
+			this.setShooter(.4);
+		} else if (Controls.operatorController.getXButton()) {
+			this.setShooter(.6);
+		} else if (Controls.operatorController.getYButton()) {
+			this.setShooter(.8);
+		} else {
+			this.setShooter(0);
+		}
+	}
+
+	public void testVel() {
 		curVel = this.getRPS();
 		if (Controls.operatorController.getBButton()) {
 			aimVelRPS = 80;

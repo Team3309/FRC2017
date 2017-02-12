@@ -26,10 +26,6 @@ public class TalonSRXMC extends Actuator {
 		return lastPosition;
 	}
 
-	public double getVelocity() {
-		return lastVelocity;
-	}
-
 	public boolean isReversed() {
 		return isReversed;
 	}
@@ -49,4 +45,5 @@ public class TalonSRXMC extends Actuator {
 	public CANTalon getTalon() {
 		return talon;
 	}
+
 }

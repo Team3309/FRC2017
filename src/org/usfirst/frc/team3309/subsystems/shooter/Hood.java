@@ -1,14 +1,17 @@
 package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.KragerMath;
 import org.team3309.lib.actuators.ContinuousRotationServo;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.tunable.IDashboard;
 import org.team3309.lib.tunable.Dashboard;
+import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Hood extends ControlledSubsystem implements IDashboard {
@@ -21,7 +24,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 	private static final double MAX_ANGLE = 200;
 	private double goalAngle = 0;
 	private double lastVisionAngle = 0;
-	@Dashboard(tunable = true)
+	@Dashboard(tunable = false)
 	private double curAngle = 0;
 	private ContinuousRotationServo servo = new ContinuousRotationServo(RobotMap.SERVO);
 
@@ -53,6 +56,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 		} else {
 			goalAngle = lastVisionAngle;
 		}
+		// testPosControl();
 		if (goalAngle >= 0) {
 			output = this.controller.getOutputSignal(getInputState()).getMotor();
 		}
@@ -62,6 +66,9 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 			output = 0;
 			// TODO POSSIBLE RESET FOR DIFFERENT ANGLES
 		}
+
+		if (Math.abs(output) > .03)
+			output = .03 * KragerMath.sign(output);
 		this.setHood(output);
 	}
 
@@ -89,7 +96,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 
 	@Override
 	public void manualControl() {
-
+		setHood(Controls.operatorController.getY(Hand.kRight));
 	}
 
 	@Override
