@@ -6,11 +6,12 @@ import java.util.Map.Entry;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerTimer;
-import org.team3309.lib.communications.SimpleCsvLogger;
+import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.team3309.lib.controllers.turret.TurretVelocitySuveyController;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
@@ -30,23 +31,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Turret extends ControlledSubsystem {
 
 	private static Turret instance;
-	private CANTalon turretMC = new CANTalon(RobotMap.TURRET_ID);
+	private DigitalInput hallEffectSensor = new DigitalInput(RobotMap.HALL_EFFECT_SENSOR);
+	private CANTalon turretMC = new CANTalon(RobotMap.TURRET_ID, 20);
 	private double currentAngle = getAngle();
 	private double pastAngle = getAngle();
-	private double pastGoalAngle = getAngle();
 	private double goalAngle = getAngle();
-	private double goalVel = getVelocity();
-	private double currentVelocity = getVelocity();
-	private TurretState currentState = TurretState.STOPPED;
 	private boolean hasCalibratedSinceRobotInit = false;
 	// angle and loops since it last of spotted
 	private HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
 	private double RIGHT_ABSOLUTE_LIMIT = -90;
 	private double LEFT_ABSOLUTE_LIMIT = 360;
-	private String[] data_fields = { "time", "angle" };
-	private String[] units_fields = { "ms", "deg" };
-	private DigitalInput hallEffectSensor = new DigitalInput(RobotMap.HALL_EFFECT_SENSOR);
 	private double lastVisionAngle = getAngle();
+
+	public final double LEFT_LIMIT = 30;
+	public final double RIGHT_LIMIT = 180;
+	public final double MAX_ACC = .8; // 180 deg/s*s
+	public final double MAX_VEL = 20; // 180 deg/s*s
 
 	public static Turret getInstance() {
 		if (instance == null)
@@ -60,17 +60,14 @@ public class Turret extends ControlledSubsystem {
 
 	private Turret() {
 		super("Turret");
-
 		// Place the angles and time loops since lastseen into the hashmap
 		// 0 - 360 degrees
 		for (int angle = 0; angle <= 360; angle++) {
 			hash.put(angle, 0);
 		}
-
 		turretMC.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		turretMC.reverseOutput(true);
 		turretMC.reverseSensor(true);
-		// turretMC.setPID(.00165, .000001, 0);
 		this.controller = new PIDPositionController(.00190, .009, .00, .1);
 		this.controller.setName("TURRET POS");
 	}
@@ -80,7 +77,6 @@ public class Turret extends ControlledSubsystem {
 		calTimer.start();
 		this.controller.reset();
 		goalAngle = getAngle();
-
 	}
 
 	@Override
@@ -91,7 +87,6 @@ public class Turret extends ControlledSubsystem {
 	@Override
 	public void updateTeleop() {
 		currentAngle = getAngle();
-		currentVelocity = getVelocity();
 		if (!hasCalibratedSinceRobotInit) {
 			calibrate();
 			return;
@@ -99,9 +94,7 @@ public class Turret extends ControlledSubsystem {
 		if (isHallEffectHit() && getAngle() < 300) {
 			this.turretMC.setEncPosition(0);
 		}
-
 		// updateValuesSeen();
-
 		// if you see the goal, aim at it
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 			moveTowardsGoal();
@@ -109,37 +102,35 @@ public class Turret extends ControlledSubsystem {
 			if (Controls.driverController.getYButton() || Controls.operatorController.getYButton()) {
 				goalAngle = lastVisionAngle;
 			} else {
-				searchForGoalVelControlledSurvey(); //
+				this.changeToVelocityMode();
 			}
-			// searchForGoal();
 		}
-
 		OutputSignal signal = this.controller.getOutputSignal(getInputState());
-
 		if (turretMC.getControlMode() == TalonControlMode.Position) {
 			turretMC.set((goalAngle / 360) * 14745.6);
 		} else {
 			turretMC.set(signal.getMotor());
 		}
-		// setTurnClockwise(signal.getMotor());
 		// add 1 loop to all angles
 		for (int angle = 0; angle <= 360; angle++) {
 			hash.replace(angle, hash.get(angle) + 1);
 		}
 		loopsSinceLastReset++;
 		sumOfOmegaSinceLastReset += Sensors.getAngularVel();
-		pastGoalAngle = goalAngle;
 	}
 
-	private void changeToPositionMode() {
+	public void changeToPositionMode() {
 		turretMC.changeControlMode(TalonControlMode.Position);
+		// position is done on talon.
+		this.setController(new BlankController());
 	}
 
-	private void changeToVelocityMode() {
+	public void changeToVelocityMode() {
 		turretMC.changeControlMode(TalonControlMode.PercentVbus);
-		if (!(this.controller instanceof FeedForwardWithPIDController)) {
-			this.controller = new FeedForwardWithPIDController(.017, 0.00, .009, .00, .00);
-			this.controller.setName("TurretVel ");
+		if (!(this.controller instanceof TurretVelocitySuveyController)) {
+			TurretVelocitySuveyController con = new TurretVelocitySuveyController();
+			con.setName("Turret Survey ");
+			this.setController(con);
 		}
 	}
 
@@ -184,24 +175,20 @@ public class Turret extends ControlledSubsystem {
 		double goalX = goal.getY();
 		System.out.println("GOAL X " + goalX);
 		double degToTurn = (goalX) * (VisionServer.FIELD_OF_VIEW_DEGREES);
-		// TODO make this line more accurate to camera frame
 		double predictionOffset = (sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
 				* (loopsSinceLastReset * (Robot.LOOP_SPEED_MS / 1000));
 		goalAngle = this.getAngle() + degToTurn;
-
-		System.out.println("deg to turn " + degToTurn);
 		if (goalAngle > 360) {
 			goalAngle -= 360;
 		}
-
 		if (goalAngle < -70) {
 			goalAngle += 360;
 		}
 		lastVisionAngle = goalAngle;
-		System.out.println("GOAL AGLE " + goalAngle + " cur angle " + getAngle());
 	}
 
 	public void searchForGoal() {
+		this.changeToVelocityMode();
 		double largestHeuristic = Double.MIN_VALUE;
 		int angleToAimTowards = Integer.MIN_VALUE;
 		// find the angle that needs most surveying
@@ -221,61 +208,11 @@ public class Turret extends ControlledSubsystem {
 		goalAngle = angleToAimTowards;
 	}
 
-	private final double LEFT_LIMIT = 30;
-	private final double RIGHT_LIMIT = 180;
-	private final double MAX_ACC = .8; // 180 deg/s*s
-	private final double MAX_VEL = 20; // 180 deg/s*s
-
-	public void testVelControl() {
-		goalVel = SmartDashboard.getNumber("aim Turret Vel", 0);
-		SmartDashboard.putNumber("aim Turret Vel", goalVel);
-
-	}
-
 	public void testPosControl() {
 		goalAngle = SmartDashboard.getNumber("aim Turret Pos", 0);
-		if (goalAngle != pastGoalAngle) {
-
-			// if (Math.abs(this.currentAngle - goalAngle) < 60) {
-			this.controller = new PIDPositionController(22.611, .037177, 0, .075);
-			this.controller.setName("TURR SLOW PID");
-			this.controller.reset();
-
-			// } else {
-			// this.teleopController = new PIDPositionController(27, 1.0, 0,
-			// .1);
-			// this.teleopController.setName("TURR FAST PID");
-			// }
-		}
 		SmartDashboard.putNumber("aim Turret Pos", goalAngle);
 		if (Controls.driverController.getYButton())
 			this.controller.reset();
-	}
-
-	private double desiredVelTarget = -MAX_VEL;
-	private double desiredVel = 0;
-	private double desiredAngle = this.RIGHT_LIMIT;
-
-	public void searchForGoalVelControlledSurvey() {
-		this.changeToVelocityMode();
-		if (desiredVel < desiredVelTarget) {
-			desiredVel += Math.min(desiredVelTarget - desiredVel, MAX_ACC);
-		} else if (desiredVel > desiredVelTarget) {
-			desiredVel -= Math.max(desiredVelTarget - desiredVel, MAX_ACC);
-		}
-
-		if (getAngle() < this.LEFT_LIMIT) {
-			desiredAngle = RIGHT_LIMIT;
-			desiredVelTarget = -MAX_VEL;
-		} else if (getAngle() > this.RIGHT_LIMIT) {
-			desiredAngle = LEFT_LIMIT;
-			desiredVelTarget = MAX_VEL;
-		}
-		System.out.println("Targetting: " + desiredAngle + " curAngle " + getAngle() + " goalVel: " + this.desiredVel
-				+ " veltarget: " + this.desiredVelTarget);
-
-		this.goalVel = this.desiredVel;
-		((FeedForwardWithPIDController) this.controller).setAimVel(goalVel);
 	}
 
 	@Override
@@ -286,11 +223,9 @@ public class Turret extends ControlledSubsystem {
 	@Override
 	public InputState getInputState() {
 		InputState s = new InputState();
-		if (this.controller instanceof FeedForwardWithPIDController) {
-			((FeedForwardWithPIDController) this.controller).setAimVel(goalVel);
-			s.setError((goalVel - getVelocity()));
-		} else
-			s.setError((goalAngle - getAngle()) / 10000);
+		s.setAngularPos(getAngle());
+		s.setAngularVel(this.getVelocity());
+		s.setError((goalAngle - getAngle()) / 10000);
 		return s;
 	}
 

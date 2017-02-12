@@ -4,24 +4,30 @@ import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.actuators.ContinuousRotationServo;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.team3309.lib.tunable.IDashboard;
+import org.team3309.lib.tunable.Dashboard;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
-public class Hood extends ControlledSubsystem {
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+public class Hood extends ControlledSubsystem implements IDashboard {
 	/**
 	 * Shooter for singleton pattern
 	 */
 	private static Hood mHood;
-	private static double aimAngle;
 	private static final double MIN_ANGLE = 0;
 	private static final double DEFAULT_ANGLE = 0;
-	private static final double MAX_ANGLE = 0;
+	private static final double MAX_ANGLE = 200;
 	private double goalAngle = 0;
 	private double lastVisionAngle = 0;
+	@Dashboard(tunable = true)
+	private double curAngle = 0;
 	private ContinuousRotationServo servo = new ContinuousRotationServo(RobotMap.SERVO);
 
 	private Hood() {
 		super("Hood");
+		this.controller = new PIDPositionController(.001, 0, 0);
 	}
 
 	/**
@@ -37,7 +43,7 @@ public class Hood extends ControlledSubsystem {
 	}
 
 	public void updateTeleop() {
-		double curAngle = this.getAngle();
+		curAngle = this.getAngle();
 		double output = 0;
 
 		// Find aim angle
@@ -45,7 +51,7 @@ public class Hood extends ControlledSubsystem {
 			goalAngle = VisionServer.getInstance().getHoodAngle();
 			lastVisionAngle = goalAngle;
 		} else {
-			goalAngle = DEFAULT_ANGLE;
+			goalAngle = lastVisionAngle;
 		}
 		if (goalAngle >= 0) {
 			output = this.controller.getOutputSignal(getInputState()).getMotor();
@@ -54,8 +60,7 @@ public class Hood extends ControlledSubsystem {
 		if ((curAngle > MAX_ANGLE && output > .2) || (curAngle < MIN_ANGLE
 				&& output < -.2) /* || this.isOnTarget() */) {
 			output = 0;
-			// if ((curAngle < 4 && output < 0))
-			// ((PIDController) this.teleopController).reset();
+			// TODO POSSIBLE RESET FOR DIFFERENT ANGLES
 		}
 		this.setHood(output);
 	}
@@ -63,6 +68,11 @@ public class Hood extends ControlledSubsystem {
 	@Override
 	public void updateAuto() {
 		updateTeleop(); // just needs to do what vision says
+	}
+
+	public void testPosControl() {
+		goalAngle = SmartDashboard.getNumber("aim Hood Angle", 0);
+		SmartDashboard.putNumber("aim Hood Angle", goalAngle);
 	}
 
 	@Override
@@ -84,8 +94,7 @@ public class Hood extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
-		aimAngle = DEFAULT_ANGLE;
-		this.controller = new PIDPositionController(.001, 0, 0);
+		goalAngle = DEFAULT_ANGLE;
 	}
 
 	@Override
@@ -100,5 +109,15 @@ public class Hood extends ControlledSubsystem {
 
 	private void setHood(double power) {
 		servo.set(power);
+	}
+
+	@Override
+	public String getTableName() {
+		return "SmartDashboard";
+	}
+
+	@Override
+	public String getObjectName() {
+		return "";
 	}
 }

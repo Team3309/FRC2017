@@ -40,7 +40,6 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void disabledInit() {
-		Turret.getInstance().logger.close();
 	}
 
 	public void disabledPeriodic() {

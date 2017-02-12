@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class TunableHelper {
-	public static void UpdateTunable(ITunable tunable) {
+public class DashboardHelper {
+	public static void updateTunable(IDashboard tunable) {
 		Class<?> c = tunable.getClass();
 		Field[] fields = c.getFields();
 
@@ -26,10 +26,10 @@ public class TunableHelper {
 
 		try {
 			for (Field f : fields) {
-				Tunable annon = f.getAnnotation(Tunable.class);
+				Dashboard annon = f.getAnnotation(Dashboard.class);
 				if (annon != null) {
-					String dispName = annon.DisplayName();
-					boolean readOnly = annon.ReadOnly();
+					String dispName = annon.displayName();
+					boolean readOnly = annon.tunable();
 					String name = prefix + (dispName != "" ? dispName : f.getName());
 
 					// ---------------------------------------------------------------

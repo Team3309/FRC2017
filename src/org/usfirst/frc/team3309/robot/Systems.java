@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.team3309.lib.KragerSystem;
+import org.team3309.lib.tunable.IDashboard;
+import org.team3309.lib.tunable.DashboardHelper;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -20,7 +22,10 @@ public class Systems {
 				e.updateAuto();
 			else
 				e.updateTeleop();
+			if (e instanceof IDashboard)
+				DashboardHelper.updateTunable((IDashboard) e);
 		}
+
 	}
 
 	public static void init() {
@@ -31,7 +36,6 @@ public class Systems {
 				e.initAuto();
 		}
 	}
-
 
 	public static void manualControl() {
 		for (KragerSystem e : systems)
