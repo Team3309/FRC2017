@@ -5,6 +5,7 @@ import java.awt.geom.Ellipse2D;
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
@@ -73,7 +74,8 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		this.controller.sendToSmartDash();
+		this.getController().sendToSmartDash();
+		DashboardHelper.updateTunable(this.getController());
 		// SmartDashboard.putNumber(this.getName() + " Vel",
 		// this.elevator.getEncPosition());
 		// SmartDashboard.putNumber(this.getName() + " Pow",

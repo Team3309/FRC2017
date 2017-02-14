@@ -1,13 +1,11 @@
 package org.usfirst.frc.team3309.robot;
 
-import org.team3309.lib.actuators.ContinuousRotationServo;
+import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
-import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
 import org.usfirst.frc.team3309.subsystems.Elevator;
-import org.usfirst.frc.team3309.subsystems.GearIntake;
-import org.usfirst.frc.team3309.subsystems.Hopper;
+import org.usfirst.frc.team3309.subsystems.Turbine;
 import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Hood;
@@ -15,7 +13,6 @@ import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class Robot extends IterativeRobot {
@@ -63,14 +60,18 @@ public class Robot extends IterativeRobot {
 
 	public void teleopPeriodic() {
 		Sensors.read();
-		// Systems.update();
-		Flywheel.getInstance().manualControl();
-		Hood.getInstance().manualControl(); // updateTeleop, check sensor values
-		Hopper.getInstance().manualControl(); // first
-		Turret.getInstance().manualControl();
-		Elevator.getInstance().manualControl();
-		Shooter.getInstance().sendToSmartDash();
-		Climber.getInstance().manualControl();
+		Systems.update();
+		/*
+		 * Flywheel.getInstance().manualControl();
+		 * Hood.getInstance().manualControl(); // updateTeleop, check sensor
+		 * values Turbine.getInstance().manualControl(); // first
+		 * Turret.getInstance().manualControl();
+		 * Elevator.getInstance().manualControl();
+		 * Shooter.getInstance().sendToSmartDash();
+		 * Climber.getInstance().manualControl();
+		 * Drive.getInstance().updateTeleop();
+		 * DashboardHelper.updateTunable(Flywheel.getInstance());
+		 */
 		Actuators.actuate();
 	}
 }

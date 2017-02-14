@@ -2,6 +2,7 @@ package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
 import org.team3309.lib.actuators.TalonSRXMC;
+import org.team3309.lib.tunable.Dashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
@@ -90,6 +91,11 @@ public class GearIntake extends KragerSystem {
 		gearIntake.setDesiredOutput(power);
 	}
 
+	@Dashboard(displayName = "GearIntakeRollerPower")
+	public double getGearIntakeRollerPower() {
+		return gearIntake.getDesiredOutput();
+	}
+
 	public void retractPivot() {
 		gearIntakePivot.set(false);
 	}
@@ -106,6 +112,7 @@ public class GearIntake extends KragerSystem {
 		return !gearIntakePivot.get(); // false = retracted, so flip the output
 	}
 
+	@Dashboard(displayName = "isPistonExtended")
 	public boolean isPivotExtended() {
 		return gearIntakePivot.get(); // true = extended
 	}
@@ -126,6 +133,7 @@ public class GearIntake extends KragerSystem {
 		return !gearIntakeWrist.get(); // false = retracted, so flip the output
 	}
 
+	@Dashboard(displayName = "isWristExtended")
 	public boolean isWristExtended() {
 		return gearIntakeWrist.get(); // true = extended
 	}

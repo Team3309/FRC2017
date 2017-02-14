@@ -6,20 +6,20 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
-public class Hopper extends ControlledSubsystem {
+public class Turbine extends ControlledSubsystem {
 
-	private static Hopper instance;
+	private static Turbine instance;
 	private TalonSRXMC hopperMC = new TalonSRXMC(RobotMap.HOPPER_ID);
 
-	public static Hopper getInstance() {
+	public static Turbine getInstance() {
 		if (instance == null) {
-			instance = new Hopper();
+			instance = new Turbine();
 		}
 		return instance;
 	}
 
-	private Hopper() {
-		super("Hopper");
+	private Turbine() {
+		super("Turbine");
 		// this.hopperMC.getTalon().reverseOutput(true);
 	}
 

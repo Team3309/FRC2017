@@ -4,6 +4,8 @@ import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.team3309.lib.tunable.Dashboard;
+import org.team3309.lib.tunable.IDashboard;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -13,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * @author TheMkrage
  *
  */
-public abstract class PIDController extends Controller {
+public abstract class PIDController extends Controller implements IDashboard {
 
 	private boolean useSmartDash = true;
 
@@ -28,17 +30,27 @@ public abstract class PIDController extends Controller {
 	/**
 	 * Gains
 	 */
-	public double kP, kD, kI;
+	@Dashboard(displayName = "kP", tunable = true)
+	public double kP;
+	@Dashboard(displayName = "kD", tunable = true)
+	public double kD;
+	@Dashboard(displayName = "kI", tunable = true)
+	public double kI;
 	/**
 	 * Limit of the Integral. mIntegral is capped off at the kILimit.
 	 */
+	@Dashboard(displayName = "kILimit", tunable = true)
 	public double kILimit = .5;
 	/**
 	 * Stores previous error
 	 */
+	@Dashboard(displayName = "error")
 	protected double previousError = 0;
+	@Dashboard(displayName = "pValue")
 	protected double previousPValue = 0;
+	@Dashboard(displayName = "iValue")
 	protected double previousIValue = 0;
+	@Dashboard(displayName = "dValue")
 	protected double previousDValue = 0;
 	/**
 	 * Running Integral term to use between loops.
@@ -64,6 +76,7 @@ public abstract class PIDController extends Controller {
 	/**
 	 * Last Output of this loop
 	 */
+	@Dashboard(displayName = "lastOutput")
 	protected double previousOutput = 0;
 
 	public PIDController(double kP, double kI, double kD) {
@@ -173,7 +186,6 @@ public abstract class PIDController extends Controller {
 	@Override
 	public void sendToSmartDash() {
 		if (this.useSmartDash) {
-
 			kP = SmartDashboard.getNumber(this.getName() + " kP", kP);
 			kI = SmartDashboard.getNumber(this.getName() + " kI", kI);
 			kD = SmartDashboard.getNumber(this.getName() + " kD", kD);
@@ -185,10 +197,6 @@ public abstract class PIDController extends Controller {
 			SmartDashboard.putNumber(this.getName() + " I CONTRIBUTION", this.previousIValue);
 			SmartDashboard.putNumber(this.getName() + " D CONTRIBUTION", this.previousDValue);
 			SmartDashboard.putNumber(this.getName() + " Last Output", this.previousOutput);
-
-			sendConstants();
 		}
-
 	}
-
 }

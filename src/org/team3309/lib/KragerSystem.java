@@ -1,5 +1,6 @@
 package org.team3309.lib;
 
+import org.team3309.lib.tunable.IDashboard;
 import org.usfirst.frc.team3309.robot.Systems;
 
 /**
@@ -7,7 +8,7 @@ import org.usfirst.frc.team3309.robot.Systems;
  * 
  * @author TheMkrage
  */
-public abstract class KragerSystem {
+public abstract class KragerSystem implements IDashboard {
 	/**
 	 * Name of Subsystem; "Drive", "Intake", etc.
 	 */
@@ -67,4 +68,14 @@ public abstract class KragerSystem {
 	 * Manual Controls
 	 */
 	public abstract void manualControl();
+
+	@Override
+	public String getTableName() {
+		return this.getName();
+	}
+
+	@Override
+	public String getObjectName() {
+		return "";
+	}
 }

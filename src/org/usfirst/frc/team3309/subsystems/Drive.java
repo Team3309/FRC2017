@@ -7,6 +7,8 @@ import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.team3309.lib.tunable.Dashboard;
+import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
@@ -77,7 +79,7 @@ public class Drive extends ControlledSubsystem {
 			isLowGear = false;
 
 		shifter.set(isLowGear);
-		OutputSignal output = controller.getOutputSignal(getInputState());
+		OutputSignal output = getController().getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
@@ -105,7 +107,7 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		OutputSignal output = controller.getOutputSignal(getInputState());
+		OutputSignal output = getController().getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
@@ -122,7 +124,8 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		controller.sendToSmartDash();
+		getController().sendToSmartDash();
+		DashboardHelper.updateTunable(getController());
 		SmartDashboard.putNumber(this.getName() + " right pow", right0.getTalon().getPosition());
 		SmartDashboard.putNumber(this.getName() + " left pow", left0.getTalon().getPosition());
 		SmartDashboard.putNumber(this.getName() + " angle", getAngle());
@@ -137,20 +140,20 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
-		controller = new DriveCheezyDriveEquation();
+		this.setController(new DriveCheezyDriveEquation());
 		changeToPercentMode();
 	}
 
 	@Override
 	public void initAuto() {
-		controller = new BlankController();
+		this.setController(new BlankController());
 	}
 
 	/**
 	 * Stops current running controller and sets motors to zero
 	 */
 	public void stopDrive() {
-		controller = new BlankController();
+		this.setController(new BlankController());
 		setLeftRight(0, 0);
 	}
 
@@ -260,6 +263,7 @@ public class Drive extends ControlledSubsystem {
 		return false;
 	}
 
+	@Dashboard(displayName = "angle")
 	public double getAngle() {
 		return Sensors.getAngle();
 	}

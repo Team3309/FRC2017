@@ -5,6 +5,9 @@ import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.communications.BlackBox;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.team3309.lib.tunable.Dashboard;
+import org.team3309.lib.tunable.DashboardHelper;
+import org.team3309.lib.tunable.IDashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
@@ -12,7 +15,7 @@ import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Flywheel extends ControlledSubsystem {
+public class Flywheel extends ControlledSubsystem implements IDashboard {
 
 	private TalonSRXMC leftTalon = new TalonSRXMC(RobotMap.LEFT_SHOOTER_ID);
 	private TalonSRXMC rightTalon = new TalonSRXMC(RobotMap.RIGHT_SHOOTER_ID);
@@ -30,10 +33,10 @@ public class Flywheel extends ControlledSubsystem {
 
 	private Flywheel() {
 		super("Flywheel");
-		this.controller = new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00);
-		this.controller.setName("Flywheel");
+		this.setController(new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00));
+		this.getController().setName("Flywheel Speed");
 		this.rightTalon.setReversed(true);
-		((FeedForwardWithPIDController) this.controller).setTHRESHOLD(10);
+		((FeedForwardWithPIDController) this.getController()).setTHRESHOLD(10);
 		SmartDashboard.putNumber("TEST RPS", 140);
 	}
 
@@ -47,10 +50,6 @@ public class Flywheel extends ControlledSubsystem {
 			mFlywheel = new Flywheel();
 		}
 		return mFlywheel;
-	}
-
-	public void setAimVelRPSAuto(double power) {
-		this.aimVelRPS = power;
 	}
 
 	@Override
@@ -92,11 +91,11 @@ public class Flywheel extends ControlledSubsystem {
 	 */
 	public void manualControl() {
 		if (Controls.operatorController.getAButton()) {
-			this.setShooter(.4);
+			this.setShooter(.45);
 		} else if (Controls.operatorController.getXButton()) {
-			this.setShooter(.6);
+			this.setShooter(.5);
 		} else if (Controls.operatorController.getYButton()) {
-			this.setShooter(.8);
+			this.setShooter(.55);
 		} else {
 			this.setShooter(0);
 		}
@@ -134,11 +133,11 @@ public class Flywheel extends ControlledSubsystem {
 			}
 		}
 		// Send our target velocity to the mController
-		if (this.controller instanceof FeedForwardWithPIDController) {
-			((FeedForwardWithPIDController) this.controller).setAimAcc(aimAccRPS);
-			((FeedForwardWithPIDController) this.controller).setAimVel(aimVelRPS);
+		if (this.getController() instanceof FeedForwardWithPIDController) {
+			((FeedForwardWithPIDController) this.getController()).setAimAcc(aimAccRPS);
+			((FeedForwardWithPIDController) this.getController()).setAimVel(aimVelRPS);
 		}
-		double output = this.controller.getOutputSignal(this.getInputState()).getMotor();
+		double output = this.getController().getOutputSignal(this.getInputState()).getMotor();
 		if (output > 1) {
 			output = 1;
 		} else if (output < 0) {
@@ -162,6 +161,7 @@ public class Flywheel extends ControlledSubsystem {
 		return input;
 	}
 
+	@Dashboard(displayName = "Percent")
 	public double getPercent() {
 		if (aimVelRPS == 0)
 			return 0;
@@ -174,7 +174,8 @@ public class Flywheel extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		controller.sendToSmartDash();
+		getController().sendToSmartDash();
+		DashboardHelper.updateTunable(this.getController());
 		SmartDashboard.putNumber(this.getName() + " RPM", curVel * 60);
 		SmartDashboard.putNumber(this.getName() + " RPS", curVel);
 		SmartDashboard.putNumber(this.getName() + " Goal", this.aimVelRPS);
@@ -182,10 +183,12 @@ public class Flywheel extends ControlledSubsystem {
 		SmartDashboard.putNumber(this.getName() + " Right", rightTalon.getDesiredOutput());
 	}
 
+	@Dashboard(displayName = "rps")
 	private double getRPS() {
 		return Sensors.getFlywheelRPS();
 	}
 
+	@Dashboard(displayName = "aimVel")
 	public double getAimVelRPS() {
 		return aimVelRPS;
 	}
@@ -202,12 +205,14 @@ public class Flywheel extends ControlledSubsystem {
 		this.aimAccRPS = aimAccRPS;
 	}
 
+	@Dashboard(displayName = "isShooterInRange")
 	public boolean isShooterInRange() {
 		if (this.getRPS() < aimVelRPS + 6 && this.getRPS() > aimVelRPS - 6)
 			return true;
 		return false;
 	}
 
+	@Dashboard(displayName = "RPM")
 	private double getRPM() {
 		return 60 * Sensors.getFlywheelRPS();
 	}
@@ -215,6 +220,16 @@ public class Flywheel extends ControlledSubsystem {
 	private void setShooter(double power) {
 		leftTalon.setDesiredOutput(power);
 		rightTalon.setDesiredOutput(power);
+	}
+
+	@Override
+	public String getTableName() {
+		return "Flywheel";
+	}
+
+	@Override
+	public String getObjectName() {
+		return "";
 	}
 
 }

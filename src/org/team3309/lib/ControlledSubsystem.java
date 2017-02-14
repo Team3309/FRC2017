@@ -15,7 +15,7 @@ public abstract class ControlledSubsystem extends KragerSystem {
 	/**
 	 * Controller of Subsystem
 	 */
-	protected Controller controller;
+	private Controller controller;
 
 	public ControlledSubsystem(String name) {
 		super(name);
@@ -39,6 +39,11 @@ public abstract class ControlledSubsystem extends KragerSystem {
 
 	public void setController(Controller mController) {
 		this.controller = mController;
+		this.controller.setSubsystemID(this.getName());
+	}
+
+	public Controller getController() {
+		return this.controller;
 	}
 
 	/**

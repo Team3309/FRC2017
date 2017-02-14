@@ -2,12 +2,18 @@ package org.team3309.lib.controllers.generic;
 
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.team3309.lib.tunable.Dashboard;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class FeedForwardWithPIDController extends PIDController {
-	private double kA = 0.0, kV = 0.0;
-	private double aimAcc = 0.0, aimVel = 0.0;
+	@Dashboard(displayName = "kA", tunable = true)
+	private double kA = 0.0;
+	@Dashboard(displayName = "kV", tunable = true)
+	private double kV = 0.0;
+	private double aimAcc = 0.0;
+	@Dashboard(displayName = "aimVel")
+	private double aimVel = 0.0;
 
 	/**
 	 * 
@@ -37,12 +43,13 @@ public class FeedForwardWithPIDController extends PIDController {
 		this.kA = kA;
 		this.kV = kV;
 	}
-	
+
 	public void setConstants(double kV, double kA, double kP, double kI, double kD) {
 		super.setConstants(kP, kI, kD);
 		this.kV = kV;
 		this.kA = kA;
 	}
+
 	@Override
 	public void reset() {
 		super.reset();
@@ -99,7 +106,7 @@ public class FeedForwardWithPIDController extends PIDController {
 
 	public void sendToSmartDash() {
 		super.sendToSmartDash();
-		
+
 		kA = SmartDashboard.getNumber(this.getName() + " kA", kA);
 		kV = SmartDashboard.getNumber(this.getName() + " kV", kV);
 		SmartDashboard.putNumber(this.getName() + " aimVel", this.aimVel);
@@ -107,4 +114,5 @@ public class FeedForwardWithPIDController extends PIDController {
 		SmartDashboard.putNumber(this.getName() + " kA", kA);
 		SmartDashboard.putNumber(this.getName() + " kV", kV);
 	}
+
 }

@@ -7,11 +7,13 @@ import java.util.Map.Entry;
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.generic.BlankController;
-import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.team3309.lib.controllers.turret.TurretVelocitySuveyController;
+import org.team3309.lib.tunable.Dashboard;
+import org.team3309.lib.tunable.DashboardHelper;
+import org.team3309.lib.tunable.IDashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
@@ -28,7 +30,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Turret extends ControlledSubsystem {
+public class Turret extends ControlledSubsystem implements IDashboard {
 
 	private static Turret instance;
 	private DigitalInput hallEffectSensor = new DigitalInput(RobotMap.HALL_EFFECT_SENSOR);
@@ -68,14 +70,14 @@ public class Turret extends ControlledSubsystem {
 		turretMC.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		turretMC.reverseOutput(true);
 		turretMC.reverseSensor(true);
-		this.controller = new PIDPositionController(.00190, .009, .00, .1);
-		this.controller.setName("TURRET POS");
+		this.setController(new PIDPositionController(.00190, .009, .00, .1));
+		this.getController().setName("TURRET POS");
 	}
 
 	@Override
 	public void initTeleop() {
 		calTimer.start();
-		this.controller.reset();
+		this.getController().reset();
 		goalAngle = getAngle();
 	}
 
@@ -105,7 +107,7 @@ public class Turret extends ControlledSubsystem {
 				this.changeToVelocityMode();
 			}
 		}
-		OutputSignal signal = this.controller.getOutputSignal(getInputState());
+		OutputSignal signal = this.getController().getOutputSignal(getInputState());
 		if (turretMC.getControlMode() == TalonControlMode.Position) {
 			turretMC.set((goalAngle / 360) * 14745.6);
 		} else {
@@ -127,7 +129,7 @@ public class Turret extends ControlledSubsystem {
 
 	public void changeToVelocityMode() {
 		turretMC.changeControlMode(TalonControlMode.PercentVbus);
-		if (!(this.controller instanceof TurretVelocitySuveyController)) {
+		if (!(this.getController() instanceof TurretVelocitySuveyController)) {
 			TurretVelocitySuveyController con = new TurretVelocitySuveyController();
 			con.setName("Turret Survey ");
 			this.setController(con);
@@ -212,7 +214,7 @@ public class Turret extends ControlledSubsystem {
 		goalAngle = SmartDashboard.getNumber("aim Turret Pos", 0);
 		SmartDashboard.putNumber("aim Turret Pos", goalAngle);
 		if (Controls.driverController.getYButton())
-			this.controller.reset();
+			this.getController().reset();
 	}
 
 	@Override
@@ -231,7 +233,8 @@ public class Turret extends ControlledSubsystem {
 
 	@Override
 	public void sendToSmartDash() {
-		this.controller.sendToSmartDash();
+		this.getController().sendToSmartDash();
+		DashboardHelper.updateTunable(this.getController());
 		SmartDashboard.putNumber(this.getName() + " power ", this.turretMC.get());
 		SmartDashboard.putNumber(this.getName() + " Angle", getAngle());
 		SmartDashboard.putNumber(this.getName() + " Goal Angle", this.turretMC.getSetpoint());
@@ -270,6 +273,7 @@ public class Turret extends ControlledSubsystem {
 		return this.getAngle() + Sensors.getAngle();
 	}
 
+	@Dashboard(tunable = false, displayName = "turret_angle")
 	public double getAngle() {
 		return -((double) turretMC.getEncPosition() / 14745.6) * 360;
 	}
@@ -293,5 +297,16 @@ public class Turret extends ControlledSubsystem {
 	public void callForCalibration() {
 		hasCalibratedSinceRobotInit = false;
 		startingDegrees = this.getAngle();
+	}
+
+	@Override
+	public String getTableName() {
+		return "Turret";
+	}
+
+	@Override
+	public String getObjectName() {
+		// TODO Auto-generated method stub
+		return "";
 	}
 }

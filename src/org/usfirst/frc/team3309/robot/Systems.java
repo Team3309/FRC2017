@@ -20,10 +20,15 @@ public class Systems {
 		for (KragerSystem e : systems) {
 			if (DriverStation.getInstance().isAutonomous())
 				e.updateAuto();
-			else
+			else {
+				System.out.println("TELEOP");
 				e.updateTeleop();
-			if (e instanceof IDashboard)
+			}
+			if (e instanceof IDashboard) {
+				System.out.println("adding to dash");
 				DashboardHelper.updateTunable((IDashboard) e);
+
+			}
 		}
 
 	}

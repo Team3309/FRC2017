@@ -4,8 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.team3309.lib.tunable.IDashboard;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -15,15 +15,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * @author TheMkrage
  * 
  */
-public abstract class Controller {
+public abstract class Controller implements IDashboard {
 
-	private String name = "Default";
-	protected String subsystemID = "drivetrain";
-	public NetworkTable table = NetworkTable.getTable(subsystemID);
+	protected String name = "Default";
+	protected String subsystemID = "Default";
 	private JSONArray JSONArray = new JSONArray();
 
 	public Controller() {
-		table = NetworkTable.getTable(subsystemID);
 	}
 
 	/**
@@ -95,5 +93,17 @@ public abstract class Controller {
 
 	public void setSubsystemID(String subsystemID) {
 		this.subsystemID = subsystemID;
+	}
+
+	@Override
+	public String getTableName() {
+		if (this.subsystemID == null)
+			return "";
+		return this.subsystemID;
+	}
+
+	@Override
+	public String getObjectName() {
+		return this.getName();
 	}
 }

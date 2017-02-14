@@ -7,6 +7,7 @@ import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.tunable.IDashboard;
 import org.team3309.lib.tunable.Dashboard;
+import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.vision.VisionServer;
@@ -32,7 +33,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 
 	private Hood() {
 		super("Hood");
-		this.controller = new PIDPositionController(.001, 0, 0);
+		this.setController(new PIDPositionController(.001, 0, 0));
 	}
 
 	/**
@@ -60,7 +61,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 		}
 		testPosControl();
 		if (goalAngle >= 0) {
-			output = this.controller.getOutputSignal(getInputState()).getMotor();
+			output = this.getController().getOutputSignal(getInputState()).getMotor();
 		}
 
 		if ((curAngle > MAX_ANGLE && output > .2) || (curAngle < MIN_ANGLE
@@ -93,7 +94,8 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 
 	@Override
 	public void sendToSmartDash() {
-		this.controller.sendToSmartDash();
+		DashboardHelper.updateTunable(getController());
+		this.getController().sendToSmartDash();
 		SmartDashboard.putNumber(this.getName() + " pow", Controls.operatorController.getY(Hand.kRight) / 20);
 	}
 
