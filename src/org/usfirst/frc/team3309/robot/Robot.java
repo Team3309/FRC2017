@@ -64,11 +64,13 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		Sensors.read();
 		// Systems.update();
-		Flywheel.getInstance().testVel();
-		Hood.getInstance().manualControl(); // updateTeleop, check sensor values first
+		Flywheel.getInstance().manualControl();
+		Hood.getInstance().manualControl(); // updateTeleop, check sensor values
+		Hopper.getInstance().manualControl(); // first
 		Turret.getInstance().manualControl();
-		Elevator.getInstance().manualControl(); 
+		Elevator.getInstance().manualControl();
 		Shooter.getInstance().sendToSmartDash();
+		Climber.getInstance().manualControl();
 		Actuators.actuate();
 	}
 }

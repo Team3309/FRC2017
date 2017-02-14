@@ -11,6 +11,7 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -22,6 +23,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 	private static final double MIN_ANGLE = 0;
 	private static final double DEFAULT_ANGLE = 0;
 	private static final double MAX_ANGLE = 200;
+	private AnalogInput hoodSensor = new AnalogInput(RobotMap.HOOD_SENSOR);
 	private double goalAngle = 0;
 	private double lastVisionAngle = 0;
 	@Dashboard(tunable = false)
@@ -92,11 +94,17 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 	@Override
 	public void sendToSmartDash() {
 		this.controller.sendToSmartDash();
+		SmartDashboard.putNumber(this.getName() + " pow", Controls.operatorController.getY(Hand.kRight) / 20);
 	}
 
 	@Override
 	public void manualControl() {
-		setHood(Controls.operatorController.getY(Hand.kRight));
+		// if (Controls.operatorController.getAButton())
+		// setHood(.02);
+		// else if (Controls.operatorController.getXButton())
+		// setHood(-.02);
+		// else
+		// setHood(0.02);
 	}
 
 	@Override
@@ -111,7 +119,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 
 	public double getAngle() {
 		// TODO get Angle
-		return 0;
+		return hoodSensor.getVoltage();
 	}
 
 	private void setHood(double power) {

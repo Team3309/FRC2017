@@ -60,6 +60,7 @@ public class Climber extends KragerSystem {
 
 	@Override
 	public void sendToSmartDash() {
+
 		SmartDashboard.putNumber("Climber Curret", climberMC.getTalon().getOutputCurrent());
 	}
 

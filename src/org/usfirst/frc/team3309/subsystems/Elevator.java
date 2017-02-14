@@ -32,18 +32,19 @@ public class Elevator extends ControlledSubsystem {
 
 	private Elevator() {
 		super("Elevator");
-		elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		elevator.changeControlMode(TalonControlMode.Speed);
+		// elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+		// elevator.changeControlMode(TalonControlMode.Speed);
+		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
 	}
 
 	@Override
 	public void initAuto() {
-		this.elevator.changeControlMode(TalonControlMode.Speed);
+		// this.elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
 	@Override
 	public void initTeleop() {
-		this.elevator.changeControlMode(TalonControlMode.Speed);
+		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
 	}
 
 	@Override
@@ -66,22 +67,24 @@ public class Elevator extends ControlledSubsystem {
 	@Override
 	public InputState getInputState() {
 		InputState s = new InputState();
-		s.setError(aimVel - elevator.getEncVelocity());
+		// s.setError(aimVel - elevator.getEncVelocity());
 		return s;
 	}
 
 	@Override
 	public void sendToSmartDash() {
 		this.controller.sendToSmartDash();
-		SmartDashboard.putNumber(this.getName() + " Vel", this.elevator.getEncPosition());
-		SmartDashboard.putNumber(this.getName() + " Pow", this.elevator.getPosition());
+		// SmartDashboard.putNumber(this.getName() + " Vel",
+		// this.elevator.getEncPosition());
+		// SmartDashboard.putNumber(this.getName() + " Pow",
+		// this.elevator.getPosition());
 	}
 
 	@Override
 	public void manualControl() {
-		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
+
 		if (Controls.operatorController.getBumper(Hand.kRight)) {
-			setElevator(.5);
+			setElevator(1);
 		} else if (Controls.operatorController.getBumper(Hand.kLeft)) {
 			setElevator(-.5);
 		} else {
@@ -91,6 +94,7 @@ public class Elevator extends ControlledSubsystem {
 
 	private void setElevator(double power) {
 		this.elevator.set(power);
+		this.feedyWheel.set(power);
 	}
 
 }

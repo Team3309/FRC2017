@@ -251,7 +251,7 @@ public class Turret extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-		setTurnClockwise(Controls.operatorController.getX(Hand.kRight));
+		setTurnClockwise(Controls.operatorController.getX(Hand.kLeft));
 	}
 
 	private boolean isHallEffectHit() {

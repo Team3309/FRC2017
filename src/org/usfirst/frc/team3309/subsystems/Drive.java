@@ -11,6 +11,7 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 
+import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.CANSpeedController.ControlMode;
@@ -39,6 +40,8 @@ public class Drive extends ControlledSubsystem {
 	private TalonSRXMC left1 = new TalonSRXMC(RobotMap.DRIVE_LEFT_1_ID);
 	private TalonSRXMC left2 = new TalonSRXMC(RobotMap.DRIVE_LEFT_2_ID);
 
+	private Solenoid shifter = new Solenoid(RobotMap.SHIFTER);
+
 	private boolean isLowGear = true;
 	private boolean hasPIDBreakStarted = false;
 
@@ -50,6 +53,8 @@ public class Drive extends ControlledSubsystem {
 
 	private Drive() {
 		super("Drive");
+		right0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
+		left0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
 	}
 
 	@Override
@@ -70,6 +75,8 @@ public class Drive extends ControlledSubsystem {
 			isLowGear = true;
 		} else
 			isLowGear = false;
+
+		shifter.set(isLowGear);
 		OutputSignal output = controller.getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
@@ -106,10 +113,10 @@ public class Drive extends ControlledSubsystem {
 		InputState input = new InputState();
 		input.setAngularPos(Sensors.getAngle());
 		input.setAngularVel(Sensors.getAngularVel());
-		input.setLeftPos(Sensors.getLeftDrive());
-		input.setLeftVel(Sensors.getLeftDriveVel());
-		input.setRightVel(Sensors.getRightDriveVel());
-		input.setRightPos(Sensors.getRightDrive());
+		input.setLeftPos(left0.getTalon().getAnalogInPosition());
+		input.setLeftVel(left0.getTalon().getAnalogInVelocity());
+		input.setRightVel(right0.getTalon().getAnalogInVelocity());
+		input.setRightPos(right0.getTalon().getAnalogInPosition());
 		return input;
 	}
 
@@ -211,7 +218,7 @@ public class Drive extends ControlledSubsystem {
 	 * @return the average of the left and right to get the distance traveled
 	 */
 	public double getDistanceTraveled() {
-		return (Sensors.getLeftDrive() + Sensors.getRightDrive()) / 2;
+		return (right0.getTalon().getAnalogInPosition() + left0.getTalon().getAnalogInPosition()) / 2;
 	}
 
 	/**

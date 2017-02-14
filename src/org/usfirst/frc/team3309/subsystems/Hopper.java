@@ -9,7 +9,7 @@ import org.usfirst.frc.team3309.robot.RobotMap;
 public class Hopper extends ControlledSubsystem {
 
 	private static Hopper instance;
-	private TalonSRXMC hopper = new TalonSRXMC(RobotMap.HOPPER_ID);
+	private TalonSRXMC hopperMC = new TalonSRXMC(RobotMap.HOPPER_ID);
 
 	public static Hopper getInstance() {
 		if (instance == null) {
@@ -20,13 +20,14 @@ public class Hopper extends ControlledSubsystem {
 
 	private Hopper() {
 		super("Hopper");
+		// this.hopperMC.getTalon().reverseOutput(true);
 	}
 
 	@Override
 	public void updateTeleop() {
 		boolean operatorBButton = Controls.operatorController.getBButton(); // sort
 		if (operatorBButton || Shooter.getInstance().isShouldBeShooting()) {
-			setHopper(1);
+			setHopper(.7);
 		} else {
 			setHopper(0);
 		}
@@ -69,6 +70,6 @@ public class Hopper extends ControlledSubsystem {
 	}
 
 	public void setHopper(double power) {
-		hopper.setDesiredOutput(power);
+		hopperMC.setDesiredOutput(-power);
 	}
 }
