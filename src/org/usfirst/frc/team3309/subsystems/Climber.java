@@ -75,7 +75,8 @@ public class Climber extends KragerSystem {
 		} else {
 			loopsAboveCurrentLimit = 0;
 		}
-		return loopsAboveCurrentLimit > 10;
+		// return loopsAboveCurrentLimit > 10;
+		return false;
 	}
 
 	public void setClimber(double power) {
