@@ -10,12 +10,13 @@ public class DashboardHelper {
 		Field[] fields = c.getDeclaredFields();
 		Method[] methods = c.getDeclaredMethods();
 
+		System.out.println("TABLE " + dashboardObj.getTableName());
 		NetworkTable table = NetworkTable.getTable(dashboardObj.getTableName());
 
 		// -- Prefix
 		String prefix = "";
 		String objName = dashboardObj.getObjectName();
-		if (objName != null)
+		if (objName != null && objName != "")
 			prefix = objName + "_";
 
 		try {
@@ -61,7 +62,6 @@ public class DashboardHelper {
 				}
 			}
 
-			
 			// -- Methods
 			for (Method m : methods) {
 				Dashboard annon = m.getAnnotation(Dashboard.class);

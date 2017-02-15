@@ -86,7 +86,6 @@ public abstract class Controller implements IDashboard {
 	public void print(String print) {
 		System.out.println(this.getName() + " " + print);
 	}
-
 	public String getSubsystemID() {
 		return subsystemID;
 	}

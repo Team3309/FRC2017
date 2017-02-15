@@ -16,13 +16,13 @@ import org.usfirst.frc.team3309.robot.Sensors;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.CANSpeedController.ControlMode;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends ControlledSubsystem {
-
+	XboxController driverRemote = new XboxController(0);
 	/**
 	 * Used to give a certain gap that the drive would be ok with being within
 	 * its goal encoder average.
@@ -53,8 +53,9 @@ public class Drive extends ControlledSubsystem {
 		return drive;
 	}
 
+	
 	private Drive() {
-		super("Drive");
+		super("Drivetrain");
 		right0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
 		left0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
 	}
@@ -126,15 +127,23 @@ public class Drive extends ControlledSubsystem {
 	public void sendToSmartDash() {
 		getController().sendToSmartDash();
 		DashboardHelper.updateTunable(getController());
-		SmartDashboard.putNumber(this.getName() + " right pow", right0.getTalon().getPosition());
-		SmartDashboard.putNumber(this.getName() + " left pow", left0.getTalon().getPosition());
+		SmartDashboard.putNumber(this.getName() + " right pos", this.getRightPos());
+		SmartDashboard.putNumber(this.getName() + " left pos", this.getLeftPos());
 		SmartDashboard.putNumber(this.getName() + " angle", getAngle());
 		SmartDashboard.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
-		// SmartDashboard.putNumber(this.getName() + " left pos" )
 	}
 
 	@Override
 	public void manualControl() {
+		// double lol = .3;
+		// if (driverRemote.getAButton()) {
+		// setRight(lol);
+		// setLeft(-lol);
+		//
+		// } else {
+		// setRight(0);
+		// setLeft(0);
+		// }
 		updateTeleop();
 	}
 
@@ -266,6 +275,26 @@ public class Drive extends ControlledSubsystem {
 	@Dashboard(displayName = "angle")
 	public double getAngle() {
 		return Sensors.getAngle();
+	}
+
+	@Dashboard(displayName = "leftVel")
+	public double getLeftVel() {
+		return this.left0.getTalon().getAnalogInVelocity();
+	}
+
+	@Dashboard(displayName = "leftPos")
+	public double getLeftPos() {
+		return this.left0.getTalon().getAnalogInPosition();
+	}
+
+	@Dashboard(displayName = "rightVel")
+	public double getRightVel() {
+		return this.right0.getTalon().getAnalogInVelocity();
+	}
+
+	@Dashboard(displayName = "rightPos")
+	public double getRightPos() {
+		return this.right0.getTalon().getAnalogInPosition();
 	}
 
 }

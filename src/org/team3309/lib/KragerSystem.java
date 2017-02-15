@@ -76,6 +76,6 @@ public abstract class KragerSystem implements IDashboard {
 
 	@Override
 	public String getObjectName() {
-		return "";
+		return null;
 	}
 }

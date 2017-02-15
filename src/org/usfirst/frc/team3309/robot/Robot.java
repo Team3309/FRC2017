@@ -62,15 +62,15 @@ public class Robot extends IterativeRobot {
 		Sensors.read();
 		// Systems.update();
 
-		Flywheel.getInstance().manualControl();
-		Hood.getInstance().manualControl(); // updateTeleop, check sensor
-		Turbine.getInstance().manualControl(); // first
-		Turret.getInstance().manualControl();
-		Elevator.getInstance().manualControl();
-		Shooter.getInstance().sendToSmartDash();
-		Climber.getInstance().manualControl();
+		// Flywheel.getInstance().manualControl();
+		// Hood.getInstance().manualControl(); // updateTeleop, check sensor
+		// Turbine.getInstance().manualControl(); // first
+		// Turret.getInstance().manualControl();
+		// Elevator.getInstance().manualControl();
+		// Shooter.getInstance().sendToSmartDash();
+		// Climber.getInstance().manualControl();
 		Drive.getInstance().updateTeleop();
-		DashboardHelper.updateTunable(Flywheel.getInstance());
+		DashboardHelper.updateTunable(Drive.getInstance());
 
 		Actuators.actuate();
 	}

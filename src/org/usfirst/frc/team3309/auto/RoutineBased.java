@@ -7,7 +7,6 @@ import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
 import org.team3309.lib.controllers.drive.DriveEncoderVelocityWithSetPointsController;
 import org.team3309.lib.controllers.drive.DriveEncodersController;
-import org.team3309.lib.controllers.drive.DriveEncodersVelocityController;
 import org.team3309.lib.controllers.drive.VelocityChangePoint;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
@@ -119,8 +118,10 @@ public class RoutineBased {
 
 	public void driveEncoder(double goal, double maxEnc, double timeout) {
 		Sensors.resetDrive();
-		DriveEncodersVelocityController x = new DriveEncodersVelocityController(goal);
-		x.setMAX_ENCODER_VEL(maxEnc);
+		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
+		LinkedList<VelocityChangePoint> arr = new LinkedList<VelocityChangePoint>();
+		arr.add(new VelocityChangePoint(maxEnc, 0));
+		x.setEncoderChanges(arr);
 		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
@@ -131,8 +132,10 @@ public class RoutineBased {
 
 	public void driveEncoder(double goal, double maxEnc, double timeout, boolean rampUp) {
 		Sensors.resetDrive();
-		DriveEncodersVelocityController x = new DriveEncodersVelocityController(goal);
-		x.setMAX_ENCODER_VEL(maxEnc);
+		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
+		LinkedList<VelocityChangePoint> arr = new LinkedList<VelocityChangePoint>();
+		arr.add(new VelocityChangePoint(maxEnc, 0));
+		x.setEncoderChanges(arr);
 		x.setRampUp(rampUp);
 		Drive.getInstance().setController(x);
 		try {

@@ -21,20 +21,15 @@ public class DriveAngleVelocityController extends Controller {
 	public DriveAngleVelocityController(double aimAngle) {
 		this.setName("DRIVE ANGLE VEL");
 		turningController.setConstants(6, 0, 13.015);
-
 		this.turningController.setName("Turning Angle Controller");
 		this.turningController.kILimit = 100;
 		goalAngle = aimAngle;
-
-		SmartDashboard.putNumber(this.getName() + " Vel to Turn At", 0);
-
 		Drive.getInstance().changeToVelocityMode();
 	}
 
 	@Override
 	public void reset() {
 		this.turningController.reset();
-
 	}
 
 	@Override
@@ -44,12 +39,9 @@ public class DriveAngleVelocityController extends Controller {
 			error = -KragerMath.sign(error) * (360 - Math.abs(error));
 			System.out.println("New Error: " + error);
 		}
-		SmartDashboard.putNumber("VISION ErRROR", error);
-		SmartDashboard.putNumber("Goal Angle", goalAngle);
 		InputState state = new InputState();
 		state.setError(error); // sets angle error to be sent in turning PID
 		OutputSignal outputOfTurningController = turningController.getOutputSignal(state); // outputs
-		SmartDashboard.putNumber("DRIVE ANGLE VEL Output", outputOfTurningController.getMotor());
 		return outputOfTurningController;
 	}
 
