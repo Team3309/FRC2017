@@ -7,7 +7,10 @@ import org.team3309.lib.sensors.CounterSensor;
 import org.team3309.lib.sensors.NavX;
 import org.team3309.lib.sensors.Sensor;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.SPI;
 
 /**
  * All the sensors on the robot
@@ -18,12 +21,12 @@ import edu.wpi.first.wpilibj.AnalogInput;
 public class Sensors {
 
 	private static List<Sensor> sensors = new LinkedList<Sensor>();
-	private static NavX navX;
+	private static AHRS navX;
 	private static CounterSensor flywheelCounter;
 
 	static {
 		System.out.println("INIT STATIC");
-		navX = new NavX();
+		navX = new AHRS(SPI.Port.kMXP);
 		System.out.println("NAVX");
 
 		System.out.println("Turret");
@@ -47,7 +50,7 @@ public class Sensors {
 	}
 
 	public static double getAngle() {
-		return navX.getAngle();
+		return navX.getPitch();
 	}
 
 	public static double getRoll() {
@@ -62,15 +65,17 @@ public class Sensors {
 		double curRPS = 1 / flywheelCounter.getPeriod();
 		// flywheel will never jump 100 RPS; make sure sensor isn't acting
 		// strange
-		if (Math.abs(curRPS - previousFlywheelCounterRPS) > 100) {
-			curRPS = previousFlywheelCounterRPS;
+		if (Math.abs(curRPS) > 500) {
+			System.out.println("past " + previousFlywheelCounterRPS);
+			System.out.println("cur " + curRPS);
+			return previousFlywheelCounterRPS;
 		}
 		previousFlywheelCounterRPS = curRPS;
 		return curRPS;
 	}
 
 	public static double getAngularVel() {
-		return navX.getAngularVel();
+		return navX.getRawGyroX();
 	}
 
 }

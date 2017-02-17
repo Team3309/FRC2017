@@ -7,6 +7,7 @@ import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.team3309.lib.tunable.Dashboard;
 import org.team3309.lib.tunable.IDashboard;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -84,9 +85,9 @@ public abstract class PIDController extends Controller implements IDashboard {
 		this.kI = kI;
 		this.kD = kD;
 
-		SmartDashboard.putNumber(this.getName() + " kP", kP);
-		SmartDashboard.putNumber(this.getName() + " kI", kI);
-		SmartDashboard.putNumber(this.getName() + " kD", kD);
+		NetworkTable.getTable(subsystemID).putNumber("k_P " + this.getName(), kP);
+		NetworkTable.getTable(subsystemID).putNumber("k_I " + this.getName(), kI);
+		NetworkTable.getTable(subsystemID).putNumber("k_D " + this.getName(), kD);
 	}
 
 	public PIDController(double kP, double kI, double kD, double kILimit) {
@@ -99,7 +100,7 @@ public abstract class PIDController extends Controller implements IDashboard {
 	@Override
 	public void reset() {
 		mIntegral = 0;
-		previousError = 0;
+		// previousError = 0;
 	}
 
 	@Override
@@ -186,17 +187,18 @@ public abstract class PIDController extends Controller implements IDashboard {
 	@Override
 	public void sendToSmartDash() {
 		if (this.useSmartDash) {
-			kP = SmartDashboard.getNumber(this.getName() + " kP", kP);
-			kI = SmartDashboard.getNumber(this.getName() + " kI", kI);
-			kD = SmartDashboard.getNumber(this.getName() + " kD", kD);
-			SmartDashboard.putNumber(this.getName() + " kP", kP);
-			SmartDashboard.putNumber(this.getName() + " kI", kI);
-			SmartDashboard.putNumber(this.getName() + " kD", kD);
-			SmartDashboard.putNumber(this.getName() + " ERROR", this.previousError);
-			SmartDashboard.putNumber(this.getName() + " P CONTRIBUTION", this.previousPValue);
-			SmartDashboard.putNumber(this.getName() + " I CONTRIBUTION", this.previousIValue);
-			SmartDashboard.putNumber(this.getName() + " D CONTRIBUTION", this.previousDValue);
-			SmartDashboard.putNumber(this.getName() + " Last Output", this.previousOutput);
+			NetworkTable table = NetworkTable.getTable(this.subsystemID);
+			kP = table.getNumber("k_P " + this.getName(), kP);
+			kI = table.getNumber("k_I " + this.getName(), kI);
+			kD = table.getNumber("k_D " + this.getName(), kD);
+			table.putNumber("k_P " + this.getName(), kP);
+			table.putNumber("k_I " + this.getName(), kI);
+			table.putNumber("k_D " + this.getName(), kD);
+			table.putNumber(this.getName() + " ERROR", this.previousError);
+			table.putNumber(this.getName() + " P CONTRIBUTION", this.previousPValue);
+			table.putNumber(this.getName() + " I CONTRIBUTION", this.previousIValue);
+			table.putNumber(this.getName() + " D CONTRIBUTION", this.previousDValue);
+			table.putNumber(this.getName() + " Last Output", this.previousOutput);
 		}
 	}
 }

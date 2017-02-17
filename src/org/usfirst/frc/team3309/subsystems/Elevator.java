@@ -14,6 +14,7 @@ import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator extends ControlledSubsystem {
@@ -23,6 +24,7 @@ public class Elevator extends ControlledSubsystem {
 	private double aimVel = 0;
 	private CANTalon elevator = new CANTalon(RobotMap.ELEVATOR_ID);
 	private CANTalon feedyWheel = new CANTalon(RobotMap.FEEDY_WHEEL_ID);
+	private NetworkTable table = NetworkTable.getTable("Elevator");
 	private static Elevator instance;
 
 	public static Elevator getInstance() {
@@ -36,6 +38,7 @@ public class Elevator extends ControlledSubsystem {
 		// elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		// elevator.changeControlMode(TalonControlMode.Speed);
 		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
+		table.putNumber("k_aimVel", 0);
 	}
 
 	@Override
@@ -50,8 +53,9 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		if (Controls.operatorController.getBButton()) {
-			aimVel = STAGING_VELOCITY;
+		if (Controls.operatorController.getAButton()) {
+			aimVel = table.getNumber("k_aimVel", 0);
+			// aimVel = STAGING_VELOCITY;
 		} else if (Shooter.getInstance().isShouldBeShooting()) {
 			aimVel = SHOOTING_VELOCITY;
 		} else {
@@ -76,17 +80,15 @@ public class Elevator extends ControlledSubsystem {
 	public void sendToSmartDash() {
 		this.getController().sendToSmartDash();
 		DashboardHelper.updateTunable(this.getController());
-		// SmartDashboard.putNumber(this.getName() + " Vel",
-		// this.elevator.getEncPosition());
-		// SmartDashboard.putNumber(this.getName() + " Pow",
-		// this.elevator.getPosition());
+		table.putNumber(this.getName() + " Vel", this.elevator.getEncPosition());
+		table.putNumber(this.getName() + " Pow", this.elevator.getPosition());
 	}
 
 	@Override
 	public void manualControl() {
 
 		if (Controls.operatorController.getBumper(Hand.kRight)) {
-			setElevator(1);
+			setElevator(.95);
 		} else if (Controls.operatorController.getBumper(Hand.kLeft)) {
 			setElevator(-.5);
 		} else {

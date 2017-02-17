@@ -23,7 +23,7 @@ public class VisionServer implements Runnable {
 	private TargetInfo currentTargetToAimTowards = new TargetInfo(0, 0);
 	private Shot currentShotToAimTowards = new Shot();
 	private static VisionServer instance;
-	public static double FIELD_OF_VIEW_DEGREES = 59.14;
+	public static double FIELD_OF_VIEW_DEGREES = 45;
 
 	private static Shot[] shots = { new Shot(120, 24.85, .59), new Shot(120, 27.85, .346), new Shot(120, 30.85, .227),
 			new Shot(120, 31.95, .09), new Shot(120, 32.95, -.037), new Shot(120, 34.05, -.148),
@@ -104,7 +104,6 @@ public class VisionServer implements Runnable {
 				int read;
 				//
 				while (socket.isConnected() && (read = is.read(buffer)) != -1) {
-					System.out.println("Got Connection");
 					String messageRaw = new String(buffer, 0, read);
 					String[] messages = messageRaw.split("\n");
 					for (String message : messages) {
@@ -132,7 +131,6 @@ public class VisionServer implements Runnable {
 	}
 
 	private void findClosestGoal() {
-		System.out.println("FIND CLOSEST GOAL PLZ");
 		List<TargetInfo> currentTargets = this.getTargets();
 		// Find the closest preset value to the vision shot
 		if (currentTargets.size() != 0) {

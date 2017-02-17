@@ -13,6 +13,7 @@ import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel extends ControlledSubsystem implements IDashboard {
@@ -20,11 +21,12 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	private TalonSRXMC leftTalon = new TalonSRXMC(RobotMap.LEFT_SHOOTER_ID);
 	private TalonSRXMC rightTalon = new TalonSRXMC(RobotMap.RIGHT_SHOOTER_ID);
 
-	private double maxAccRPS = 31.0;
+	private double maxAccRPS = 60.0;
 	private double aimVelRPS = 0.0;
 	private double aimAccRPS = 0.0;
 	private double curVel = 0;
 	private double lastVisionRPS = 0;
+	private NetworkTable table = NetworkTable.getTable("Flywheel");
 
 	/**
 	 * Shooter for singleton pattern
@@ -33,11 +35,11 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 
 	private Flywheel() {
 		super("Flywheel");
-		this.setController(new FeedForwardWithPIDController(.006, 0, .035, 0.000, 0.00));
+		this.setController(new FeedForwardWithPIDController(.004, 0, .0, 0.000, 0.00));
 		this.getController().setName("Flywheel Speed");
 		this.rightTalon.setReversed(true);
 		((FeedForwardWithPIDController) this.getController()).setTHRESHOLD(10);
-		SmartDashboard.putNumber("TEST RPS", 140);
+		table.putNumber("k_TEST RPS", 140);
 	}
 
 	/**
@@ -104,10 +106,10 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	public void testVel() {
 		curVel = this.getRPS();
 		if (Controls.operatorController.getXButton()) {
-			aimVelRPS = 0;
+			aimVelRPS = 90;
 		} else if (Controls.operatorController.getYButton()) {
-			aimVelRPS = SmartDashboard.getNumber("Flywheel aim vel testable", 0);
-			SmartDashboard.putNumber("Flywheel aim vel testable", aimVelRPS);
+			aimVelRPS = table.getNumber("k_TEST RPS", 0);
+			// SmartDashboard.putNumber("Flywheel aim vel testable", aimVelRPS);
 
 		} else {
 			aimVelRPS = 0;
@@ -121,11 +123,11 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	private void shootLikeRobie() {
 		if (aimVelRPS == 0) {
 		} else {
-			if (curVel < aimVelRPS - 32) {
+			if (curVel < aimVelRPS - maxAccRPS) {
 				aimAccRPS = maxAccRPS;
 				aimVelRPS = curVel + maxAccRPS;
 
-			} else if (curVel > aimVelRPS + 32) {
+			} else if (curVel > aimVelRPS + maxAccRPS) {
 				aimAccRPS = 0;
 				// aimVelRPS = curVel + maxAccRPS;
 			} else {
@@ -177,9 +179,10 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 		getController().sendToSmartDash();
 		DashboardHelper.updateTunable(this.getController());
 		SmartDashboard.putNumber(this.getName() + " RPM", curVel * 60);
-		SmartDashboard.putNumber(this.getName() + " RPS", curVel);
-		SmartDashboard.putNumber(this.getName() + " Goal", this.aimVelRPS);
-		SmartDashboard.putNumber(this.getName() + " Left", leftTalon.getDesiredOutput());
+		table.putNumber(this.getName() + " RPS", getRPS());
+		table.putNumber(this.getName() + " Goal", this.aimVelRPS);
+		table.putNumber(this.getName() + " Left", leftTalon.getDesiredOutput());
+
 		SmartDashboard.putNumber(this.getName() + " Right", rightTalon.getDesiredOutput());
 	}
 

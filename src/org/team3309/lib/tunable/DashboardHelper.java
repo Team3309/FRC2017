@@ -10,7 +10,7 @@ public class DashboardHelper {
 		Field[] fields = c.getDeclaredFields();
 		Method[] methods = c.getDeclaredMethods();
 
-		System.out.println("TABLE " + dashboardObj.getTableName());
+		// System.out.println("TABLE " + dashboardObj.getTableName());
 		NetworkTable table = NetworkTable.getTable(dashboardObj.getTableName());
 
 		// -- Prefix
@@ -70,14 +70,15 @@ public class DashboardHelper {
 					Class<?> ft = m.getReturnType();
 					String dispName = annon.displayName();
 					String name = prefix + (dispName != "" ? dispName : m.getName());
-					System.out.println(name);
+					// System.out.println(name);
 					// -- Boolean
 					if (ft.isAssignableFrom(boolean.class)) {
 						table.putBoolean(name, (boolean) m.invoke(dashboardObj));
 					}
 					// -- Number
 					else if (ft.isAssignableFrom(double.class)) {
-						System.out.println(name + " " + m.invoke(dashboardObj));
+						// System.out.println(name + " " +
+						// m.invoke(dashboardObj));
 						table.putNumber(name, (double) m.invoke(dashboardObj));
 					}
 					// -- String

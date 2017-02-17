@@ -4,6 +4,7 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.team3309.lib.tunable.Dashboard;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class FeedForwardWithPIDController extends PIDController {
@@ -106,13 +107,13 @@ public class FeedForwardWithPIDController extends PIDController {
 
 	public void sendToSmartDash() {
 		super.sendToSmartDash();
-
-		kA = SmartDashboard.getNumber(this.getName() + " kA", kA);
-		kV = SmartDashboard.getNumber(this.getName() + " kV", kV);
-		SmartDashboard.putNumber(this.getName() + " aimVel", this.aimVel);
-		SmartDashboard.putNumber(this.getName() + " aimAcc", this.aimAcc);
-		SmartDashboard.putNumber(this.getName() + " kA", kA);
-		SmartDashboard.putNumber(this.getName() + " kV", kV);
+		NetworkTable table = NetworkTable.getTable(this.subsystemID);
+		kA = table.getNumber("k_A " + this.getName(), kA);
+		kV = table.getNumber("k_V " + this.getName(), kV);
+		table.putNumber(this.getName() + " aimVel", this.aimVel);
+		table.putNumber(this.getName() + " aimAcc", this.aimAcc);
+		table.putNumber("k_A " + this.getName(), kA);
+		table.putNumber("k_V " + this.getName(), kV);
 	}
 
 }

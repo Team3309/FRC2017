@@ -5,14 +5,17 @@ import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
 import org.usfirst.frc.team3309.subsystems.Elevator;
+import org.usfirst.frc.team3309.subsystems.FuelIntake;
 import org.usfirst.frc.team3309.subsystems.Turbine;
 import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
+import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class Robot extends IterativeRobot {
@@ -62,15 +65,22 @@ public class Robot extends IterativeRobot {
 		Sensors.read();
 		// Systems.update();
 
-		// Flywheel.getInstance().manualControl();
-		// Hood.getInstance().manualControl(); // updateTeleop, check sensor
-		// Turbine.getInstance().manualControl(); // first
-		// Turret.getInstance().manualControl();
-		// Elevator.getInstance().manualControl();
+		Flywheel.getInstance().testVel();
+		// Flywheel.getInstance().sendToSmartDash();
+		// Hood.getInstance().updateTeleop(); // updateTeleop, check sensor
+		// Hood.getInstance().sendToSmartDash();
+		Turbine.getInstance().manualControl(); // first
+		Turret.getInstance().updateTeleop();
+		Turret.getInstance().sendToSmartDash();
+
+		Elevator.getInstance().manualControl();
+		Elevator.getInstance().sendToSmartDash();
+		FuelIntake.getInstance().updateTeleop();
 		// Shooter.getInstance().sendToSmartDash();
 		// Climber.getInstance().manualControl();
 		Drive.getInstance().updateTeleop();
-		DashboardHelper.updateTunable(Drive.getInstance());
+		Drive.getInstance().sendToSmartDash();
+		// DashboardHelper.updateTunable(Drive.getInstance());
 
 		Actuators.actuate();
 	}

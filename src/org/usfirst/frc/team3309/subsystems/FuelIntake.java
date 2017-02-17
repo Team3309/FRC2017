@@ -72,7 +72,7 @@ public class FuelIntake extends KragerSystem {
 	}
 
 	public void setFuelIntake(double power) {
-
+		this.fuel.setDesiredOutput(power);
 	}
 
 }

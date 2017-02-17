@@ -18,11 +18,10 @@ import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends ControlledSubsystem {
-	XboxController driverRemote = new XboxController(0);
 	/**
 	 * Used to give a certain gap that the drive would be ok with being within
 	 * its goal encoder average.
@@ -41,11 +40,14 @@ public class Drive extends ControlledSubsystem {
 	private TalonSRXMC left0 = new TalonSRXMC(RobotMap.DRIVE_LEFT_0_ID);
 	private TalonSRXMC left1 = new TalonSRXMC(RobotMap.DRIVE_LEFT_1_ID);
 	private TalonSRXMC left2 = new TalonSRXMC(RobotMap.DRIVE_LEFT_2_ID);
-
+	private NetworkTable table = NetworkTable.getTable("Drivetrain");
 	private Solenoid shifter = new Solenoid(RobotMap.SHIFTER);
 
 	private boolean isLowGear = true;
 	private boolean hasPIDBreakStarted = false;
+
+	@Dashboard(displayName = "k_test Velocity", tunable = true)
+	private double testVel = 0;
 
 	public static Drive getInstance() {
 		if (drive == null)
@@ -53,11 +55,11 @@ public class Drive extends ControlledSubsystem {
 		return drive;
 	}
 
-	
 	private Drive() {
 		super("Drivetrain");
 		right0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
 		left0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
+		SmartDashboard.putNumber("testVel", 0);
 	}
 
 	@Override
@@ -79,6 +81,9 @@ public class Drive extends ControlledSubsystem {
 		} else
 			isLowGear = false;
 
+		NetworkTable.getTable("Drivetrain").putNumber("rightVel", this.getRightVel());
+		NetworkTable.getTable("Drivetrain").putNumber("leftVel", this.getLeftVel());
+		System.out.println("right pos " + this.getRightPos());
 		shifter.set(isLowGear);
 		OutputSignal output = getController().getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
@@ -127,10 +132,10 @@ public class Drive extends ControlledSubsystem {
 	public void sendToSmartDash() {
 		getController().sendToSmartDash();
 		DashboardHelper.updateTunable(getController());
-		SmartDashboard.putNumber(this.getName() + " right pos", this.getRightPos());
-		SmartDashboard.putNumber(this.getName() + " left pos", this.getLeftPos());
-		SmartDashboard.putNumber(this.getName() + " angle", getAngle());
-		SmartDashboard.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
+		table.putNumber(this.getName() + " right pos", this.getRightPos());
+		table.putNumber(this.getName() + " left pos", this.getLeftPos());
+		table.putNumber(this.getName() + " angle", getAngle());
+		table.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
 	}
 
 	@Override
@@ -295,6 +300,13 @@ public class Drive extends ControlledSubsystem {
 	@Dashboard(displayName = "rightPos")
 	public double getRightPos() {
 		return this.right0.getTalon().getAnalogInPosition();
+	}
+
+	public void testVel() {
+		this.changeToVelocityMode();
+		testVel = SmartDashboard.getNumber("testVel", 0);
+		right0.setDesiredOutput(testVel);
+		left0.setDesiredOutput(-testVel);
 	}
 
 }
