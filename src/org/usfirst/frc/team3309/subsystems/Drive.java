@@ -19,6 +19,7 @@ import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends ControlledSubsystem {
 	/**
@@ -134,6 +135,7 @@ public class Drive extends ControlledSubsystem {
 		table.putNumber(this.getName() + " right pos", this.getRightPos());
 		table.putNumber(this.getName() + " left pos", this.getLeftPos());
 		table.putNumber(this.getName() + " angle", getAngle());
+		table.putNumber(this.getName() + " angl1e", Sensors.getAngle1());
 		table.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
 		table.putNumber("error", this.right0.getTalon().getError());
 	}

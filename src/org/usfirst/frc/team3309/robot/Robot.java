@@ -18,7 +18,7 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<AutoRoutine> mainAutoChooser = new SendableChooser<AutoRoutine>();
 	private SendableChooser<AutoRoutine> sideAutoChooser = new SendableChooser<AutoRoutine>();
 	public static double LOOP_SPEED_MS = 20;
-	private Compressor c = new Compressor();
+	public static Compressor c = new Compressor();
 
 	public boolean getMatch() {
 		return false;
@@ -67,7 +67,7 @@ public class Robot extends IterativeRobot {
 		// Hood.getInstance().updateTeleop(); // updateTeleop, check sensor
 		// Hood.getInstance().sendToSmartDash();
 		Turbine.getInstance().manualControl(); // first
-		Turret.getInstance().updateTeleop();
+		// Turret.getInstance().updateTeleop();
 		Turret.getInstance().sendToSmartDash();
 
 		Elevator.getInstance().manualControl();

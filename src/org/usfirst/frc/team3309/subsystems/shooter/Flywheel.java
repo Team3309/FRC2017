@@ -9,6 +9,7 @@ import org.team3309.lib.tunable.Dashboard;
 import org.team3309.lib.tunable.DashboardHelper;
 import org.team3309.lib.tunable.IDashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
+import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.vision.VisionServer;
@@ -221,6 +222,10 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	}
 
 	private void setShooter(double power) {
+		if (power > .1)
+			Robot.c.stop();
+		else
+			Robot.c.start();
 		leftTalon.setDesiredOutput(power);
 		rightTalon.setDesiredOutput(power);
 	}
