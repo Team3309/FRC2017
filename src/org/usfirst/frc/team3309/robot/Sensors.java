@@ -1,5 +1,6 @@
 package org.usfirst.frc.team3309.robot;
 
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,13 +23,14 @@ public class Sensors {
 
 	private static List<Sensor> sensors = new LinkedList<Sensor>();
 	private static AHRS navX;
+	private static ADXRS450_Gyro gyro;
 	private static CounterSensor flywheelCounter;
 
 	static {
 		System.out.println("INIT STATIC");
 		navX = new AHRS(SPI.Port.kMXP);
 		System.out.println("NAVX");
-
+		gyro = new ADXRS450_Gyro();
 		System.out.println("Turret");
 		flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
 	}

@@ -59,7 +59,7 @@ public class Drive extends ControlledSubsystem {
 		super("Drivetrain");
 		right0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
 		left0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
-		SmartDashboard.putNumber("testVel", 0);
+		table.putNumber("testVel", 0);
 	}
 
 	@Override
@@ -134,6 +134,8 @@ public class Drive extends ControlledSubsystem {
 		DashboardHelper.updateTunable(getController());
 		table.putNumber(this.getName() + " right pos", this.getRightPos());
 		table.putNumber(this.getName() + " left pos", this.getLeftPos());
+		table.putNumber(this.getName() + " right vel", this.getRightVel());
+		table.putNumber(this.getName() + " left vel", this.getLeftVel());
 		table.putNumber(this.getName() + " angle", getAngle());
 		table.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
 	}
@@ -304,7 +306,7 @@ public class Drive extends ControlledSubsystem {
 
 	public void testVel() {
 		this.changeToVelocityMode();
-		testVel = SmartDashboard.getNumber("testVel", 0);
+		testVel = table.getNumber("testVel", 0);
 		right0.setDesiredOutput(testVel);
 		left0.setDesiredOutput(-testVel);
 	}
