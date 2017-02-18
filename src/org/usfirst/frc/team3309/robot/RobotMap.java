@@ -26,7 +26,7 @@ public class RobotMap {
 	// PNEUMATICS
 	public static final int GEAR_INTAKE_PIVOT_SOLENOID = 0;
 	public static final int GEAR_INTAKE_WRIST_SOLENOID = 1;
-	public static final int SHIFTER = 7;
+	public static final int SHIFTER = 2;
 
 	// PWM
 	public static final int SERVO = 9;

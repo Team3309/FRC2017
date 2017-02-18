@@ -23,7 +23,6 @@ public class Sensors {
 	private static List<Sensor> sensors = new LinkedList<Sensor>();
 	private static AHRS navX;
 	private static CounterSensor flywheelCounter;
-	private static float lastPitch;
 
 	static {
 		System.out.println("INIT STATIC");
@@ -76,9 +75,7 @@ public class Sensors {
 	}
 
 	public static double getAngularVel() {
-		double toReturn = (navX.getPitch() - lastPitch) / 22;
-		lastPitch = navX.getPitch();
-		return toReturn;
+		return navX.getRawGyroX();
 	}
 
 }

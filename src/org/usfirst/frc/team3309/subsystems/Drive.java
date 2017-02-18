@@ -19,6 +19,7 @@ import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends ControlledSubsystem {
 	/**
@@ -58,7 +59,7 @@ public class Drive extends ControlledSubsystem {
 		super("Drivetrain");
 		right0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
 		left0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
-		table.putNumber("k_testVel", 0);
+		SmartDashboard.putNumber("testVel", 0);
 	}
 
 	@Override
@@ -80,9 +81,9 @@ public class Drive extends ControlledSubsystem {
 		} else
 			isLowGear = false;
 
-		table.putNumber("current", right0.getTalon().getOutputCurrent());
 		NetworkTable.getTable("Drivetrain").putNumber("rightVel", this.getRightVel());
 		NetworkTable.getTable("Drivetrain").putNumber("leftVel", this.getLeftVel());
+		System.out.println("right pos " + this.getRightPos());
 		shifter.set(isLowGear);
 		OutputSignal output = getController().getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
@@ -135,7 +136,6 @@ public class Drive extends ControlledSubsystem {
 		table.putNumber(this.getName() + " left pos", this.getLeftPos());
 		table.putNumber(this.getName() + " angle", getAngle());
 		table.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
-		table.putNumber("error", this.right0.getTalon().getError());
 	}
 
 	@Override
@@ -206,8 +206,6 @@ public class Drive extends ControlledSubsystem {
 		if (this.right0.getTalon().getControlMode() == TalonControlMode.Speed) {
 			this.right0.setDesiredOutput(right);
 		} else {
-			if (Math.abs(right) < .12)
-				right = 0;
 			this.right0.setDesiredOutput(-right);
 			this.right1.setDesiredOutput(-right);
 			this.right2.setDesiredOutput(-right);
@@ -225,8 +223,6 @@ public class Drive extends ControlledSubsystem {
 		if (left0.getTalon().getControlMode() == TalonControlMode.Speed) {
 			this.left0.setDesiredOutput(left);
 		} else {
-			if (Math.abs(left) < .12)
-				left = 0;
 			this.left0.setDesiredOutput(left);
 			this.left1.setDesiredOutput(left);
 			this.left2.setDesiredOutput(left);
@@ -308,7 +304,7 @@ public class Drive extends ControlledSubsystem {
 
 	public void testVel() {
 		this.changeToVelocityMode();
-		testVel = table.getNumber("k_testVel", 0);
+		testVel = SmartDashboard.getNumber("testVel", 0);
 		right0.setDesiredOutput(testVel);
 		left0.setDesiredOutput(-testVel);
 	}

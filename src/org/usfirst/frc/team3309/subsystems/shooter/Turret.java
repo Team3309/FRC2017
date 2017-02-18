@@ -44,14 +44,13 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	private HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
 	private double RIGHT_ABSOLUTE_LIMIT = 330;
 	private double LEFT_ABSOLUTE_LIMIT = -120;
-	private double lastGoalX = 0;
 	private double lastVisionAngle = getAngle();
 	private NetworkTable table = NetworkTable.getTable("Turret");
 
 	private boolean isMarked = false;
 
 	public final double LEFT_LIMIT = -40;
-	public final double RIGHT_LIMIT = 150;
+	public final double RIGHT_LIMIT = 270;
 	public final double MAX_ACC = .8; // 180 deg/s*s
 	public final double MAX_VEL = 30; // 180 deg/s*s
 
@@ -191,16 +190,10 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		changeToPositionMode();
 		TargetInfo goal = VisionServer.getInstance().getTargets().get(0);
 		double goalX = goal.getZ();
-		if (lastGoalX != goalX) {
-			this.resetAngVelocityCounts();
-		}
-		lastGoalX = goalX;
 		// System.out.println("GOAL X " + goalX);
 		double degToTurn = ((goalX) / .8) * (VisionServer.FIELD_OF_VIEW_DEGREES);
-		double predictionOffset = Sensors.getAngle() - this.robotAngleAtLastGoal;
-		System.out.println("sum of " + sumOfOmegaSinceLastReset + " loops snce " + loopsSinceLastReset);
-		System.out.println("predictionOffset " + predictionOffset);
-		table.putNumber("prediction offset", predictionOffset);
+		double predictionOffset = (sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
+				* (loopsSinceLastReset * (22 / 1000));
 
 		goalAngle = this.getAngle() + degToTurn + predictionOffset;
 
@@ -213,7 +206,6 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 			isMarked = true;
 		}
 		lastVisionAngle = goalAngle;
-
 	}
 
 	public void searchForGoal() {
@@ -313,10 +305,8 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	private KragerTimer timerSinceLastVisionGoalSeen = new KragerTimer(1000);
 	private int loopsSinceLastReset = 0;
 	private double sumOfOmegaSinceLastReset = 0;
-	private double robotAngleAtLastGoal = getAngle();
 
 	public void resetAngVelocityCounts() {
-		robotAngleAtLastGoal = Sensors.getAngle();
 		timerSinceLastVisionGoalSeen.stop();
 		timerSinceLastVisionGoalSeen.reset();
 		timerSinceLastVisionGoalSeen.start();
