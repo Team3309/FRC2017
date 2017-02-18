@@ -4,11 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.team3309.lib.sensors.CounterSensor;
-import org.team3309.lib.sensors.FriarGyro;
+import org.team3309.lib.sensors.NavX;
 import org.team3309.lib.sensors.Sensor;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 
 /**
@@ -23,12 +24,10 @@ public class Sensors {
 	private static AHRS navX;
 	private static CounterSensor flywheelCounter;
 	private static float lastPitch;
-	private static FriarGyro gyro;
 
 	static {
 		System.out.println("INIT STATIC");
 		navX = new AHRS(SPI.Port.kMXP);
-		gyro = new FriarGyro(0);
 		System.out.println("NAVX");
 
 		System.out.println("Turret");
@@ -52,11 +51,7 @@ public class Sensors {
 	}
 
 	public static double getAngle() {
-		return gyro.getAngle();
-	}
-
-	public static double getAngle1() {
-		return navX.getRoll();
+		return navX.getPitch();
 	}
 
 	public static double getRoll() {
