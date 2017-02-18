@@ -1,21 +1,16 @@
 package org.usfirst.frc.team3309.robot;
 
-import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
-import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
 import org.usfirst.frc.team3309.subsystems.Elevator;
 import org.usfirst.frc.team3309.subsystems.FuelIntake;
 import org.usfirst.frc.team3309.subsystems.Turbine;
-import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
-import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
-import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class Robot extends IterativeRobot {
@@ -23,6 +18,7 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<AutoRoutine> mainAutoChooser = new SendableChooser<AutoRoutine>();
 	private SendableChooser<AutoRoutine> sideAutoChooser = new SendableChooser<AutoRoutine>();
 	public static double LOOP_SPEED_MS = 20;
+	private Compressor c = new Compressor();
 
 	public boolean getMatch() {
 		return false;
@@ -34,6 +30,7 @@ public class Robot extends IterativeRobot {
 		mainAutoChooser.addObject("", null);
 		mainAutoChooser.addObject("Straight 1 Gear", null);
 
+		c.start();
 		// Start the Vision (connect to server)
 		(new Thread(VisionServer.getInstance())).start();
 
@@ -78,7 +75,7 @@ public class Robot extends IterativeRobot {
 		FuelIntake.getInstance().updateTeleop();
 		// Shooter.getInstance().sendToSmartDash();
 		// Climber.getInstance().manualControl();
-		Drive.getInstance().updateTeleop();
+		Drive.getInstance().manualControl();
 		Drive.getInstance().sendToSmartDash();
 		// DashboardHelper.updateTunable(Drive.getInstance());
 

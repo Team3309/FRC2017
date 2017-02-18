@@ -64,7 +64,7 @@ public class VisionServer implements Runnable {
 				targetInfos.add(new TargetInfo(y, z));
 			}
 			targets = targetInfos;
-			Turret.getInstance().resetAngVelocityCounts();
+
 		} catch (ClassCastException e) {
 			System.err.println("Data type error: " + e);
 			System.err.println(updateString);
@@ -194,7 +194,7 @@ public class VisionServer implements Runnable {
 	public TargetInfo getTarget() {
 		if (this.hasTargetsToAimAt())
 			return targets.get(0);
-		return null;
+		return new TargetInfo(0, 0);
 	}
 
 	public void setTargets(List<TargetInfo> targets) {
