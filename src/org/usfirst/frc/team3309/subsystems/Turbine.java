@@ -27,7 +27,7 @@ public class Turbine extends ControlledSubsystem {
 	public void updateTeleop() {
 		boolean operatorBButton = Controls.operatorController.getBButton(); // sort
 		if (operatorBButton || Shooter.getInstance().isShouldBeShooting()) {
-			setHopper(.7);
+			setHopper(1);
 		} else {
 			setHopper(0);
 		}

@@ -66,12 +66,12 @@ public class Robot extends IterativeRobot {
 		// Systems.update();
 
 		Flywheel.getInstance().testVel();
-		// Flywheel.getInstance().sendToSmartDash();
-		// Hood.getInstance().updateTeleop(); // updateTeleop, check sensor
-		// Hood.getInstance().sendToSmartDash();
+		Flywheel.getInstance().sendToSmartDash();
+		Hood.getInstance().updateTeleop(); // updateTeleop, check sensor
+		Hood.getInstance().sendToSmartDash();
 		Turbine.getInstance().manualControl(); // first
-		Turret.getInstance().updateTeleop();
-		Turret.getInstance().sendToSmartDash();
+		// Turret.getInstance().updateTeleop();
+		// Turret.getInstance().sendToSmartDash();
 
 		Elevator.getInstance().manualControl();
 		Elevator.getInstance().sendToSmartDash();
