@@ -12,7 +12,7 @@ public class GearIntakeMiddleCurvy extends AutoRoutine {
 	public void routine() throws TimedOutException, InterruptedException {
 		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
 		changePoints.add(new VelocityChangePoint(100, 0));
-		changePoints.add(new VelocityChangePoint(30, 100));
+		changePoints.add(new VelocityChangePoint(30, 9000));
 		this.driveEncoder(500, 10, changePoints);
 	}
 

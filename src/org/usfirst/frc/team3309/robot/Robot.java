@@ -19,8 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 
 	private SendableChooser<AutoRoutine> mainAutoChooser = new SendableChooser<AutoRoutine>();
-	private SendableChooser<AutoRoutine> sideAutoChooser = new SendableChooser<AutoRoutine>();
-	public static double LOOP_SPEED_MS = 20;
+	private Thread autoThread;
 
 	public boolean getMatch() {
 		return false;
@@ -46,7 +45,8 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		Systems.init();
 		Drive.getInstance().resetDrive();
-		(new Thread((AutoRoutine) mainAutoChooser.getSelected())).start();
+		autoThread = (new Thread((AutoRoutine) mainAutoChooser.getSelected()));
+		autoThread.start();
 	}
 
 	public void autonomousPeriodic() {
@@ -58,6 +58,9 @@ public class Robot extends IterativeRobot {
 
 	public void teleopInit() {
 		Systems.init();
+		if (autoThread != null)
+			autoThread.stop();
+		;
 		System.out.println("DONE INIT");
 	}
 

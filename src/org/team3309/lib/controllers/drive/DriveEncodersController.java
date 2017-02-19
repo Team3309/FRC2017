@@ -17,10 +17,10 @@ import org.usfirst.frc.team3309.subsystems.Drive;
  */
 public class DriveEncodersController extends Controller {
 
-	protected PIDPositionController linearController = new PIDPositionController(.2, 0, 0);
+	protected PIDPositionController linearController = new PIDPositionController(.15, 0, 0);
 	// protected PIDPositionController angController = new
 	// PIDPositionController(0.166, 0.001, 0.002);
-	protected PIDPositionController angController = new PIDPositionController(40, 0, 0);
+	protected PIDPositionController angController = new PIDPositionController(37, .13, 17);
 	@Dashboard(displayName = "Goal Encoder")
 	protected double goalEncoder;
 	protected double goalAngle;
@@ -34,7 +34,7 @@ public class DriveEncodersController extends Controller {
 		linearController.setName("linear");
 		linearController.setCompletable(true);
 		linearController.setTHRESHOLD(1000);
-		linearController.setTIME_TO_BE_COMPLETE_MILLISECONDS(.4);
+		linearController.setTIME_TO_BE_COMPLETE_MILLISECONDS(100);
 		linearController.setSubsystemID(this.subsystemID);
 		angController.setName("ang");
 		angController.setSubsystemID(this.subsystemID);
