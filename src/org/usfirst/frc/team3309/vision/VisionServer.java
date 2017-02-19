@@ -47,7 +47,7 @@ public class VisionServer implements Runnable {
 			adb.reversePortForward(PORT, PORT);
 			adb.runCommand("devices");
 			System.out.println("RUN");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

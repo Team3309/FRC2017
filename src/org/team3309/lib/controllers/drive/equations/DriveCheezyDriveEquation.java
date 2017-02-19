@@ -6,11 +6,16 @@ import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.driverstation.Controls;
+import org.usfirst.frc.team3309.subsystems.Drive;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveCheezyDriveEquation extends Controller {
+
+	public DriveCheezyDriveEquation() {
+		Drive.getInstance().changeToPercentMode();
+	}
 
 	@Override
 	public void reset() {

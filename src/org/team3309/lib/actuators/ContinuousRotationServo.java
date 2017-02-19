@@ -22,13 +22,9 @@ public class ContinuousRotationServo extends PWM {
 		if (value == 0) {
 			// setSpeed(0);
 			// this.setZeroLatch();
-
-			System.out.println("ZERO LATCH");
 			this.setDisabled();
 		} else {
-			System.out.println("SPEED SETTING");
 			setSpeed(value);
 		}
-		System.out.println(this.getRaw());
 	}
 }

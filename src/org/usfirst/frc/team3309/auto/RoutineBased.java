@@ -27,10 +27,12 @@ public class RoutineBased {
 
 	public void waitForController(Controller c, double timeout) throws TimedOutException, InterruptedException {
 		Timer waitTimer = new Timer();
+
 		waitTimer.start();
 		while (!c.isCompleted()) {
+			System.out.println();
 			if (waitTimer.get() > timeout) {
-				throw new TimedOutException();
+				break;
 			}
 			KragerTimer.delayMS(100);
 		}
@@ -97,6 +99,8 @@ public class RoutineBased {
 	public void driveEncoder(double goal, double timeout) {
 		Sensors.resetDrive();
 		DriveEncodersController x = new DriveEncodersController(goal);
+		System.out.println("SETTINGF");
+		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
 		} catch (Exception e) {

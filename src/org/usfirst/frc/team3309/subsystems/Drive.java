@@ -1,7 +1,6 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
-import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
 import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
@@ -13,13 +12,13 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 
+import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive extends ControlledSubsystem {
 	/**
@@ -32,14 +31,14 @@ public class Drive extends ControlledSubsystem {
 	 * Used to give a certain gap that the drive would be ok with being within
 	 * its goal angle
 	 */
-	private static final double DRIVE_GYRO_LENIENCY = .5;
+	private static final double DRIVE_GYRO_LENIENCY = 5;
 	private static Drive drive;
-	private TalonSRXMC right0 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_0_ID);
-	private TalonSRXMC right1 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_1_ID);
-	private TalonSRXMC right2 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_2_ID);
-	private TalonSRXMC left0 = new TalonSRXMC(RobotMap.DRIVE_LEFT_0_ID);
-	private TalonSRXMC left1 = new TalonSRXMC(RobotMap.DRIVE_LEFT_1_ID);
-	private TalonSRXMC left2 = new TalonSRXMC(RobotMap.DRIVE_LEFT_2_ID);
+	private CANTalon right0 = new CANTalon(RobotMap.DRIVE_RIGHT_0_ID);
+	private CANTalon right1 = new CANTalon(RobotMap.DRIVE_RIGHT_1_ID);
+	private CANTalon right2 = new CANTalon(RobotMap.DRIVE_RIGHT_2_ID);
+	private CANTalon left0 = new CANTalon(RobotMap.DRIVE_LEFT_0_ID);
+	private CANTalon left1 = new CANTalon(RobotMap.DRIVE_LEFT_1_ID);
+	private CANTalon left2 = new CANTalon(RobotMap.DRIVE_LEFT_2_ID);
 	private NetworkTable table = NetworkTable.getTable("Drivetrain");
 	private Solenoid shifter = new Solenoid(RobotMap.SHIFTER);
 
@@ -47,7 +46,6 @@ public class Drive extends ControlledSubsystem {
 	private boolean hasPIDBreakStarted = false;
 
 	@Dashboard(displayName = "k_test Velocity", tunable = true)
-	private double testVel = 0;
 
 	public static Drive getInstance() {
 		if (drive == null)
@@ -57,13 +55,15 @@ public class Drive extends ControlledSubsystem {
 
 	private Drive() {
 		super("Drivetrain");
-		right0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
-		left0.getTalon().setFeedbackDevice(FeedbackDevice.AnalogEncoder);
-		table.putNumber("testVel", 0);
+
+		right0.setFeedbackDevice(FeedbackDevice.AnalogEncoder);
+		left0.setFeedbackDevice(FeedbackDevice.AnalogEncoder);
+		table.putNumber("k_testVel", 0);
 	}
 
 	@Override
 	public void updateTeleop() {
+		this.changeToPercentMode();
 		if (Controls.driverController.getAButton() && !hasPIDBreakStarted) {
 			DriveAngleVelocityController drivePIDBreak = new DriveAngleVelocityController(this.getAngle());
 			drivePIDBreak.setCompletable(false);
@@ -77,43 +77,44 @@ public class Drive extends ControlledSubsystem {
 		}
 
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
-			isLowGear = true;
-		} else
 			isLowGear = false;
+		} else
+			isLowGear = true;
 
-		NetworkTable.getTable("Drivetrain").putNumber("rightVel", this.getRightVel());
-		NetworkTable.getTable("Drivetrain").putNumber("leftVel", this.getLeftVel());
-		System.out.println("right pos " + this.getRightPos());
+		// System.out.println("right pos " + this.getRightPos());
 		shifter.set(isLowGear);
 		OutputSignal output = getController().getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
 	public void changeToVelocityMode() {
-		right0.getTalon().changeControlMode(TalonControlMode.Speed);
-		right1.getTalon().changeControlMode(TalonControlMode.Follower);
-		right2.getTalon().changeControlMode(TalonControlMode.Follower);
-		right1.getTalon().set(RobotMap.DRIVE_RIGHT_0_ID);
-		right2.getTalon().set(RobotMap.DRIVE_RIGHT_0_ID);
-		left0.getTalon().changeControlMode(TalonControlMode.Speed);
-		left1.getTalon().changeControlMode(TalonControlMode.Follower);
-		left2.getTalon().changeControlMode(TalonControlMode.Follower);
-		left1.getTalon().set(RobotMap.DRIVE_LEFT_0_ID);
-		left2.getTalon().set(RobotMap.DRIVE_LEFT_0_ID);
+		right0.changeControlMode(TalonControlMode.Speed);
+
+		right1.changeControlMode(TalonControlMode.Follower);
+		right2.changeControlMode(TalonControlMode.Follower);
+		right1.set(RobotMap.DRIVE_RIGHT_0_ID);
+		right2.set(RobotMap.DRIVE_RIGHT_0_ID);
+		left0.changeControlMode(TalonControlMode.Speed);
+		left1.changeControlMode(TalonControlMode.Follower);
+		left2.changeControlMode(TalonControlMode.Follower);
+		left1.set(RobotMap.DRIVE_LEFT_0_ID);
+		left2.set(RobotMap.DRIVE_LEFT_0_ID);
 	}
 
 	public void changeToPercentMode() {
-		right0.getTalon().changeControlMode(TalonControlMode.PercentVbus);
-		right1.getTalon().changeControlMode(TalonControlMode.PercentVbus);
-		right2.getTalon().changeControlMode(TalonControlMode.PercentVbus);
-		left0.getTalon().changeControlMode(TalonControlMode.PercentVbus);
-		left1.getTalon().changeControlMode(TalonControlMode.PercentVbus);
-		left2.getTalon().changeControlMode(TalonControlMode.PercentVbus);
+		right0.changeControlMode(TalonControlMode.PercentVbus);
+		right1.changeControlMode(TalonControlMode.PercentVbus);
+		right2.changeControlMode(TalonControlMode.PercentVbus);
+		left0.changeControlMode(TalonControlMode.PercentVbus);
+		left1.changeControlMode(TalonControlMode.PercentVbus);
+		left2.changeControlMode(TalonControlMode.PercentVbus);
 	}
 
 	@Override
 	public void updateAuto() {
+		this.changeToVelocityMode();
 		OutputSignal output = getController().getOutputSignal(getInputState());
+		System.out.println("AIM SPEED " + output.getLeftMotor());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
@@ -121,10 +122,10 @@ public class Drive extends ControlledSubsystem {
 		InputState input = new InputState();
 		input.setAngularPos(Sensors.getAngle());
 		input.setAngularVel(Sensors.getAngularVel());
-		input.setLeftPos(left0.getTalon().getAnalogInPosition());
-		input.setLeftVel(left0.getTalon().getAnalogInVelocity());
-		input.setRightVel(right0.getTalon().getAnalogInVelocity());
-		input.setRightPos(right0.getTalon().getAnalogInPosition());
+		input.setLeftPos(left0.getAnalogInPosition());
+		input.setLeftVel(left0.getAnalogInVelocity());
+		input.setRightVel(right0.getAnalogInVelocity());
+		input.setRightPos(right0.getAnalogInPosition());
 		return input;
 	}
 
@@ -137,7 +138,11 @@ public class Drive extends ControlledSubsystem {
 		table.putNumber(this.getName() + " right vel", this.getRightVel());
 		table.putNumber(this.getName() + " left vel", this.getLeftVel());
 		table.putNumber(this.getName() + " angle", getAngle());
+		// table.putNumber(this.getName() + " angle raw", getAngle());
+		// table.putNumber(this.getName() + " angle", getAngle());
 		table.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
+		table.putNumber("right error", this.right0.getClosedLoopError());
+		table.putNumber("left error", this.left0.getClosedLoopError());
 	}
 
 	@Override
@@ -156,8 +161,9 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
+		System.out.println("INIT TELE");
 		this.setController(new DriveCheezyDriveEquation());
-		changeToPercentMode();
+		this.stopDrive();
 	}
 
 	@Override
@@ -169,6 +175,7 @@ public class Drive extends ControlledSubsystem {
 	 * Stops current running controller and sets motors to zero
 	 */
 	public void stopDrive() {
+		this.changeToPercentMode();
 		this.setController(new BlankController());
 		setLeftRight(0, 0);
 	}
@@ -193,6 +200,7 @@ public class Drive extends ControlledSubsystem {
 	 * @param left
 	 *            leftMotorSpeed
 	 */
+
 	public void setRightLeft(double right, double left) {
 		setLeft(left);
 		setRight(right);
@@ -205,12 +213,14 @@ public class Drive extends ControlledSubsystem {
 	 *            rightMotorSpeed
 	 */
 	public void setRight(double right) {
-		if (this.right0.getTalon().getControlMode() == TalonControlMode.Speed) {
-			this.right0.setDesiredOutput(right);
+		if (this.right0.getControlMode() == TalonControlMode.Speed) {
+			// System.out.println("SPEED ");
+			this.right0.set(right);
 		} else {
-			this.right0.setDesiredOutput(-right);
-			this.right1.setDesiredOutput(-right);
-			this.right2.setDesiredOutput(-right);
+			// System.out.println("NOT SPEEd");
+			this.right0.set(-right);
+			this.right1.set(-right);
+			this.right2.set(-right);
 		}
 
 	}
@@ -222,12 +232,14 @@ public class Drive extends ControlledSubsystem {
 	 *            leftMotorSpeed
 	 */
 	public void setLeft(double left) {
-		if (left0.getTalon().getControlMode() == TalonControlMode.Speed) {
-			this.left0.setDesiredOutput(left);
+		if (left0.getControlMode() == TalonControlMode.Speed) {
+			// System.out.println("SPEED ");
+			this.left0.set(-left);
 		} else {
-			this.left0.setDesiredOutput(left);
-			this.left1.setDesiredOutput(left);
-			this.left2.setDesiredOutput(left);
+			// System.out.println("NOT SPEEd");
+			this.left0.set(left);
+			this.left1.set(left);
+			this.left2.set(left);
 		}
 	}
 
@@ -237,7 +249,7 @@ public class Drive extends ControlledSubsystem {
 	 * @return the average of the left and right to get the distance traveled
 	 */
 	public double getDistanceTraveled() {
-		return (right0.getTalon().getAnalogInPosition() + left0.getTalon().getAnalogInPosition()) / 2;
+		return (right0.getAnalogInPosition() - left0.getAnalogInPosition()) / 2;
 	}
 
 	/**
@@ -270,8 +282,7 @@ public class Drive extends ControlledSubsystem {
 	 */
 	public boolean isAngleCloseTo(double angleGoal) {
 		try {
-			if (getAngle() < angleGoal + DRIVE_GYRO_LENIENCY
-					&& getDistanceTraveled() > angleGoal - DRIVE_GYRO_LENIENCY) {
+			if (getAngle() < angleGoal + DRIVE_GYRO_LENIENCY && getAngle() > angleGoal - DRIVE_GYRO_LENIENCY) {
 				return true;
 			}
 		} catch (Exception e) {
@@ -286,29 +297,42 @@ public class Drive extends ControlledSubsystem {
 
 	@Dashboard(displayName = "leftVel")
 	public double getLeftVel() {
-		return this.left0.getTalon().getAnalogInVelocity();
+		return this.left0.getAnalogInVelocity();
 	}
 
 	@Dashboard(displayName = "leftPos")
 	public double getLeftPos() {
-		return this.left0.getTalon().getAnalogInPosition();
+		return this.left0.getAnalogInPosition();
 	}
 
 	@Dashboard(displayName = "rightVel")
 	public double getRightVel() {
-		return this.right0.getTalon().getAnalogInVelocity();
+		return this.right0.getAnalogInVelocity();
 	}
 
 	@Dashboard(displayName = "rightPos")
 	public double getRightPos() {
-		return this.right0.getTalon().getAnalogInPosition();
+		return this.right0.getAnalogInPosition();
 	}
 
 	public void testVel() {
 		this.changeToVelocityMode();
-		testVel = table.getNumber("testVel", 0);
-		right0.setDesiredOutput(testVel);
-		left0.setDesiredOutput(-testVel);
+		double testVel = table.getNumber("k_testVel", 0);
+		setRight(testVel);
+		setLeft(testVel);
+	}
+
+	public void resetDrive() {
+		right0.setAnalogPosition(0);
+		left0.setAnalogPosition(0);
+	}
+
+	public void setHighGear() {
+		shifter.set(true);
+	}
+
+	public void setLowGear() {
+		shifter.set(false);
 	}
 
 }

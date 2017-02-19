@@ -17,8 +17,10 @@ import org.usfirst.frc.team3309.subsystems.Drive;
  */
 public class DriveEncodersController extends Controller {
 
-	protected PIDPositionController linearController = new PIDPositionController(.003, 0, 0);
-	protected PIDPositionController angController = new PIDPositionController(0.166, 0.001, 0.002);
+	protected PIDPositionController linearController = new PIDPositionController(.2, 0, 0);
+	// protected PIDPositionController angController = new
+	// PIDPositionController(0.166, 0.001, 0.002);
+	protected PIDPositionController angController = new PIDPositionController(40, 0, 0);
 	@Dashboard(displayName = "Goal Encoder")
 	protected double goalEncoder;
 	protected double goalAngle;
@@ -28,11 +30,17 @@ public class DriveEncodersController extends Controller {
 	private double pastAngOutput = 0;
 
 	public DriveEncodersController(double goal) {
+		this.setSubsystemID("Drivetrain");
 		linearController.setName("linear");
+		linearController.setCompletable(true);
+		linearController.setTHRESHOLD(1000);
+		linearController.setTIME_TO_BE_COMPLETE_MILLISECONDS(.4);
+		linearController.setSubsystemID(this.subsystemID);
 		angController.setName("ang");
+		angController.setSubsystemID(this.subsystemID);
 		goalEncoder = goal;
 		goalAngle = Sensors.getAngle();
-		Drive.getInstance().changeToPercentMode();
+		Drive.getInstance().changeToVelocityMode();
 	}
 
 	public DriveEncodersController(double goal, double angle) {
@@ -66,7 +74,7 @@ public class DriveEncodersController extends Controller {
 
 	@Override
 	public boolean isCompleted() {
-		return linearController.isCompleted() && angController.isCompleted();
+		return linearController.isCompleted();
 	}
 
 	@Override

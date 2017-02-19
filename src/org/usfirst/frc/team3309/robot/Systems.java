@@ -25,7 +25,6 @@ public class Systems {
 				e.updateTeleop();
 			}
 			if (e instanceof IDashboard) {
-				System.out.println("adding to dash");
 				DashboardHelper.updateTunable((IDashboard) e);
 
 			}
@@ -38,7 +37,7 @@ public class Systems {
 			if (DriverStation.getInstance().isAutonomous())
 				e.initAuto();
 			else
-				e.initAuto();
+				e.initTeleop();
 		}
 	}
 

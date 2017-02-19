@@ -5,6 +5,7 @@ import org.team3309.lib.actuators.TalonSRXMC;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Climber extends KragerSystem {
@@ -34,7 +35,7 @@ public class Climber extends KragerSystem {
 			if (hasHitTop())
 				setClimber(0);
 			else
-				setClimber(UP_POWER);
+				setClimber(Controls.operatorController.getY(Hand.kRight));
 		} else if (operatorBackButton) {
 			setClimber(-1);
 		} else {

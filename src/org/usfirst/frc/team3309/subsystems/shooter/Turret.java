@@ -40,7 +40,7 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	private boolean hasCalibratedSinceRobotInit = false;
 	// angle and loops since it last of spotted
 	private HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
-	private double RIGHT_ABSOLUTE_LIMIT = 90;
+	private double RIGHT_ABSOLUTE_LIMIT = 340;
 	private double LEFT_ABSOLUTE_LIMIT = -90;
 	private double lastGoalX = 0;
 	private double lastVisionAngle = getAngle();
@@ -55,7 +55,7 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	private boolean isSurvey = false;
 
 	public final double LEFT_LIMIT = -40;
-	public final double RIGHT_LIMIT = 40;
+	public final double RIGHT_LIMIT = 270;
 	public final double MAX_ACC = .8; // 180 deg/s*s
 	public final double MAX_VEL = 30; // 180 deg/s*s
 

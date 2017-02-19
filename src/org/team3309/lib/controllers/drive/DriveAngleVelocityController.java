@@ -13,17 +13,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveAngleVelocityController extends Controller {
 
-	public PIDPositionController turningController = new PIDPositionController(3, 0.5, 16.015);
+	public PIDPositionController turningController = new PIDPositionController(40, 0, 0);
 	private KragerTimer doneTimer = new KragerTimer(.5);
 	protected double goalAngle = 0;
 	private boolean isCompletable = true;
 
 	public DriveAngleVelocityController(double aimAngle) {
 		this.setName("DRIVE ANGLE VEL");
-		turningController.setConstants(6, 0, 13.015);
+		this.setSubsystemID("Drivetrain");
+		this.turningController.setSubsystemID("Drivetrain");
 		this.turningController.setName("Turning Angle Controller");
 		this.turningController.kILimit = 100;
 		goalAngle = aimAngle;
+		this.setCompletable(true);
 		Drive.getInstance().changeToVelocityMode();
 	}
 
@@ -35,24 +37,28 @@ public class DriveAngleVelocityController extends Controller {
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
 		double error = goalAngle - inputState.getAngularPos();
-		if (Math.abs(error) > 180) {
-			error = -KragerMath.sign(error) * (360 - Math.abs(error));
-			System.out.println("New Error: " + error);
-		}
 		InputState state = new InputState();
 		state.setError(error); // sets angle error to be sent in turning PID
 		OutputSignal outputOfTurningController = turningController.getOutputSignal(state); // outputs
-		return outputOfTurningController;
+		OutputSignal x = new OutputSignal();
+		x.setLeftMotor(outputOfTurningController.getMotor());
+		x.setRightMotor(-outputOfTurningController.getMotor());
+		return x;
 	}
 
 	@Override
 	public boolean isCompleted() {
-		if (isCompletable)
-			return doneTimer.isConditionMaintained(Drive.getInstance().isAngleCloseTo(goalAngle));
-		return false;
+
+		boolean isDone = doneTimer.isConditionMaintained(Drive.getInstance().isAngleCloseTo(goalAngle));
+		System.out.println("is done " + isDone);
+		System.out.println("cur Angle " + Drive.getInstance().getAngle() + " goalAngle " + goalAngle);
+		if (isDone)
+			Drive.getInstance().stopDrive();
+		return isDone;
 	}
 
 	public void sendToSmartDash() {
+		System.out.println("ERROR " + turningController.kP);
 		turningController.sendToSmartDash();
 	}
 
