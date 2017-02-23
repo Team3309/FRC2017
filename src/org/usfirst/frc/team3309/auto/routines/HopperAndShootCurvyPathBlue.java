@@ -10,12 +10,15 @@ public class HopperAndShootCurvyPathBlue extends AutoRoutine {
 
 	@Override
 	public void routine() throws TimedOutException, InterruptedException {
+		this.spinUp();
 		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
 		// do a curvy path to the shooting locations
-		changePoints.add(new VelocityChangePoint(100, 0));
-		changePoints.add(new VelocityChangePoint(1500, 1000, 5000));
-		changePoints.add(new VelocityChangePoint(500, 35000));
-		this.driveEncoder(40000, 5, changePoints);
+		changePoints.add(new VelocityChangePoint(3000, 0));
+		changePoints.add(new VelocityChangePoint(3500, 600, 17000));
+		changePoints.add(new VelocityChangePoint(1000, 1000, 31000, -90)); // vel,
+																			// goal,
+																			// angle
+		this.driveEncoder(40000, 9, changePoints);
 		this.shoot();
 	}
 

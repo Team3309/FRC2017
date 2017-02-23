@@ -11,6 +11,9 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.usfirst.frc.team3309.robot.Sensors;
+import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
+import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 
 public class VisionServer implements Runnable {
@@ -20,17 +23,21 @@ public class VisionServer implements Runnable {
 	private Socket socket;
 	private int PORT = 8254;
 	public List<TargetInfo> targets = new LinkedList<TargetInfo>();
-	private TargetInfo currentTargetToAimTowards = new TargetInfo(0, 0);
 	private Shot currentShotToAimTowards = new Shot();
 	private static VisionServer instance;
 	public static double FIELD_OF_VIEW_DEGREES = 45;
 
-	private static Shot[] shots = { new Shot(120, 24.85, .59), new Shot(120, 27.85, .346), new Shot(120, 30.85, .227),
-			new Shot(120, 31.95, .09), new Shot(120, 32.95, -.037), new Shot(120, 34.05, -.148),
-			new Shot(120, 35.05, -.25), new Shot(120, 35.55, -.329), new Shot(120, 35.5, -.4),
-			new Shot(130, 36.4, -.401), new Shot(130, 39.8, -.479), new Shot(130, 40.5, -.562),
-			new Shot(130, 41.2, -.615), new Shot(130, 41.7, -.735), new Shot(130, 42.1, -.812),
-			new Shot(140, 45.7, -.813), new Shot(140, 46.1, -.98) };
+	private static Shot[] shots = {
+			new Shot(125, 10, .17),
+			new Shot(125, 200, .11),
+			new Shot(135, 200, .071),
+			new Shot(140, 200, .045),
+			new Shot(150, 500, .02),
+			new Shot(150, 950, .009),
+			new Shot(165, 1000, .005),
+			new Shot(180, 1200, .001),
+			new Shot(180, 600, -.04)
+	};
 
 	public static VisionServer getInstance() {
 		if (instance == null)
@@ -107,6 +114,7 @@ public class VisionServer implements Runnable {
 					String messageRaw = new String(buffer, 0, read);
 					String[] messages = messageRaw.split("\n");
 					for (String message : messages) {
+						// System.out.println("message " + message);
 						OffWireMessage parsedMessage = new OffWireMessage(message);
 						if (parsedMessage.isValid()) {
 							handleMessage(parsedMessage);
@@ -131,55 +139,66 @@ public class VisionServer implements Runnable {
 	}
 
 	private void findClosestGoal() {
+		// System.out.println("FIND CLOSEST GOAL");
 		List<TargetInfo> currentTargets = this.getTargets();
 		// Find the closest preset value to the vision shot
-		if (currentTargets.size() != 0) {
-			for (TargetInfo x : currentTargets) {
-			}
-		} else {
-			currentTargetToAimTowards = null;
-		}
-		// Find Shot To Aim At
-		if (currentTargetToAimTowards == null) {
+		if (!this.hasTargetsToAimAt()) {
 			currentShotToAimTowards = null;
-		} else {
-			double closestShot = Integer.MAX_VALUE;
-			double currentHyp = currentTargetToAimTowards.getHyp();
-			Shot shotToBeSet = new Shot();
-			for (int i = 0; i < shots.length; i++) {
-				Shot shot = shots[i];
-				if (Math.abs(currentHyp - shot.getHyp()) < closestShot) {
-					closestShot = Math.abs(currentHyp - shot.getHyp());
-					shotToBeSet.setGoalHoodAngle(shot.getGoalHoodAngle());
-					shotToBeSet.setGoalRPS(shot.getGoalRPS());
-					shotToBeSet.setHyp(shot.getHyp());
-					// Find out which of the other shots need to be found to
-					// make an equation
-					if (currentHyp > shot.getHyp()) {
-						if (i != 0) {
-							Shot previousShot = shots[i - 1];
-							double slope = (previousShot.getGoalHoodAngle() - shot.getGoalHoodAngle())
-									/ (previousShot.getHyp() - shot.getHyp());
-							double b = previousShot.getGoalHoodAngle() - (slope * previousShot.getHyp());
-							double newOutput = slope * currentHyp + b;
-							shotToBeSet.setGoalHoodAngle(newOutput);
-						}
-					} else {
-						if (i != shots.length - 1) {
-							Shot upperShot = shots[i + 1];
-							double slope = (upperShot.getGoalHoodAngle() - shot.getGoalHoodAngle())
-									/ (upperShot.getHyp() - shot.getHyp());
-							double b = upperShot.getGoalHoodAngle() - (slope * upperShot.getHyp());
-							double newOutput = slope * currentHyp + b;
-							shotToBeSet.setGoalHoodAngle(newOutput);
-						}
+			return;
+		}
+		System.out.println("into the place");
+		double closestShot = Integer.MAX_VALUE;
+		double currentHyp = this.getTarget().getHyp();
+		Shot shotToBeSet = new Shot();
+		for (int i = 0; i < shots.length; i++) {
+			Shot shot = shots[i];
+			if (Math.abs(currentHyp - shot.getHyp()) < closestShot) {
+				closestShot = Math.abs(currentHyp - shot.getHyp());
+				shotToBeSet.setGoalHoodAngle(shot.getGoalHoodAngle());
+				shotToBeSet.setGoalRPS(shot.getGoalRPS());
+				shotToBeSet.setHyp(shot.getHyp());
+				// Find out which of the other shots need to be found to
+				// make an equation
+				if (currentHyp > shot.getHyp()) {
+					if (i != 0) {
+						Shot previousShot = shots[i - 1];
+						double slope = (previousShot.getGoalHoodAngle() - shot.getGoalHoodAngle())
+								/ (previousShot.getHyp() - shot.getHyp());
+						double b = previousShot.getGoalHoodAngle() - (slope * previousShot.getHyp());
+						double newOutput = slope * currentHyp + b;
+						// RPS stuff
+						double slopeRPS = (previousShot.getGoalRPS() - shot.getGoalRPS())
+								/ (previousShot.getHyp() - shot.getHyp());
+						double bRPS = previousShot.getGoalRPS() - (slopeRPS * previousShot.getHyp());
+						double newOutputRPS = slopeRPS * currentHyp + bRPS;
+						shotToBeSet.setGoalRPS(newOutputRPS);
+						shotToBeSet.setGoalHoodAngle(newOutput);
+					}
+				} else {
+					if (i != shots.length - 1) {
+						Shot upperShot = shots[i + 1];
+						double slope = (upperShot.getGoalHoodAngle() - shot.getGoalHoodAngle())
+								/ (upperShot.getHyp() - shot.getHyp());
+						double b = upperShot.getGoalHoodAngle() - (slope * upperShot.getHyp());
+						double newOutput = slope * currentHyp + b;
+						// RPS stuff
+
+						double slopeRPS = (upperShot.getGoalRPS() - shot.getGoalRPS())
+								/ (upperShot.getHyp() - shot.getHyp());
+						double bRPS = upperShot.getGoalRPS() - (slopeRPS * upperShot.getHyp());
+						double newOutputRPS = slopeRPS * currentHyp + bRPS;
+						shotToBeSet.setGoalRPS(newOutputRPS);
+						shotToBeSet.setGoalHoodAngle(newOutput);
 					}
 				}
+
 			}
 			shotToBeSet.setHyp(currentHyp);
-			shotToBeSet.setGoalHoodAngle(shotToBeSet.getGoalHoodAngle() - 1);
+			System.out.println("shotTobe Set " + shotToBeSet.getGoalHoodAngle());
+			// shotToBeSet.setGoalHoodAngle(shotToBeSet.getGoalHoodAngle() - 1);
 			currentShotToAimTowards = shotToBeSet;
 		}
+
 	}
 
 	public void restartAdb() {
@@ -194,7 +213,7 @@ public class VisionServer implements Runnable {
 	public TargetInfo getTarget() {
 		if (this.hasTargetsToAimAt())
 			return targets.get(0);
-		return null;
+		return new TargetInfo(0, 0);
 	}
 
 	public void setTargets(List<TargetInfo> targets) {
@@ -202,11 +221,15 @@ public class VisionServer implements Runnable {
 	}
 
 	public double getHoodAngle() {
-		return currentShotToAimTowards.getGoalHoodAngle();
+		if (currentShotToAimTowards != null)
+			return currentShotToAimTowards.getGoalHoodAngle();
+		return Hood.getInstance().getAngle();
 	}
 
 	public double getRPS() {
-		return currentShotToAimTowards.getGoalRPS();
+		if (currentShotToAimTowards != null)
+			return currentShotToAimTowards.getGoalRPS();
+		return Sensors.getFlywheelRPS();
 	}
 
 	public boolean hasTargetsToAimAt() {

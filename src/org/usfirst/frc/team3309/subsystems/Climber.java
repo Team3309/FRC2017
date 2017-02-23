@@ -6,6 +6,7 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Climber extends KragerSystem {
@@ -15,6 +16,7 @@ public class Climber extends KragerSystem {
 	private final double CURRENT_LIMIT = 8;
 	private final double UP_POWER = .8;
 	private int loopsAboveCurrentLimit = 0;
+	private boolean hasStartedClimbing = false;
 
 	public static Climber getInstance() {
 		if (instance == null) {
@@ -31,13 +33,11 @@ public class Climber extends KragerSystem {
 	public void updateTeleop() {
 		boolean operatorStartButton = Controls.operatorController.getStartButton();
 		boolean operatorBackButton = Controls.operatorController.getBackButton();
+		// System.out.println(this.);
 		if (operatorStartButton) {
-			if (hasHitTop())
-				setClimber(0);
-			else
-				setClimber(Controls.operatorController.getY(Hand.kRight));
-		} else if (operatorBackButton) {
-			setClimber(-1);
+			setClimber(1);
+			// } else if (operatorBackButton) {
+			// setClimber(-1);
 		} else {
 			setClimber(0);
 		}
@@ -61,7 +61,7 @@ public class Climber extends KragerSystem {
 
 	@Override
 	public void sendToSmartDash() {
-
+		NetworkTable.getTable("Climber").putNumber("current", climberMC.getTalon().getOutputCurrent());
 		SmartDashboard.putNumber("Climber Curret", climberMC.getTalon().getOutputCurrent());
 	}
 
@@ -81,7 +81,14 @@ public class Climber extends KragerSystem {
 	}
 
 	public void setClimber(double power) {
+		if (power != 0) {
+			hasStartedClimbing = true;
+		}
 		climberMC.setDesiredOutput(power);
+	}
+
+	public boolean isClimbing() {
+		return hasStartedClimbing;
 	}
 
 }

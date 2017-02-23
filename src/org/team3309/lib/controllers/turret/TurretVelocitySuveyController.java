@@ -40,6 +40,13 @@ public class TurretVelocitySuveyController extends FeedForwardWithPIDController 
 			desiredAngle = turret.LEFT_LIMIT;
 			desiredVelTarget = turret.MAX_VEL;
 		}
+		if (curAngle < Turret.getInstance().LEFT_ABSOLUTE_LIMIT) {
+			desiredAngle = turret.RIGHT_LIMIT;
+			desiredVel = -1.5;
+		} else if (curAngle > Turret.getInstance().RIGHT_ABSOLUTE_LIMIT) {
+			desiredAngle = turret.LEFT_LIMIT;
+			desiredVel = 1.5;
+		}
 		System.out.println("Targetting: " + desiredAngle + " curAngle " + curAngle + " goalVel: " + this.desiredVel
 				+ " veltarget: " + this.desiredVelTarget);
 

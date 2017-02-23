@@ -8,6 +8,7 @@ import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
+import org.usfirst.frc.team3309.vision.VisionServer;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
@@ -37,12 +38,13 @@ public class Elevator extends ControlledSubsystem {
 		super("Elevator");
 		// elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		// elevator.changeControlMode(TalonControlMode.Speed);
-		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
+		this.elevator.changeControlMode(TalonControlMode.Speed);
 		table.putNumber("k_aimVel", 0);
 	}
 
 	@Override
 	public void initAuto() {
+		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
 		// this.elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
@@ -53,6 +55,7 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
+		System.out.println(elevator.isSensorPresent(FeedbackDevice.QuadEncoder));
 		if (Controls.operatorController.getAButton()) {
 			aimVel = table.getNumber("k_aimVel", 0);
 			// aimVel = STAGING_VELOCITY;
@@ -66,13 +69,17 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		updateTeleop();
+		if (Shooter.getInstance().isShouldBeShooting() && VisionServer.getInstance().hasTargetsToAimAt()) {
+			this.elevator.set(.95);
+			this.feedyWheel.set(1);
+		}
+		// updateTeleop();
 	}
 
 	@Override
 	public InputState getInputState() {
 		InputState s = new InputState();
-		// s.setError(aimVel - elevator.getEncVelocity());
+		s.setError(aimVel - elevator.getEncVelocity());
 		return s;
 	}
 
@@ -80,8 +87,9 @@ public class Elevator extends ControlledSubsystem {
 	public void sendToSmartDash() {
 		this.getController().sendToSmartDash();
 		DashboardHelper.updateTunable(this.getController());
-		table.putNumber(this.getName() + " Vel", this.elevator.getEncPosition());
+		table.putNumber(this.getName() + " Vel", this.elevator.getEncVelocity());
 		table.putNumber(this.getName() + " Pow", this.elevator.getPosition());
+		table.putNumber(this.getName() + " Error", aimVel - elevator.getEncVelocity());
 	}
 
 	@Override

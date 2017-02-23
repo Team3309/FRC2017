@@ -5,20 +5,20 @@ import java.util.LinkedList;
 import org.team3309.lib.controllers.drive.VelocityChangePoint;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.auto.TimedOutException;
-import org.usfirst.frc.team3309.subsystems.Drive;
 
 public class HopperAndShootStraightPathRed extends AutoRoutine {
 
 	@Override
 	public void routine() throws TimedOutException, InterruptedException {
-		System.out.println("AUTO RUNS");
-		Drive.getInstance().setLowGear();
-		this.driveEncoder(31500, 10);
-		System.out.println("turb to anga");
-		this.turnToAngle(90, 10000);
-		// this.waitForDriveAngle(90, 1);
-		System.out.println("GO FORARD");
-		this.driveEncoder(15500, 10);
-		this.waitForEndOfAuto();
+		this.spinUp();
+		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
+		// do a curvy path to the shooting locations
+		changePoints.add(new VelocityChangePoint(3000, 0));
+		changePoints.add(new VelocityChangePoint(600, 3500, 17000));
+		changePoints.add(new VelocityChangePoint(1000, 1000, 31000, 90)); // vel,
+																			// goal,
+																			// angle
+		this.driveEncoder(40000, 9, changePoints);
+		this.shoot();
 	}
 }

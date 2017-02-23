@@ -8,15 +8,19 @@ public class GearIntakeMiddle extends AutoRoutine {
 
 	@Override
 	public void routine() throws TimedOutException, InterruptedException {
+
 		System.out.println("AUTO RUNS");
 		Drive.getInstance().setLowGear();
-		this.driveEncoder(31500, 10);
+		this.driveEncoder(34000, 3);
 		System.out.println("turb to anga");
-		this.turnToAngle(90, 10000);
+		this.turnToAngle(90, 2.5);
 		Thread.sleep(1000);
 		// this.waitForDriveAngle(90, 1);
 		System.out.println("GO FORARD");
-		this.driveEncoder(15500, 10);
+		spinUp();
+		this.setFuelIntake(1);
+		this.driveEncoder(17000, 3);
+		this.shoot();
 		this.waitForEndOfAuto();
 	}
 }

@@ -11,6 +11,7 @@ import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 public class Shooter extends KragerSystem {
 
 	private boolean shouldBeShooting = false;
+	private boolean shouldBeSpinningUp = false;
 	private static Shooter instance;
 
 	public static Shooter getInstance() {
@@ -26,7 +27,7 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void updateTeleop() {
-		if (Controls.operatorController.getAButton()) {
+		if (Controls.operatorController.getYButton()) {
 			shouldBeShooting = true;
 		} else {
 			shouldBeShooting = false;
@@ -39,7 +40,8 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void initTeleop() {
-
+		shouldBeShooting = false;
+		shouldBeSpinningUp = false;
 	}
 
 	@Override
@@ -67,4 +69,11 @@ public class Shooter extends KragerSystem {
 		return shouldBeShooting;
 	}
 
+	public void setShouldBeSpinningUp(boolean b) {
+		shouldBeSpinningUp = b;
+	}
+
+	public boolean isShouldBeSpinningUp() {
+		return shouldBeSpinningUp;
+	}
 }

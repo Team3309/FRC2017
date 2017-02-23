@@ -1,19 +1,15 @@
 package org.usfirst.frc.team3309.robot;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.team3309.lib.sensors.CounterSensor;
-import org.team3309.lib.sensors.NavX;
 import org.team3309.lib.sensors.Sensor;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.subsystems.Drive;
 
-import com.kauailabs.navx.frc.AHRS;
-
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * All the sensors on the robot
@@ -32,7 +28,6 @@ public class Sensors {
 		System.out.println("INIT STATIC");
 		// navX = new AHRS(SPI.Port.kMXP);
 		gyro = new ADXRS450_Gyro();
-
 		System.out.println("Turret");
 		flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
 	}
@@ -40,9 +35,9 @@ public class Sensors {
 	private static double previousFlywheelCounterRPS = 0;
 
 	public static void read() {
-		if (Controls.driverController.getYButton()) {
-			gyro.calibrate();
+		if (!DriverStation.getInstance().isDisabled() && Controls.driverController.getYButton()) {
 			Sensors.resetDrive();
+			gyro.calibrate();
 		}
 		try {
 			for (Sensor x : sensors) {

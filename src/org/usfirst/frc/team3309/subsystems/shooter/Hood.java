@@ -10,6 +10,7 @@ import org.team3309.lib.tunable.Dashboard;
 import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
+import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -27,8 +28,9 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 	private static final double MAX_ANGLE = 2280;
 	private static final double MIN_RAW = 3400;
 	private static final double MAX_POW = .1;
-	private static final double MIN_POW = .005;
-
+	private static final double MIN_POW_UP = .0001;
+	private static final double MIN_POW_DOWN = -.001;
+	private static final double MIN_POW_DOWN_LOWER_BOUND = -.002;
 	private AnalogInput hoodSensor = new AnalogInput(RobotMap.HOOD_SENSOR);
 	private double goalAngle = 0;
 	private double pastGoal = goalAngle;
@@ -44,8 +46,8 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 
 	private Hood() {
 		super("Hood");
-		table.putNumber("k_pow", 0);
-		this.setController(new PIDPositionController(.00011, .0000003, -.000139));
+		// NetworkTable.getTable("Climber").putNumber("k_pow", 0);
+		this.setController(new PIDPositionController(.00018, .0000004, -.00011));
 
 	}
 
@@ -66,16 +68,22 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 		double output = 0;
 
 		// Find aim angle
-		if (VisionServer.getInstance().hasTargetsToAimAt()) {
+		if (Controls.operatorController.getYButton()) {
+			testPosControl();
+		} else if (VisionServer.getInstance().hasTargetsToAimAt() && Controls.operatorController.getXButton()) {
+
 			goalAngle = VisionServer.getInstance().getHoodAngle();
+			System.out.println("VISION HOOD " + goalAngle);
 			lastVisionAngle = goalAngle;
 		} else {
 			goalAngle = lastVisionAngle;
 		}
-		testPosControl();
+
 		if (goalAngle != pastGoal)
 			this.getController().reset();
-		if (goalAngle >= 1.0) {
+		if (goalAngle >= 1.0)
+
+		{
 			output = this.getController().getOutputSignal(getInputState()).getMotor();
 		}
 
@@ -83,33 +91,47 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 			output = 0;
 			// TODO POSSIBLE RESET FOR DIFFERENT ANGLES
 		}
+		if (Math.abs(output) > MAX_POW)
+			output = MAX_POW * KragerMath.sign(output);
+		if (Math.abs(output) < .003)
+			output = 0;
 
-		if (Math.abs(goalAngle - getAngle()) < 50) {
+		double error = goalAngle - getAngle();
+		if (Math.abs(error) < 60) {
 			getController().reset();
-			if (Math.abs(goalAngle - getAngle()) < 25) {
+			if (Math.abs(error) < 25) {
 				output = 0;
 			} else {
-				this.setHood(.0025 * KragerMath.sign(goalAngle - getAngle()));
-				return;
+				if (error > 0)
+					output = MIN_POW_UP;
+				else
+					output = getAngle() > 1000 ? MIN_POW_DOWN : MIN_POW_DOWN_LOWER_BOUND;
 			}
 		}
 
-		if (Math.abs(output) > MAX_POW)
-			output = MAX_POW * KragerMath.sign(output);
-		if (Math.abs(output) < MIN_POW)
-			output = 0;
+		if (Shooter.getInstance().isShouldBeShooting()) {
+			if (this.getAngle() > this.goalAngle + 30) {
+				output = MIN_POW_DOWN / 6;
+			} else if (this.getAngle() < this.goalAngle - 30) {
+				output = MIN_POW_UP / 6;
+			} else {
+				output = 0;
+			}
+		}
+
 		pastGoal = goalAngle;
 		this.setHood(output);
 	}
 
 	@Override
 	public void updateAuto() {
-		updateTeleop(); // just needs to do what vision says
+		// updateTeleop(); // just needs to do what vision says
+		goalAngle = 600;
 	}
 
 	public void testPosControl() {
-		goalAngle = table.getNumber("k_aim Hood Angle", 20);
-		table.putNumber("k_aim Hood Angle", goalAngle);
+		goalAngle = NetworkTable.getTable("Climber").getNumber("k_aim Hood Angle", 20);
+		NetworkTable.getTable("Climber").putNumber("k_aim Hood Angle", goalAngle);
 	}
 
 	@Override
@@ -126,7 +148,9 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 		this.getController().sendToSmartDash();
 		table.putNumber(this.getName() + " pow", this.servo.getSpeed());
 		table.putNumber("angle", getAngle());
+		table.putNumber("aim", goalAngle);
 		table.putNumber("raw angle", getAngleRaw());
+
 	}
 
 	@Override
@@ -137,11 +161,7 @@ public class Hood extends ControlledSubsystem implements IDashboard {
 		// else if (Controls.operatorController.getXButton())
 		// setHood(-.02);
 		// else'
-		if (Controls.operatorController.getAButton())
-			setHood(Controls.operatorController.getX(Hand.kRight) / 100);
-		else
-			setHood(0.0);
-		System.out.println(servo.getSpeed());
+		setHood(0.0);
 	}
 
 	@Override

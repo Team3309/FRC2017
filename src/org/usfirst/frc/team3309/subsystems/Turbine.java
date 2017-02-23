@@ -35,7 +35,11 @@ public class Turbine extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		updateTeleop();
+		if (Shooter.getInstance().isShouldBeShooting()) {
+			setHopper(1);
+		} else {
+			setHopper(0);
+		}
 
 	}
 
