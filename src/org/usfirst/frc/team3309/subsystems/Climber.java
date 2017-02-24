@@ -14,7 +14,8 @@ public class Climber extends KragerSystem {
 	private static Climber instance;
 	private TalonSRXMC climberMC = new TalonSRXMC(RobotMap.CLIMBER_ID);
 	private final double CURRENT_LIMIT = 8;
-	private final double UP_POWER = .8;
+	private final double UP_POWER = 1;
+	private final double HOLD_POWER = .3;
 	private int loopsAboveCurrentLimit = 0;
 	private boolean hasStartedClimbing = false;
 
@@ -33,14 +34,17 @@ public class Climber extends KragerSystem {
 	public void updateTeleop() {
 		boolean operatorStartButton = Controls.operatorController.getStartButton();
 		boolean operatorBackButton = Controls.operatorController.getBackButton();
-		// System.out.println(this.);
 		if (operatorStartButton) {
-			setClimber(1);
-			// } else if (operatorBackButton) {
-			// setClimber(-1);
+			if (hasHitTop())
+				setClimber(UP_POWER);
+			else
+				setClimber(HOLD_POWER);
 		} else {
 			setClimber(0);
 		}
+		// check if a cancel on turret auto correction has occurred
+		if (operatorBackButton)
+			this.hasStartedClimbing = false;
 	}
 
 	@Override
@@ -76,8 +80,7 @@ public class Climber extends KragerSystem {
 		} else {
 			loopsAboveCurrentLimit = 0;
 		}
-		// return loopsAboveCurrentLimit > 10;
-		return false;
+		return loopsAboveCurrentLimit > 10;
 	}
 
 	public void setClimber(double power) {

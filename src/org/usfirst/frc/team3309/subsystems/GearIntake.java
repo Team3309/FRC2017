@@ -40,37 +40,40 @@ public class GearIntake extends KragerSystem {
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
 		if ((driverStart || operatorLB) && !hasChangedForThisPress) {
-			hasChangedForThisPress = true;
-			togglePivot();
+			this.extendPivot();
+			this.extendWrist();
+			this.setGearIntakeRoller(1);
 		} else if ((driverStart || operatorLB)) {
 
-		} else if ((driverSelect || operatorRB) && !hasChangedForThisPress) {
-			hasChangedForThisPress = true;
-			toggleWrist();
-		} else if ((driverSelect
-				|| operatorRB)) {
-
 		} else {
+			this.retractPivot();
+			this.retractWrist();
+			this.setGearIntakeRoller(0);
 			hasChangedForThisPress = false;
 		}
 
-		// only use driver inputs if the gear mechanism is extended
-		double operatorRightTrigger = Controls.operatorController.getTriggerAxis(Hand.kRight);
-		double operatorLeftTrigger = Controls.operatorController.getTriggerAxis(Hand.kLeft);
-		double driverRightTrigger = Controls.driverController.getTriggerAxis(Hand.kRight);
-		double driverLeftTrigger = Controls.driverController.getTriggerAxis(Hand.kLeft);
-		if (driverRightTrigger > MIN_VALUE_TO_MOVE && this.isPivotExtended()) {
-			setGearIntakeRoller(driverRightTrigger);
-		} else if (driverLeftTrigger >
-		MIN_VALUE_TO_MOVE && this.isPivotExtended()) {
-			setGearIntakeRoller(-driverLeftTrigger);
-		} else if (operatorRightTrigger > MIN_VALUE_TO_MOVE) {
-			setGearIntakeRoller(operatorRightTrigger);
-		} else if (operatorLeftTrigger > MIN_VALUE_TO_MOVE) {
-			setGearIntakeRoller(-operatorLeftTrigger);
-		} else {
-			setGearIntakeRoller(0);
-		}
+		// // only use driver inputs if the gear mechanism is extended
+		// double operatorRightTrigger =
+		// Controls.operatorController.getTriggerAxis(Hand.kRight);
+		// double operatorLeftTrigger =
+		// Controls.operatorController.getTriggerAxis(Hand.kLeft);
+		// double driverRightTrigger =
+		// Controls.driverController.getTriggerAxis(Hand.kRight);
+		// double driverLeftTrigger =
+		// Controls.driverController.getTriggerAxis(Hand.kLeft);
+		// if (driverRightTrigger > MIN_VALUE_TO_MOVE && this.isPivotExtended())
+		// {
+		// setGearIntakeRoller(driverRightTrigger);
+		// } else if (driverLeftTrigger > MIN_VALUE_TO_MOVE &&
+		// this.isPivotExtended()) {
+		// setGearIntakeRoller(-driverLeftTrigger);
+		// } else if (operatorRightTrigger > MIN_VALUE_TO_MOVE) {
+		// setGearIntakeRoller(operatorRightTrigger);
+		// } else if (operatorLeftTrigger > MIN_VALUE_TO_MOVE) {
+		// setGearIntakeRoller(-operatorLeftTrigger);
+		// } else {
+		// setGearIntakeRoller(0);
+		// }
 	}
 
 	@Override

@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator extends ControlledSubsystem {
 
-	private final double STAGING_VELOCITY = 2;
 	private final double SHOOTING_VELOCITY = 10;
 	private double aimVel = 0;
 	private CANTalon elevator = new CANTalon(RobotMap.ELEVATOR_ID);
@@ -58,7 +57,6 @@ public class Elevator extends ControlledSubsystem {
 		System.out.println(elevator.isSensorPresent(FeedbackDevice.QuadEncoder));
 		if (Controls.operatorController.getAButton()) {
 			aimVel = table.getNumber("k_aimVel", 0);
-			// aimVel = STAGING_VELOCITY;
 		} else if (Shooter.getInstance().isShouldBeShooting()) {
 			aimVel = SHOOTING_VELOCITY;
 		} else {
@@ -73,7 +71,6 @@ public class Elevator extends ControlledSubsystem {
 			this.elevator.set(.95);
 			this.feedyWheel.set(1);
 		}
-		// updateTeleop();
 	}
 
 	@Override
