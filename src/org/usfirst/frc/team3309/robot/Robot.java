@@ -1,11 +1,10 @@
 package org.usfirst.frc.team3309.robot;
 
+import org.usfirst.frc.team3309.auto.AllianceColor;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
-import org.usfirst.frc.team3309.auto.routines.GearIntakeMiddle;
-import org.usfirst.frc.team3309.auto.routines.HopperAndGearCurvyBlue;
-import org.usfirst.frc.team3309.auto.routines.HopperAndGearCurvyRed;
-import org.usfirst.frc.team3309.auto.routines.HopperAndShootCurvyPathBlue;
-import org.usfirst.frc.team3309.auto.routines.HopperAndShootCurvyPathRed;
+import org.usfirst.frc.team3309.auto.routines.GearIntakeMiddleCurvy;
+import org.usfirst.frc.team3309.auto.routines.HopperAndGearCurvy;
+import org.usfirst.frc.team3309.auto.routines.HopperAndShootCurvyPath;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
 import org.usfirst.frc.team3309.subsystems.Elevator;
@@ -26,7 +25,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 
-	private SendableChooser<AutoRoutine> mainAutoChooser = new SendableChooser<AutoRoutine>();
+	private static SendableChooser<AutoRoutine> mainAutoChooser = new SendableChooser<AutoRoutine>();
+	private static SendableChooser<AllianceColor> redBlueAutoChooser = new SendableChooser<AllianceColor>();
 	private Thread autoThread;
 	private Compressor c = new Compressor();
 	private AnalogOutput indicatorLight = new AnalogOutput(RobotMap.INDICATOR_LIGHT);
@@ -34,15 +34,16 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		// Main Auto Chooser
 		Sensors.read();
-		mainAutoChooser.addObject("Straight 1 Gear", new GearIntakeMiddle());
-		mainAutoChooser.addObject("Curvey Red Hopper", new HopperAndShootCurvyPathRed());
-		mainAutoChooser.addObject("Curvey Red Gear and Hopper", new HopperAndGearCurvyRed());
-		mainAutoChooser.addObject("Curvey Blue Hopper", new HopperAndShootCurvyPathBlue());
-		mainAutoChooser.addObject("Curvey Blue Gear and Hopper", new HopperAndGearCurvyBlue());
+		mainAutoChooser.addObject("Gear Curvey", new GearIntakeMiddleCurvy());
+		mainAutoChooser.addObject("Hopper Curvey", new HopperAndShootCurvyPath());
+		mainAutoChooser.addObject("Gear and Hopper Curvey", new HopperAndGearCurvy());
 
+		redBlueAutoChooser.addObject("Red", AllianceColor.RED);
+		redBlueAutoChooser.addObject("Blue", AllianceColor.BLUE);
+		SmartDashboard.putData("Color", redBlueAutoChooser);
 		SmartDashboard.putData("AUTO", mainAutoChooser);
-		// Start the Vision (connect to server)
 
+		// Start the Vision (connect to server)
 		Climber.getInstance();
 		Drive.getInstance();
 		Elevator.getInstance();
@@ -52,7 +53,6 @@ public class Robot extends IterativeRobot {
 		Turbine.getInstance();
 		Flywheel.getInstance();
 		Hood.getInstance();
-		Turret.getInstance();
 		Turret.getInstance().callForCalibration();
 		(new Thread(VisionServer.getInstance())).start();
 
@@ -60,6 +60,7 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void disabledInit() {
+
 	}
 
 	public void disabledPeriodic() {
@@ -95,7 +96,6 @@ public class Robot extends IterativeRobot {
 		Systems.init();
 		if (autoThread != null)
 			autoThread.stop();
-		;
 		System.out.println("DONE INIT");
 	}
 
@@ -123,5 +123,13 @@ public class Robot extends IterativeRobot {
 		// DashboardHelper.updateTunable(Drive.getInstance());
 
 		Actuators.actuate();
+	}
+
+	public static AllianceColor getAllianceColor() {
+		return redBlueAutoChooser.getSelected();
+	}
+
+	public static AutoRoutine getAutoRoutine() {
+		return mainAutoChooser.getSelected();
 	}
 }
