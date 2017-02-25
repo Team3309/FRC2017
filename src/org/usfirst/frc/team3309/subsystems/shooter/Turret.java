@@ -3,7 +3,6 @@ package org.usfirst.frc.team3309.subsystems.shooter;
 import java.util.HashMap;
 
 import org.team3309.lib.ControlledSubsystem;
-import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
@@ -13,14 +12,16 @@ import org.team3309.lib.tunable.Dashboard;
 import org.team3309.lib.tunable.DashboardHelper;
 import org.team3309.lib.tunable.IDashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
-import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
+import org.usfirst.frc.team3309.subsystems.Climber;
+import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.FeedbackDeviceStatus;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -33,20 +34,16 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 
 	private static Turret instance;
 	private DigitalInput hallEffectSensor = new DigitalInput(RobotMap.HALL_EFFECT_SENSOR);
-	private CANTalon turretMC = new CANTalon(RobotMap.TURRET_ID, 20);
-	private double currentAngle = getAngle();
-	private double pastAngle = getAngle();
+	private CANTalon turretMC = new CANTalon(RobotMap.TURRET_ID, 10);
 
-	private boolean hasCalibratedSinceRobotInit = false;
+	public boolean hasCalibratedSinceRobotInit = false;
 	// angle and loops since it last of spotted
 	private HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
-	private double RIGHT_ABSOLUTE_LIMIT = 340;
-	private double LEFT_ABSOLUTE_LIMIT = -90;
+	public double RIGHT_ABSOLUTE_LIMIT = 270;
+	public double LEFT_ABSOLUTE_LIMIT = -90;
 	private double lastGoalX = 0;
 	private double lastVisionAngle = getAngle();
 	private NetworkTable table = NetworkTable.getTable("Turret");
-
-	private double fieldGoalAng = 0;
 	private double goalAngle = getAngle();
 	private double robotAngleWhenGoalLost = 0;
 	private double turretGoalWhenLost = 0;
@@ -54,10 +51,17 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	private boolean isFirstLostLogged = false;
 	private boolean isSurvey = false;
 
-	public final double LEFT_LIMIT = -40;
-	public final double RIGHT_LIMIT = 270;
-	public final double MAX_ACC = .8; // 180 deg/s*s
+	public final double LEFT_LIMIT = 10;
+	public final double RIGHT_LIMIT = 170;
+	public final double MAX_ACC = 1.5; // 180 deg/s*s
 	public final double MAX_VEL = 30; // 180 deg/s*s
+
+	private TurretState currentState = TurretState.HOME;
+	private Timer calTimer = new Timer();
+
+	public enum TurretState {
+		SURVEY, HOME, CLIMBING, HOLD, USING_VISION
+	}
 
 	public static Turret getInstance() {
 		if (instance == null)
@@ -90,74 +94,101 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		calTimer.start();
 		this.getController().reset();
 		goalAngle = getAngle();
+		isSurvey = true;
 	}
 
 	@Override
 	public void initAuto() {
 		calTimer.start();
+		this.getController().reset();
+		goalAngle = getAngle();
+		isSurvey = true;
 	}
 
 	@Override
 	public void updateTeleop() {
-		currentAngle = getAngle();
 		if (!hasCalibratedSinceRobotInit) {
 			calibrate();
 			return;
 		}
-		if (isHallEffectHit() && getAngle() < 300) {
-			this.turretMC.setEncPosition(0);
-		}
-		// updateValuesSeen();
-		// if you see the goal, aim at it
 
-		if (VisionServer.getInstance().hasTargetsToAimAt()) {
-			isSurvey = false;
-			isFirstLostLogged = false;
+		// STATE UPDATES
+		// If climbing,
+		if (Climber.getInstance().isClimbing()) {
+			currentState = TurretState.CLIMBING;
+		}
+
+		if (Controls.driverController.getPOV() == 90 || Controls.operatorController.getPOV() == 90) {
+			currentState = TurretState.SURVEY;
+		} else if (Controls.driverController.getPOV() == 270 || Controls.operatorController.getPOV() == 270) {
+			currentState = TurretState.HOME;
+		}
+
+		// STATE MATH
+		// if you see the goal, aim at it
+		if (VisionServer.getInstance().hasTargetsToAimAt() && currentState != TurretState.HOME) {
+			currentState = TurretState.USING_VISION;
 			moveTowardsGoal();
-		} else if (isSurvey) {
-			isFirstLostLogged = false;
-			System.out.println("BEGIN SURVEY");
-			this.changeToVelocityMode();
+		} else if (currentState == TurretState.SURVEY) {
+			survey();
+		} else if (currentState == TurretState.CLIMBING) {
+			this.changeToPositionMode();
+			goalAngle = 90;
+		} else if (currentState == TurretState.HOME) {
+			this.changeToPositionMode();
+			goalAngle = 0;
 		} else {
-			isSurvey = false;
-			if (!isFirstLostLogged) {
+			if (currentState != TurretState.HOLD) {
 				System.out.println("RESET");
-				isFirstLostLogged = true;
+				currentState = TurretState.HOLD;
 				robotAngleWhenGoalLost = Sensors.getAngle();
 				turretGoalWhenLost = goalAngle;
 			}
-
-			double robotAngleOffset = Sensors.getAngle() - robotAngleWhenGoalLost;
+			double robotAngleOffset = -(Sensors.getAngle() - robotAngleWhenGoalLost);
 			goalAngle = robotAngleOffset + turretGoalWhenLost;
-			System.out.println("OFFSET GARBAGE " + goalAngle);
-			if (this.getAngle() > goalAngle - 3 && this.getAngle() < goalAngle + 3
-					&& !VisionServer.getInstance().hasTargetsToAimAt() && !Controls.operatorController.getYButton()) {
-				isSurvey = true;
+			correctGoalAngleBounds();
+			if (this.getAngle() > goalAngle - 2 && this.getAngle() < goalAngle + 2
+					&& !VisionServer.getInstance().hasTargetsToAimAt() && !Shooter.getInstance().isShouldBeShooting()) {
+				currentState = TurretState.SURVEY;
 			} else {
 				this.changeToPositionMode();
 			}
 		}
 
-		if (goalAngle > RIGHT_ABSOLUTE_LIMIT) {
-			goalAngle -= 360;
-		}
-		if (goalAngle < LEFT_ABSOLUTE_LIMIT) {
-			goalAngle += 360;
-		}
-		// this.testPosControl();
+		// SET THE MOTORS
+		correctGoalAngleBounds();
+
 		OutputSignal signal = this.getController().getOutputSignal(getInputState());
+
 		if (turretMC.getControlMode() == TalonControlMode.Position) {
-			turretMC.set((goalAngle / 360) * 14745.6);
+			// Stop when you are close enough
+			if (this.getAngle() > goalAngle - .5 && this.getAngle() < goalAngle + .5) {
+				this.turretMC.changeControlMode(TalonControlMode.PercentVbus);
+				this.turretMC.set(0);
+			} else {
+				this.changeToPositionMode();
+				turretMC.set((goalAngle / 360) * 14745.6);
+			}
 		} else {
 			turretMC.set(signal.getMotor());
 		}
-		// add 1 loop to all angles
-		/*
-		 * for (int angle = 0; angle <= 360; angle++) { hash.replace(angle,
-		 * hash.get(angle) + 1); }
-		 */
-		loopsSinceLastReset++;
-		sumOfOmegaSinceLastReset += Sensors.getAngularVel();
+
+		// Turn off sensor if it is not found
+		if (turretMC.isSensorPresent(FeedbackDevice.QuadEncoder) == FeedbackDeviceStatus.FeedbackStatusNotPresent) {
+			turretMC.changeControlMode(TalonControlMode.PercentVbus);
+			turretMC.set(0);
+		}
+	}
+
+	private void correctGoalAngleBounds() {
+		while (goalAngle > RIGHT_ABSOLUTE_LIMIT || goalAngle < LEFT_ABSOLUTE_LIMIT) {
+			if (goalAngle > RIGHT_ABSOLUTE_LIMIT) {
+				goalAngle -= 360;
+			}
+			if (goalAngle < LEFT_ABSOLUTE_LIMIT) {
+				goalAngle += 360;
+			}
+		}
 	}
 
 	public void changeToPositionMode() {
@@ -166,52 +197,52 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		this.setController(new BlankController());
 	}
 
-	public void changeToVelocityMode() {
+	public void survey() {
 		turretMC.changeControlMode(TalonControlMode.PercentVbus);
 		if (!(this.getController() instanceof TurretVelocitySuveyController)) {
 			TurretVelocitySuveyController con = new TurretVelocitySuveyController();
 			con.setName("Turret Survey ");
+			double predictedGoal = this.turretGoalWhenLost + (Sensors.getAngle() - this.robotAngleWhenGoalLost);
+			double error = predictedGoal - this.getAngle();
+			if (error > 0) {
+				con.setDesiredAngle(this.RIGHT_LIMIT);
+			} else {
+				con.setDesiredAngle(this.LEFT_LIMIT);
+			}
 			this.setController(con);
 		}
 	}
 
-	private Timer calTimer = new Timer();
-
 	private void calibrate() {
-		this.turretMC.changeControlMode(TalonControlMode.PercentVbus);
-		if (calTimer.get() < 1)
-			this.turretMC.set(.15);
-		else {
-			this.turretMC.set(-.15);
-		}
-		if (calTimer.get() > 3)
-			calTimer.reset();
-		if (this.isHallEffectHit()) {
-			this.turretMC.set(0);
-			hasCalibratedSinceRobotInit = true;
-			this.turretMC.setEncPosition(0);
-			this.turretMC.setForwardSoftLimit(this.LEFT_ABSOLUTE_LIMIT);
-			this.turretMC.setReverseSoftLimit(this.RIGHT_ABSOLUTE_LIMIT);
+		if (!hasCalibratedSinceRobotInit) {
+			this.turretMC.changeControlMode(TalonControlMode.PercentVbus);
+			if (calTimer.get() < 2)
+				this.turretMC.set(.15);
+			else {
+				this.turretMC.set(-.25);
+			}
+			if (calTimer.get() > 5)
+				calTimer.reset();
+			this.checkForCalibration();
 		}
 	}
 
 	private void moveTowardsGoal() {
 		changeToPositionMode();
-		TargetInfo goal = VisionServer.getInstance().getTargets().get(0);
+		TargetInfo goal = VisionServer.getInstance().getTarget();
 		double goalX = goal.getZ();
 		if (lastGoalX != goalX) {
 			System.out.println("SEE NEW GOAL AIMING");
 			double degToTurn = ((goalX) / .8) * (VisionServer.FIELD_OF_VIEW_DEGREES);
 			goalAngle = this.getAngle() + degToTurn;
-			this.resetAngVelocityCounts();
+			this.resetAngVelocityCounts(); // WORK FASTER!!!!!!!
 		} else {
 			System.out.println("have old goal still");
-			double predictionOffset = (Sensors.getAngle() - this.robotAngleAtLastGoal);
+			double predictionOffset = -(Sensors.getAngle() - this.robotAngleAtLastGoal);
 			table.putNumber("prediction offset", predictionOffset);
 			goalAngle = lastGoalAngleFromVision + predictionOffset;
 		}
 		lastGoalX = goalX;
-		fieldGoalAng = Sensors.getAngle() - goalAngle;
 		lastVisionAngle = goalAngle;
 	}
 
@@ -244,12 +275,12 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		table.putNumber(this.getName() + " Goal Angle", this.goalAngle);
 		SmartDashboard.putNumber(this.getName() + " get", this.turretMC.get());
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
-			table.putNumber(this.getName() + " hyp", VisionServer.getInstance().getTarget().getHyp());
-			table.putNumber(this.getName() + " X", VisionServer.getInstance().getTarget().getZ());
+			NetworkTable.getTable("Climber").putNumber(this.getName() + " hyp",
+					VisionServer.getInstance().getTarget().getHyp());
+			NetworkTable.getTable("Climber").putNumber(this.getName() + " X",
+					VisionServer.getInstance().getTarget().getZ());
 		}
-		SmartDashboard.putNumber(this.getName() + " prediction degrees",
-				(sumOfOmegaSinceLastReset / (double) loopsSinceLastReset)
-						* (loopsSinceLastReset * (Robot.LOOP_SPEED_MS / 1000)));
+
 		table.putNumber(this.getName() + " closed loop error", this.turretMC.getClosedLoopError());
 		table.putNumber(this.getName() + " error", (turretMC.getError() / 147445) * 360);
 		SmartDashboard.putBoolean(this.getName() + " hall effect", this.hallEffectSensor.get());
@@ -260,16 +291,12 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		setTurnClockwise(Controls.operatorController.getX(Hand.kLeft));
 	}
 
-	private boolean isHallEffectHit() {
+	public boolean isHallEffectHit() {
 		return !this.hallEffectSensor.get();
 	}
 
 	private void setTurnClockwise(double power) {
 		turretMC.set(power);
-	}
-
-	private void setTurnCounterClockwise(double power) {
-		setTurnClockwise(-power);
 	}
 
 	public double getAngleRelativeToField() {
@@ -285,19 +312,11 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		turretMC.setEncPosition(0);
 	}
 
-	private KragerTimer timerSinceLastVisionGoalSeen = new KragerTimer(1000);
-	private int loopsSinceLastReset = 0;
-	private double sumOfOmegaSinceLastReset = 0;
 	private double robotAngleAtLastGoal = getAngle();
 
 	public void resetAngVelocityCounts() {
 		robotAngleAtLastGoal = Sensors.getAngle();
 		lastGoalAngleFromVision = goalAngle;
-		timerSinceLastVisionGoalSeen.stop();
-		timerSinceLastVisionGoalSeen.reset();
-		timerSinceLastVisionGoalSeen.start();
-		loopsSinceLastReset = 1;
-		sumOfOmegaSinceLastReset = 0;
 	}
 
 	public void callForCalibration() {
@@ -313,5 +332,15 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	public String getObjectName() {
 		// TODO Auto-generated method stub
 		return "";
+	}
+
+	public void checkForCalibration() {
+		if (!hasCalibratedSinceRobotInit && this.isHallEffectHit()) {
+			this.turretMC.set(0);
+			hasCalibratedSinceRobotInit = true;
+			this.turretMC.setEncPosition(0);
+			this.turretMC.setForwardSoftLimit(this.LEFT_ABSOLUTE_LIMIT);
+			this.turretMC.setReverseSoftLimit(this.RIGHT_ABSOLUTE_LIMIT);
+		}
 	}
 }

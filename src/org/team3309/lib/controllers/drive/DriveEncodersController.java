@@ -20,7 +20,7 @@ public class DriveEncodersController extends Controller {
 	protected PIDPositionController linearController = new PIDPositionController(.15, 0, 0);
 	// protected PIDPositionController angController = new
 	// PIDPositionController(0.166, 0.001, 0.002);
-	protected PIDPositionController angController = new PIDPositionController(37, .13, 17);
+	protected PIDPositionController angController = new PIDPositionController(40, 0, 0);
 	@Dashboard(displayName = "Goal Encoder")
 	protected double goalEncoder;
 	protected double goalAngle;
@@ -33,7 +33,7 @@ public class DriveEncodersController extends Controller {
 		this.setSubsystemID("Drivetrain");
 		linearController.setName("linear");
 		linearController.setCompletable(true);
-		linearController.setTHRESHOLD(1000);
+		linearController.setTHRESHOLD(2000);
 		linearController.setTIME_TO_BE_COMPLETE_MILLISECONDS(100);
 		linearController.setSubsystemID(this.subsystemID);
 		angController.setName("ang");

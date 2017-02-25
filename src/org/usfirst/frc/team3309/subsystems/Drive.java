@@ -114,7 +114,7 @@ public class Drive extends ControlledSubsystem {
 	public void updateAuto() {
 		this.changeToVelocityMode();
 		OutputSignal output = getController().getOutputSignal(getInputState());
-		System.out.println("AIM SPEED " + output.getLeftMotor());
+		System.out.println("AIM SPEED lEFT" + output.getLeftMotor());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
@@ -136,7 +136,7 @@ public class Drive extends ControlledSubsystem {
 		table.putNumber(this.getName() + " right pos", this.getRightPos());
 		table.putNumber(this.getName() + " left pos", this.getLeftPos());
 		table.putNumber(this.getName() + " right vel", this.getRightVel());
-		table.putNumber(this.getName() + " left vel", this.getLeftVel());
+		table.putNumber(this.getName() + " left vel", -this.getLeftVel());
 		table.putNumber(this.getName() + " angle", getAngle());
 		// table.putNumber(this.getName() + " angle raw", getAngle());
 		// table.putNumber(this.getName() + " angle", getAngle());

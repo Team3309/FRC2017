@@ -191,7 +191,13 @@ public class RoutineBased {
 	}
 
 	public void shoot() {
+		System.out.println("SHOOTING NOW");
 		Shooter.getInstance().setShouldBeShooting(true);
+	}
+
+	public void spinUp() {
+		System.out.println("Spinning NOW");
+		Shooter.getInstance().setShouldBeSpinningUp(true);
 	}
 
 	public void deployGearIntake() {

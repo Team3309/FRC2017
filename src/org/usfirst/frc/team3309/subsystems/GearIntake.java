@@ -6,16 +6,19 @@ import org.team3309.lib.tunable.Dashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.Solenoid;
 
 public class GearIntake extends KragerSystem {
 
 	private static final double MIN_VALUE_TO_MOVE = .15;
 	private static GearIntake instance;
 	private boolean hasChangedForThisPress = false;
-	private Solenoid gearIntakePivot = new Solenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID);
-	private Solenoid gearIntakeWrist = new Solenoid(RobotMap.GEAR_INTAKE_WRIST_SOLENOID);
+	private DoubleSolenoid gearIntakePivot = new DoubleSolenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_A,
+			RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_B);
+	private DoubleSolenoid gearIntakeWrist = new DoubleSolenoid(RobotMap.GEAR_INTAKE_WRIST_SOLENOID_A,
+			RobotMap.GEAR_INTAKE_WRIST_SOLENOID_B);
 	private TalonSRXMC gearIntake = new TalonSRXMC(RobotMap.GEAR_INTAKE_ID);
 
 	public static GearIntake getInstance() {
@@ -33,29 +36,24 @@ public class GearIntake extends KragerSystem {
 	public void updateTeleop() {
 		boolean driverStart = Controls.driverController.getStartButton();
 		boolean operatorLB = Controls.operatorController.getBumper(Hand.kLeft);
-		if ((driverStart || operatorLB) && !hasChangedForThisPress) {
-			hasChangedForThisPress = true;
-			togglePivot();
+		boolean driverSelect = Controls.driverController.getBackButton();
+		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
+
+		if ((driverStart || operatorRB) && !hasChangedForThisPress) {
+			this.extendPivot();
+			this.extendWrist();
+			this.setGearIntakeRoller(1);
 		} else if ((driverStart || operatorLB)) {
 
 		} else {
+			this.retractPivot();
+			this.retractWrist();
+			this.setGearIntakeRoller(0);
 			hasChangedForThisPress = false;
 		}
-		// only use driver inputs if the gear mechanism is extended
-		double operatorRightTrigger = Controls.operatorController.getTriggerAxis(Hand.kRight);
-		double operatorLeftTrigger = Controls.operatorController.getTriggerAxis(Hand.kLeft);
-		double driverRightTrigger = Controls.driverController.getTriggerAxis(Hand.kRight);
-		double driverLeftTrigger = Controls.driverController.getTriggerAxis(Hand.kLeft);
-		if (driverRightTrigger > MIN_VALUE_TO_MOVE && this.isPivotExtended()) {
-			setGearIntakeRoller(driverRightTrigger);
-		} else if (driverLeftTrigger > MIN_VALUE_TO_MOVE && this.isPivotExtended()) {
-			setGearIntakeRoller(-driverLeftTrigger);
-		} else if (operatorRightTrigger > MIN_VALUE_TO_MOVE) {
-			setGearIntakeRoller(operatorRightTrigger);
-		} else if (operatorLeftTrigger > MIN_VALUE_TO_MOVE) {
-			setGearIntakeRoller(-operatorLeftTrigger);
-		} else {
-			setGearIntakeRoller(0);
+
+		if (operatorLB) {
+			this.setGearIntakeRoller(-1);
 		}
 	}
 
@@ -97,45 +95,53 @@ public class GearIntake extends KragerSystem {
 	}
 
 	public void retractPivot() {
-		gearIntakePivot.set(false);
+		gearIntakePivot.set(Value.kReverse);
 	}
 
 	public void extendPivot() {
-		gearIntakePivot.set(true);
+		gearIntakePivot.set(Value.kForward);
 	}
 
 	public void togglePivot() {
-		gearIntakePivot.set(!gearIntakePivot.get());
+		if (gearIntakePivot.get() == Value.kForward)
+			gearIntakePivot.set(Value.kReverse);
+		else
+			gearIntakePivot.set(Value.kForward);
 	}
 
 	public boolean isPivotRetracted() {
-		return !gearIntakePivot.get(); // false = retracted, so flip the output
+		return gearIntakeWrist.get() == Value.kReverse;
+		// false = retracted, so flip the output
 	}
 
 	@Dashboard(displayName = "isPistonExtended")
 	public boolean isPivotExtended() {
-		return gearIntakePivot.get(); // true = extended
+		return gearIntakeWrist.get() == Value.kForward;// true = extended
 	}
 
 	public void retractWrist() {
-		gearIntakeWrist.set(false);
+		gearIntakeWrist.set(Value.kReverse);
 	}
 
 	public void extendWrist() {
-		gearIntakeWrist.set(true);
+		gearIntakeWrist.set(Value.kForward);
 	}
 
 	public void toggleWrist() {
-		gearIntakeWrist.set(!gearIntakeWrist.get());
+		if (gearIntakeWrist.get() == Value.kForward)
+			gearIntakeWrist.set(Value.kReverse);
+		else
+			gearIntakeWrist.set(Value.kForward);
 	}
 
 	public boolean isWristRetracted() {
-		return !gearIntakeWrist.get(); // false = retracted, so flip the output
+		return gearIntakeWrist.get() == Value.kReverse; // false = retracted, so
+														// flip the output
 	}
 
 	@Dashboard(displayName = "isWristExtended")
 	public boolean isWristExtended() {
-		return gearIntakeWrist.get(); // true = extended
+		return gearIntakeWrist.get() == Value.kForward; // true = extended
 	}
 
 }

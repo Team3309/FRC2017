@@ -14,8 +14,22 @@ public class TurretVelocitySuveyController extends FeedForwardWithPIDController 
 	private double desiredVel = 0;
 	private double desiredAngle = turret.RIGHT_LIMIT;
 
+	public double getDesiredAngle() {
+		return desiredAngle;
+	}
+
+	public void setDesiredAngle(double desiredAngle) {
+		this.desiredAngle = desiredAngle;
+	}
+
 	public TurretVelocitySuveyController() {
 		super(.017, 0, .009, 0, 0);
+	}
+
+	public TurretVelocitySuveyController(boolean isLeftFirst) {
+		super(.017, 0, .009, 0, 0);
+		if (isLeftFirst)
+			desiredAngle = turret.LEFT_LIMIT;
 	}
 
 	@Override
@@ -26,7 +40,7 @@ public class TurretVelocitySuveyController extends FeedForwardWithPIDController 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
 		double curAngle = inputState.getAngularPos();
-		Turret.getInstance().changeToVelocityMode();
+		Turret.getInstance().survey();
 		if (desiredVel < desiredVelTarget) {
 			desiredVel += Math.min(desiredVelTarget - desiredVel, turret.MAX_ACC);
 		} else if (desiredVel > desiredVelTarget) {
@@ -39,6 +53,13 @@ public class TurretVelocitySuveyController extends FeedForwardWithPIDController 
 		} else if (curAngle > Turret.getInstance().RIGHT_LIMIT) {
 			desiredAngle = turret.LEFT_LIMIT;
 			desiredVelTarget = turret.MAX_VEL;
+		}
+		if (curAngle < Turret.getInstance().LEFT_ABSOLUTE_LIMIT) {
+			desiredAngle = turret.RIGHT_LIMIT;
+			desiredVel = -1.5;
+		} else if (curAngle > Turret.getInstance().RIGHT_ABSOLUTE_LIMIT) {
+			desiredAngle = turret.LEFT_LIMIT;
+			desiredVel = 1.5;
 		}
 		System.out.println("Targetting: " + desiredAngle + " curAngle " + curAngle + " goalVel: " + this.desiredVel
 				+ " veltarget: " + this.desiredVelTarget);

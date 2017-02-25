@@ -1,25 +1,20 @@
 package org.usfirst.frc.team3309.subsystems;
 
-import java.awt.geom.Ellipse2D;
-
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.KragerMath;
 import org.team3309.lib.controllers.statesandsignals.InputState;
-import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
+import org.usfirst.frc.team3309.vision.VisionServer;
 
 import com.ctre.CANTalon;
-import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator extends ControlledSubsystem {
 
-	private final double STAGING_VELOCITY = 2;
 	private final double SHOOTING_VELOCITY = 10;
 	private double aimVel = 0;
 	private CANTalon elevator = new CANTalon(RobotMap.ELEVATOR_ID);
@@ -37,12 +32,13 @@ public class Elevator extends ControlledSubsystem {
 		super("Elevator");
 		// elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		// elevator.changeControlMode(TalonControlMode.Speed);
-		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
+		this.elevator.changeControlMode(TalonControlMode.Speed);
 		table.putNumber("k_aimVel", 0);
 	}
 
 	@Override
 	public void initAuto() {
+		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
 		// this.elevator.changeControlMode(TalonControlMode.Speed);
 	}
 
@@ -53,9 +49,8 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		if (Controls.operatorController.getAButton()) {
+		if (Controls.operatorController.getBButton()) {
 			aimVel = table.getNumber("k_aimVel", 0);
-			// aimVel = STAGING_VELOCITY;
 		} else if (Shooter.getInstance().isShouldBeShooting()) {
 			aimVel = SHOOTING_VELOCITY;
 		} else {
@@ -66,13 +61,16 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		updateTeleop();
+		if (Shooter.getInstance().isShouldBeShooting() && VisionServer.getInstance().hasTargetsToAimAt()) {
+			this.elevator.set(.95);
+			this.feedyWheel.set(1);
+		}
 	}
 
 	@Override
 	public InputState getInputState() {
 		InputState s = new InputState();
-		// s.setError(aimVel - elevator.getEncVelocity());
+		s.setError(aimVel - elevator.getEncVelocity());
 		return s;
 	}
 
@@ -80,17 +78,18 @@ public class Elevator extends ControlledSubsystem {
 	public void sendToSmartDash() {
 		this.getController().sendToSmartDash();
 		DashboardHelper.updateTunable(this.getController());
-		table.putNumber(this.getName() + " Vel", this.elevator.getEncPosition());
+		table.putNumber(this.getName() + " Vel", this.elevator.getEncVelocity());
 		table.putNumber(this.getName() + " Pow", this.elevator.getPosition());
+		table.putNumber(this.getName() + " Error", aimVel - elevator.getEncVelocity());
 	}
 
 	@Override
 	public void manualControl() {
 
-		if (Controls.operatorController.getBumper(Hand.kRight)) {
-			setElevator(.95);
-		} else if (Controls.operatorController.getBumper(Hand.kLeft)) {
+		if (Controls.operatorController.getBButton()) {
 			setElevator(-.5);
+		} else if (Shooter.getInstance().isShouldBeShooting()) {
+			setElevator(.95);
 		} else {
 			setElevator(0);
 		}
@@ -98,7 +97,7 @@ public class Elevator extends ControlledSubsystem {
 
 	private void setElevator(double power) {
 		this.elevator.set(power);
-		this.feedyWheel.set(power);
+		this.feedyWheel.set(1 * KragerMath.sign(power));
 	}
 
 }

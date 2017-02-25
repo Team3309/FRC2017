@@ -1,10 +1,11 @@
-package org.usfirst.frc.team3309.auto.routines;
+package org.usfirst.frc.team3309.auto;
 
 import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.auto.TimedOutException;
 import org.usfirst.frc.team3309.subsystems.Drive;
 
-public class HopperAndShootStraightPathBlue extends AutoRoutine {
+public class GearIntakeMiddle extends AutoRoutine {
+
 	@Override
 	public void routine() throws TimedOutException, InterruptedException {
 		System.out.println("AUTO RUNS");

@@ -4,6 +4,7 @@ import org.team3309.lib.KragerSystem;
 import org.team3309.lib.actuators.TalonSRXMC;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
+import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
@@ -11,6 +12,7 @@ import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 public class Shooter extends KragerSystem {
 
 	private boolean shouldBeShooting = false;
+	private boolean shouldBeSpinningUp = false;
 	private static Shooter instance;
 
 	public static Shooter getInstance() {
@@ -26,10 +28,13 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void updateTeleop() {
-		if (Controls.operatorController.getAButton()) {
+		if (Sensors.getFlywheelRPS() > Flywheel.getInstance().getAimVelRPS() - 50) {
 			shouldBeShooting = true;
+		} else if (Sensors.getFlywheelRPS() != 0) {
+			shouldBeSpinningUp = true;
 		} else {
 			shouldBeShooting = false;
+			shouldBeSpinningUp = false;
 		}
 	}
 
@@ -39,7 +44,8 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void initTeleop() {
-
+		shouldBeShooting = false;
+		shouldBeSpinningUp = false;
 	}
 
 	@Override
@@ -67,4 +73,11 @@ public class Shooter extends KragerSystem {
 		return shouldBeShooting;
 	}
 
+	public void setShouldBeSpinningUp(boolean b) {
+		shouldBeSpinningUp = b;
+	}
+
+	public boolean isShouldBeSpinningUp() {
+		return shouldBeSpinningUp;
+	}
 }

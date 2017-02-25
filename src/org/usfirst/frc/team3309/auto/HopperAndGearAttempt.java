@@ -1,4 +1,5 @@
-package org.usfirst.frc.team3309.auto.routines;
+package org.usfirst.frc.team3309.auto;
+
 
 import java.util.LinkedList;
 

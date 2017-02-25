@@ -45,6 +45,7 @@ public class FuelIntake extends KragerSystem {
 	@Override
 	public void updateAuto() {
 		// use the setFuelIntake method to set
+		
 	}
 
 	@Override

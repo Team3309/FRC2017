@@ -20,7 +20,7 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 	/**
 	 * Helps turn when both sides have the same aim velocity
 	 */
-	private PIDPositionController turningController = new PIDPositionController(.06, 0, 0);
+	private PIDPositionController turningController = new PIDPositionController(40, 0, 0);
 	private KragerTimer doneTimer = new KragerTimer(.5);
 	private LinkedList<VelocityChangePoint> encoderChanges = new LinkedList<VelocityChangePoint>();
 	private LinkedList<Operation> operations = new LinkedList<Operation>();
@@ -28,13 +28,12 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 	private double goalEncoder = 0;
 	private double pastAim = 0;
 	private final double MAX_ACC = 5;
-	private final double DEFAULT_STARTING_VEL = 100;
+	private final double DEFAULT_STARTING_VEL = 1000;
 	private boolean isRampUp = false;
 
 	public DriveEncoderVelocityWithSetPointsController(double encoderGoal) {
 		Drive.getInstance().changeToVelocityMode();
-		turningController.setConstants(.06, 0, 0);
-
+		turningController.setConstants(40, 0, 0);
 		goalAngle = Sensors.getAngle();
 		this.goalEncoder = encoderGoal;
 		this.setName("DRIVE ENCODER VEL");
@@ -95,6 +94,13 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 		// start setting velocities and turning controllers
 		double rightAimVel = currentVelocityPoint.rightVelocityNew;
 		double leftAimVel = currentVelocityPoint.leftVelocityNew;
+
+		if (currentVelocityPoint.goalAngle == null) {
+			currentVelocityPoint.goalAngle = Sensors.getAngle();
+			System.out.println("ESTABLISHIG NEW GOAL " + currentVelocityPoint.goalAngle);
+		}
+		goalAngle = currentVelocityPoint.goalAngle;
+
 		// used when going from rest to default speed
 		if (isRampUp) {
 			if (rightAimVel < 0)
@@ -107,18 +113,13 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 			}
 			leftAimVel = rightAimVel;
 		}
+
 		OutputSignal toBeReturnedSignal = new OutputSignal();
+
 		// if going straight, control angle too
 		if (leftAimVel == rightAimVel) {
-			// if the error is huge (meaning the robot has turned from dif
-			// velocities on each side) then set the current angle to the new
-			// goal
-			if (Math.abs(inputState.getAngularPos() - goalAngle) > 30) {
-				goalAngle = inputState.getAngularPos();
-			}
 			InputState turningState = new InputState();
 			turningState.setError(goalAngle - inputState.getAngularPos());
-
 			double turn = turningController.getOutputSignal(turningState).getMotor();
 			toBeReturnedSignal.setLeftRightMotor(leftAimVel + turn, rightAimVel - turn);
 		} else {
@@ -158,7 +159,8 @@ public class DriveEncoderVelocityWithSetPointsController extends Controller {
 
 	@Override
 	public boolean isCompleted() {
-		return doneTimer.isConditionMaintained(Drive.getInstance().isEncoderCloseTo(goalEncoder));
+		return doneTimer
+				.isConditionMaintained(Math.abs(Drive.getInstance().getDistanceTraveled()) > Math.abs(goalEncoder));
 	}
 
 	public LinkedList<VelocityChangePoint> getEncoderChanges() {
