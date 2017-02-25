@@ -56,7 +56,12 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	public final double MAX_ACC = 1.5; // 180 deg/s*s
 	public final double MAX_VEL = 30; // 180 deg/s*s
 
+	private TurretState currentState = TurretState.HOME;
 	private Timer calTimer = new Timer();
+
+	public enum TurretState {
+		SURVEY, HOME, CLIMBING, HOLD, USING_VISION
+	}
 
 	public static Turret getInstance() {
 		if (instance == null)
@@ -106,73 +111,77 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 			calibrate();
 			return;
 		}
-		// updateValuesSeen();
+
+		// STATE UPDATES
+		// If climbing,
+		if (Climber.getInstance().isClimbing()) {
+			currentState = TurretState.CLIMBING;
+		}
+
+		if (Controls.driverController.getPOV() == 90 || Controls.operatorController.getPOV() == 90) {
+			currentState = TurretState.SURVEY;
+		} else if (Controls.driverController.getPOV() == 270 || Controls.operatorController.getPOV() == 270) {
+			currentState = TurretState.HOME;
+		}
+
+		// STATE MATH
 		// if you see the goal, aim at it
-		if (VisionServer.getInstance().hasTargetsToAimAt()) {
-			isSurvey = false;
-			isFirstLostLogged = false;
+		if (VisionServer.getInstance().hasTargetsToAimAt() && currentState != TurretState.HOME) {
+			currentState = TurretState.USING_VISION;
 			moveTowardsGoal();
-		} else if (isSurvey) {
-			isFirstLostLogged = false;
-			System.out.println("BEGIN SURVEY");
+		} else if (currentState == TurretState.SURVEY) {
 			survey();
+		} else if (currentState == TurretState.CLIMBING) {
+			this.changeToPositionMode();
+			goalAngle = 90;
+		} else if (currentState == TurretState.HOME) {
+			this.changeToPositionMode();
+			goalAngle = 0;
 		} else {
-			isSurvey = false;
-			if (!isFirstLostLogged) {
+			if (currentState != TurretState.HOLD) {
 				System.out.println("RESET");
-				isFirstLostLogged = true;
+				currentState = TurretState.HOLD;
 				robotAngleWhenGoalLost = Sensors.getAngle();
 				turretGoalWhenLost = goalAngle;
 			}
-
 			double robotAngleOffset = -(Sensors.getAngle() - robotAngleWhenGoalLost);
 			goalAngle = robotAngleOffset + turretGoalWhenLost;
-			System.out.println("ANGE OFFSET " + robotAngleOffset + " last	scene " + turretGoalWhenLost);
-			System.out.println("OFFSET GARBAGE " + goalAngle);
-			fixGoalAngle();
-			if (this.getAngle() > goalAngle - 3 && this.getAngle() < goalAngle + 3
-					&& !VisionServer.getInstance().hasTargetsToAimAt() && !Controls.operatorController.getYButton()
+			correctGoalAngleBounds();
+			if (this.getAngle() > goalAngle - 2 && this.getAngle() < goalAngle + 2
+					&& !VisionServer.getInstance().hasTargetsToAimAt()
 					&& !Shooter.getInstance().isShouldBeShooting()) {
-				isSurvey = true;
+				currentState = TurretState.SURVEY;
 			} else {
 				this.changeToPositionMode();
 			}
 		}
 
-		if (Climber.getInstance().isClimbing()) {
-			this.changeToPositionMode();
-			goalAngle = 90;
-			this.turretMC.set((goalAngle / 360) * 14745.6);
-			return;
-		}
-		fixGoalAngle();
-		// System.out.println("goal Angle " + goalAngle + " curAngle " +
-		// this.getAngle());
-		// this.testPosControl();
+		// SET THE MOTORS
+		correctGoalAngleBounds();
+
 		OutputSignal signal = this.getController().getOutputSignal(getInputState());
+
 		if (turretMC.getControlMode() == TalonControlMode.Position) {
+			// Stop when you are close enough
 			if (this.getAngle() > goalAngle - .5 && this.getAngle() < goalAngle + .5) {
 				this.turretMC.changeControlMode(TalonControlMode.PercentVbus);
 				this.turretMC.set(0);
-				// System.out.println("GOOD SO STOPPING");
 			} else {
 				this.changeToPositionMode();
-				// System.out.println("MOVING TO GOAL + " + goalAngle);
 				turretMC.set((goalAngle / 360) * 14745.6);
 			}
 		} else {
-			// System.out.println("RAW AFF");
 			turretMC.set(signal.getMotor());
 		}
 
+		// Turn off sensor if it is not found
 		if (turretMC.isSensorPresent(FeedbackDevice.QuadEncoder) == FeedbackDeviceStatus.FeedbackStatusNotPresent) {
 			turretMC.changeControlMode(TalonControlMode.PercentVbus);
-			// System.out.println("ERRORF");
 			turretMC.set(0);
 		}
 	}
 
-	private void fixGoalAngle() {
+	private void correctGoalAngleBounds() {
 		while (goalAngle > RIGHT_ABSOLUTE_LIMIT || goalAngle < LEFT_ABSOLUTE_LIMIT) {
 			if (goalAngle > RIGHT_ABSOLUTE_LIMIT) {
 				goalAngle -= 360;
@@ -227,7 +236,7 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 			System.out.println("SEE NEW GOAL AIMING");
 			double degToTurn = ((goalX) / .8) * (VisionServer.FIELD_OF_VIEW_DEGREES);
 			goalAngle = this.getAngle() + degToTurn;
-			this.resetAngVelocityCounts();
+			this.resetAngVelocityCounts(); // WORK FASTER!!!!!!!
 		} else {
 			System.out.println("have old goal still");
 			double predictionOffset = -(Sensors.getAngle() - this.robotAngleAtLastGoal);
