@@ -26,8 +26,10 @@ public class Turbine extends ControlledSubsystem {
 	@Override
 	public void updateTeleop() {
 		boolean operatorBButton = Controls.operatorController.getBButton(); // sort
-		if (operatorBButton || Shooter.getInstance().isShouldBeShooting()) {
+		if (Shooter.getInstance().isShouldBeShooting()) {
 			setHopper(1);
+		} else if (operatorBButton) {
+			setHopper(-.5);
 		} else {
 			setHopper(0);
 		}
@@ -40,7 +42,6 @@ public class Turbine extends ControlledSubsystem {
 		} else {
 			setHopper(0);
 		}
-
 	}
 
 	@Override

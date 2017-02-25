@@ -1,22 +1,17 @@
 package org.usfirst.frc.team3309.subsystems;
 
-import java.awt.geom.Ellipse2D;
-
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.KragerMath;
 import org.team3309.lib.controllers.statesandsignals.InputState;
-import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import com.ctre.CANTalon;
-import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator extends ControlledSubsystem {
 
@@ -54,8 +49,7 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		System.out.println(elevator.isSensorPresent(FeedbackDevice.QuadEncoder));
-		if (Controls.operatorController.getAButton()) {
+		if (Controls.operatorController.getBButton()) {
 			aimVel = table.getNumber("k_aimVel", 0);
 		} else if (Shooter.getInstance().isShouldBeShooting()) {
 			aimVel = SHOOTING_VELOCITY;
@@ -92,10 +86,10 @@ public class Elevator extends ControlledSubsystem {
 	@Override
 	public void manualControl() {
 
-		if (Controls.operatorController.getBumper(Hand.kRight)) {
-			setElevator(.95);
-		} else if (Controls.operatorController.getBumper(Hand.kLeft)) {
+		if (Controls.operatorController.getBButton()) {
 			setElevator(-.5);
+		} else if (Shooter.getInstance().isShouldBeShooting()) {
+			setElevator(.95);
 		} else {
 			setElevator(0);
 		}
@@ -103,7 +97,7 @@ public class Elevator extends ControlledSubsystem {
 
 	private void setElevator(double power) {
 		this.elevator.set(power);
-		this.feedyWheel.set(power);
+		this.feedyWheel.set(1 * KragerMath.sign(power));
 	}
 
 }

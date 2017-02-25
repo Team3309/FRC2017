@@ -84,14 +84,18 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	public void updateTeleop() {
 		curVel = this.getRPS();
 		// Find our base aim vel
-		if (Controls.operatorController.getYButton()) {
+		if (Controls.operatorController.getYButton() || Controls.driverController.getYButton()) {
 			this.testVel();
-		} else if (VisionServer.getInstance().hasTargetsToAimAt() && Controls.operatorController.getXButton()) {
-			aimVelRPS = VisionServer.getInstance().getRPS();
-			System.out.println("FLYWHEEL VISION AIM " + aimVelRPS);
-			lastVisionRPS = aimVelRPS;
-		} else if (Controls.operatorController.getPOV() == 0) {
-			aimVelRPS = lastVisionRPS;
+		} else if (Controls.operatorController.getXButton()) {
+			aimVelRPS = 180;
+		} else if (Controls.operatorController.getAButton()) {
+			if (VisionServer.getInstance().hasTargetsToAimAt()) {
+				aimVelRPS = VisionServer.getInstance().getRPS();
+				System.out.println("FLYWHEEL VISION AIM " + aimVelRPS);
+				lastVisionRPS = aimVelRPS;
+			} else {
+				aimVelRPS = lastVisionRPS;
+			}
 		} else {
 			aimVelRPS = 0;
 			aimAccRPS = 0;
@@ -100,7 +104,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	}
 
 	// ANGLE CLOCKWISE POSITIV
-	
+
 	// NEGATIVE POWERGF
 	/**
 	 * Raw power values
