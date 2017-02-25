@@ -103,24 +103,23 @@ public class Robot extends IterativeRobot {
 		Sensors.read();
 		// Systems.update();
 		indicatorLight.setVoltage(0);
-		Flywheel.getInstance().updateTeleop();
+		Flywheel.getInstance().manualControl();
 		Flywheel.getInstance().sendToSmartDash();
-		Hood.getInstance().updateTeleop(); // updateTeleop, check sensor
-		Hood.getInstance().sendToSmartDash();
-		Turbine.getInstance().manualControl(); // first
-		Turret.getInstance().updateTeleop();
-		Turret.getInstance().sendToSmartDash();
+		// Hood.getInstance().updateTeleop(); // updateTeleop, check sensor
+		// Hood.getInstance().sendToSmartDash();
+		// Turbine.getInstance().manualControl(); // first
+		// Turret.getInstance().updateTeleop();
+		// Turret.getInstance().sendToSmartDash();
 		Shooter.getInstance().updateTeleop();
-		Elevator.getInstance().manualControl();
-		Elevator.getInstance().sendToSmartDash();
-		FuelIntake.getInstance().updateTeleop();
+		// Elevator.getInstance().manualControl();
+		// Elevator.getInstance().sendToSmartDash();
+		// FuelIntake.getInstance().updateTeleop();
 		// Shooter.getInstance().sendToSmartDash();
 		// GearIntake.getInstance().updateTeleop();
-		Climber.getInstance().manualControl();
-		Climber.getInstance().sendToSmartDash();
-		Drive.getInstance().updateTeleop();
-		Drive.getInstance().sendToSmartDash();
-		// DashboardHelper.updateTunable(Drive.getInstance());
+		// Climber.getInstance().manualControl();
+		// Climber.getInstance().sendToSmartDash();
+		// Drive.getInstance().updateTeleop();
+		// Drive.getInstance().sendToSmartDash();
 
 		Actuators.actuate();
 	}

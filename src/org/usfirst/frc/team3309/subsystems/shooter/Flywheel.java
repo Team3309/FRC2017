@@ -110,7 +110,6 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	 * Raw power values
 	 */
 	public void manualControl() {
-
 		if (Controls.operatorController.getAButton()) {
 			this.setShooter(.45);
 		} else if (Controls.operatorController.getXButton()) {
@@ -124,16 +123,11 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 
 	public void testVel() {
 		curVel = this.getRPS();
-		if (Controls.operatorController.getXButton()) {
-			aimVelRPS = 90;
-		} else if (Controls.operatorController.getYButton()) {
+		if (Controls.operatorController.getYButton()) {
 			aimVelRPS = NetworkTable.getTable("Climber").getNumber("k_TEST RPS", 0);
-			// SmartDashboard.putNumber("Flywheel aim vel testable", aimVelRPS);
-
 		} else {
 			aimVelRPS = 0;
 		}
-		// shootLikeRobie();
 	}
 
 	/**
