@@ -110,6 +110,7 @@ public class Robot extends IterativeRobot {
 		// Turbine.getInstance().manualControl(); // first
 		// Turret.getInstance().updateTeleop();
 		// Turret.getInstance().sendToSmartDash();
+<<<<<<< HEAD
 
 		// GearIntake.getInstance()
 
@@ -118,6 +119,13 @@ public class Robot extends IterativeRobot {
 		// Elevator.getInstance().sendToSmartDash();
 		// FuelIntake.getInstance().updateTeleop();
 		// GearIntake.getInstance().updateTeleop();
+=======
+		Shooter.getInstance().updateTeleop();
+		// Elevator.getInstance().manualControl();
+		// Elevator.getInstance().sendToSmartDash();
+		// FuelIntake.getInstance().updateTeleop();
+		// Shooter.getInstance().sendToSmartDash();
+>>>>>>> origin/master
 		// GearIntake.getInstance().updateTeleop();
 		// Climber.getInstance().manualControl();
 		// Climber.getInstance().sendToSmartDash();

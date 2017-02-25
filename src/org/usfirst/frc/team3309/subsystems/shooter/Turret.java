@@ -148,7 +148,12 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 			goalAngle = robotAngleOffset + turretGoalWhenLost;
 			correctGoalAngleBounds();
 			if (this.getAngle() > goalAngle - 2 && this.getAngle() < goalAngle + 2
+<<<<<<< HEAD
 					&& !VisionServer.getInstance().hasTargetsToAimAt() && !Shooter.getInstance().isShouldBeShooting()) {
+=======
+					&& !VisionServer.getInstance().hasTargetsToAimAt()
+					&& !Shooter.getInstance().isShouldBeShooting()) {
+>>>>>>> origin/master
 				currentState = TurretState.SURVEY;
 			} else {
 				this.changeToPositionMode();
@@ -280,7 +285,10 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 			NetworkTable.getTable("Climber").putNumber(this.getName() + " X",
 					VisionServer.getInstance().getTarget().getZ());
 		}
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 		table.putNumber(this.getName() + " closed loop error", this.turretMC.getClosedLoopError());
 		table.putNumber(this.getName() + " error", (turretMC.getError() / 147445) * 360);
 		SmartDashboard.putBoolean(this.getName() + " hall effect", this.hallEffectSensor.get());
