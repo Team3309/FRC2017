@@ -39,7 +39,7 @@ public class GearIntake extends KragerSystem {
 		boolean driverSelect = Controls.driverController.getBackButton();
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
-		if ((driverStart || operatorLB) && !hasChangedForThisPress) {
+		if ((driverStart || operatorRB) && !hasChangedForThisPress) {
 			this.extendPivot();
 			this.extendWrist();
 			this.setGearIntakeRoller(1);
@@ -50,6 +50,10 @@ public class GearIntake extends KragerSystem {
 			this.retractWrist();
 			this.setGearIntakeRoller(0);
 			hasChangedForThisPress = false;
+		}
+
+		if (operatorLB) {
+			this.setGearIntakeRoller(-1);
 		}
 
 		// // only use driver inputs if the gear mechanism is extended
