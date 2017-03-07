@@ -4,6 +4,7 @@ public class Shot {
 	private double goalRPS = 0;
 	private double goalHoodAngle = 0;
 	private double hyp = 0;
+	private double x = 0;
 
 	public Shot() {
 	}
@@ -40,5 +41,13 @@ public class Shot {
 
 	public void setHyp(double hyp) {
 		this.hyp = hyp;
+	}
+
+	public double getX() {
+		return x;
+	}
+
+	public void setX(double x) {
+		this.x = x;
 	}
 }

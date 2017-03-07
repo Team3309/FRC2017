@@ -13,6 +13,8 @@ public class HopperAndShootStraightPath extends SteamworksAutoRoutine {
 	@Override
 	public void redRoutine() throws TimedOutException, InterruptedException {
 		this.spinUp();
+		this.closeGearIntake();
+		this.pivotUpGearIntake();
 		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
 		// do a curvy path to the shooting locations
 		changePoints.add(new VelocityChangePoint(3000, 0));
@@ -25,6 +27,8 @@ public class HopperAndShootStraightPath extends SteamworksAutoRoutine {
 	@Override
 	public void blueRoutine() throws TimedOutException, InterruptedException {
 		this.spinUp();
+		this.closeGearIntake();
+		this.pivotUpGearIntake();
 		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
 		// do a curvy path to the shooting locations
 		changePoints.add(new VelocityChangePoint(3000, 0));

@@ -21,7 +21,6 @@ public class Systems {
 			if (DriverStation.getInstance().isAutonomous())
 				e.updateAuto();
 			else {
-				System.out.println("TELEOP");
 				e.updateTeleop();
 			}
 			if (e instanceof IDashboard) {
@@ -30,6 +29,12 @@ public class Systems {
 			}
 		}
 
+	}
+
+	public static void smartDashboard() {
+		for (KragerSystem e : systems) {
+			e.sendToSmartDash();
+		}
 	}
 
 	public static void init() {

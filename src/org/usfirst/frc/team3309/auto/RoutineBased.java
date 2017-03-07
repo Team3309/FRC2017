@@ -13,6 +13,7 @@ import org.usfirst.frc.team3309.subsystems.Drive;
 import org.usfirst.frc.team3309.subsystems.FuelIntake;
 import org.usfirst.frc.team3309.subsystems.GearIntake;
 import org.usfirst.frc.team3309.subsystems.Shooter;
+import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.Timer;
 
@@ -192,6 +193,9 @@ public class RoutineBased {
 
 	public void shoot() {
 		System.out.println("SHOOTING NOW");
+		while (!VisionServer.getInstance().hasTargetsToAimAt()
+				&& Math.abs(VisionServer.getInstance().getTarget().getHyp()) < .2) {
+		}
 		Shooter.getInstance().setShouldBeShooting(true);
 	}
 
@@ -200,14 +204,20 @@ public class RoutineBased {
 		Shooter.getInstance().setShouldBeSpinningUp(true);
 	}
 
-	public void deployGearIntake() {
-		GearIntake.getInstance().extendPivot();
-		GearIntake.getInstance().extendWrist();
+	public void closeGearIntake() {
+		GearIntake.getInstance().closeGearIntake();
 	}
 
-	public void retractGearIntake() {
-		GearIntake.getInstance().retractPivot();
-		GearIntake.getInstance().retractWrist();
+	public void openGearIntake() {
+		GearIntake.getInstance().openGearIntake();
+	}
+
+	public void pivotUpGearIntake() {
+		GearIntake.getInstance().pivotUpGearIntake();
+	}
+
+	public void pivotDownGearIntake() {
+		GearIntake.getInstance().pivotDownGearIntake();
 	}
 
 	public void setFuelIntake(double power) {

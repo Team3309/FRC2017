@@ -25,6 +25,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 
 	private double maxAccRPS = 60.0;
 	private double aimVelRPS = 0.0;
+
 	private double aimAccRPS = 0.0;
 	private double curVel = 0;
 	private double lastVisionRPS = 0;
@@ -37,7 +38,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 
 	private Flywheel() {
 		super("Flywheel");
-		this.setController(new FeedForwardWithPIDController(0.004, 0, 0.022, 0.0000008, 0.00));
+		this.setController(new FeedForwardWithPIDController(0.0035, 0, 0.013, 0.000000001, 0.00));
 		this.getController().setName("Flywheel Speed");
 		this.rightTalon.setReversed(true);
 		((FeedForwardWithPIDController) this.getController()).setTHRESHOLD(10);
@@ -76,6 +77,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 			lastVisionRPS = aimVelRPS;
 		} else if (Shooter.getInstance().isShouldBeSpinningUp()) {
 			aimVelRPS = 180;
+
 		}
 		shootLikeRobie();
 	}
@@ -84,11 +86,13 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	public void updateTeleop() {
 		curVel = this.getRPS();
 		// Find our base aim vel
+		//System.out.println("constnats: " + ((FeedForwardWithPIDController) this.getController()).getkV() + " kP "
+			//	+ ((FeedForwardWithPIDController) this.getController()).kP);
 		if (Controls.operatorController.getYButton() || Controls.driverController.getYButton()) {
 			this.testVel();
-		} else if (Controls.operatorController.getXButton()) {
-			aimVelRPS = 180;
 		} else if (Controls.operatorController.getAButton()) {
+			aimVelRPS = 180;
+		} else if (Controls.operatorController.getBButton()) {
 			if (VisionServer.getInstance().hasTargetsToAimAt()) {
 				aimVelRPS = VisionServer.getInstance().getRPS();
 				System.out.println("FLYWHEEL VISION AIM " + aimVelRPS);
@@ -103,7 +107,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 		shootLikeRobie();
 	}
 
-	// ANGLE CLOCKWISE POSITIV
+	// ANGLE CLOCKWISE POSITIVE
 
 	// NEGATIVE POWERGF
 	/**
@@ -111,7 +115,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	 */
 	public void manualControl() {
 		if (Controls.operatorController.getAButton()) {
-			this.setShooter(.45);
+			this.setShooter(.05);
 		} else if (Controls.operatorController.getXButton()) {
 			this.setShooter(.5);
 		} else if (Controls.operatorController.getYButton()) {
@@ -128,6 +132,13 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 		} else {
 			aimVelRPS = 0;
 		}
+	}
+
+	private void bangBang() {
+		if (this.curVel < aimVelRPS)
+			this.setShooter(1);
+		else
+			this.setShooter(0);
 	}
 
 	/**
@@ -163,7 +174,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 			this.setShooter(0);
 		} else {
 			if (curVel < 30) {
-				output = .45;
+				output = .5;
 			}
 			// System.out.println(aimVelRPS);
 			// System.out.println(output);
@@ -193,11 +204,11 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	public void sendToSmartDash() {
 		getController().sendToSmartDash();
 		DashboardHelper.updateTunable(this.getController());
-		SmartDashboard.putNumber(this.getName() + " RPM", curVel * 60);
+		SmartDashboard.putNumber(this.getName() + " RPS", curVel);
 		table.putNumber(this.getName() + " RPS", getRPS());
 		table.putNumber(this.getName() + " Goal", this.aimVelRPS);
 		table.putNumber(this.getName() + " Left", leftTalon.getDesiredOutput());
-
+		table.putNumber("raw", Sensors.rawRPS);
 		SmartDashboard.putNumber(this.getName() + " Right", rightTalon.getDesiredOutput());
 	}
 

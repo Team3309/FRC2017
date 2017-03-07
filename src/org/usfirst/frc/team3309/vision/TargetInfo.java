@@ -1,5 +1,7 @@
 package org.usfirst.frc.team3309.vision;
 
+import org.team3309.lib.KragerMath;
+
 public class TargetInfo {
 	protected double x = 1.0;
 	protected double y;
@@ -19,10 +21,10 @@ public class TargetInfo {
 	}
 
 	public double getZ() {
-		return z + .04;
+		return z; // comp bot had a +.04
 	}
 
 	public double getHyp() {
-		return Math.pow(getY(), 2) + Math.pow(getZ(), 2);
+		return KragerMath.sign(getY()) * (Math.pow(getY(), 2) + Math.pow(getZ(), 2));
 	}
 }

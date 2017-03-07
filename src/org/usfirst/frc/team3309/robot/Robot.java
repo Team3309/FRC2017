@@ -5,6 +5,7 @@ import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.auto.routines.GearIntakeMiddleCurvy;
 import org.usfirst.frc.team3309.auto.routines.HopperAndGearCurvy;
 import org.usfirst.frc.team3309.auto.routines.HopperAndShootCurvyPath;
+import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
 import org.usfirst.frc.team3309.subsystems.Elevator;
@@ -18,8 +19,12 @@ import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.AnalogOutput;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -29,6 +34,7 @@ public class Robot extends IterativeRobot {
 	private static SendableChooser<AllianceColor> redBlueAutoChooser = new SendableChooser<AllianceColor>();
 	private Thread autoThread;
 	private Compressor c = new Compressor();
+	// private CameraServer cServer = CameraServer.getInstance();
 	private AnalogOutput indicatorLight = new AnalogOutput(RobotMap.INDICATOR_LIGHT);
 
 	public void robotInit() {
@@ -54,21 +60,29 @@ public class Robot extends IterativeRobot {
 		Flywheel.getInstance();
 		Hood.getInstance();
 		Turret.getInstance().callForCalibration();
-		(new Thread(VisionServer.getInstance())).start();
 
+		t.start();
+		(new Thread(VisionServer.getInstance())).start();
+		CameraServer.getInstance().startAutomaticCapture();
 		c.start();
+		// cServer.startAutomaticCapture("cam0", 0);
 	}
 
 	public void disabledInit() {
-
+		NetworkTable table = NetworkTable.getTable("Drivetrain");
+		table.putNumber("k_PWM", 0);
 	}
 
 	public void disabledPeriodic() {
+		NetworkTable table = NetworkTable.getTable("Drivetrain");
+		// Systems.smartDashboard();
 		Turret.getInstance().checkForCalibration();
+		// System.out.println("RAW " + indicatorLight.getRaw());
 		if (Turret.getInstance().hasCalibratedSinceRobotInit)
-			indicatorLight.setVoltage(4096);
+			indicatorLight.setVoltage(2.5);
 		else
-			indicatorLight.setVoltage(2048);
+			indicatorLight.setVoltage(0);
+		Controls.operatorController.setRumble(RumbleType.kLeftRumble, 0);
 	}
 
 	public void autonomousInit() {
@@ -80,7 +94,7 @@ public class Robot extends IterativeRobot {
 
 	public void autonomousPeriodic() {
 		Sensors.read();
-		indicatorLight.setVoltage(0);
+		indicatorLight.setVoltage(5);
 		try {
 			Systems.update();
 		} catch (Exception e) {
@@ -90,38 +104,44 @@ public class Robot extends IterativeRobot {
 		Hood.getInstance().sendToSmartDash();
 		Drive.getInstance().sendToSmartDash();
 		Actuators.actuate();
+
 	}
 
 	public void teleopInit() {
 		Systems.init();
 		if (autoThread != null)
 			autoThread.stop();
-		System.out.println("DONE INIT");
 	}
 
+	private Timer t = new Timer();
+
 	public void teleopPeriodic() {
+		t.reset();
 		Sensors.read();
 		// Systems.update();
-		indicatorLight.setVoltage(0);
-		Flywheel.getInstance().manualControl();
+		indicatorLight.setVoltage(5);
+		Flywheel.getInstance().updateTeleop();
 		Flywheel.getInstance().sendToSmartDash();
-		// Hood.getInstance().updateTeleop(); // updateTeleop, check sensor
-		// Hood.getInstance().sendToSmartDash();
-		// Turbine.getInstance().manualControl(); // first
-		// Turret.getInstance().updateTeleop();
-		// Turret.getInstance().sendToSmartDash();
+		Hood.getInstance().updateTeleop();
+		Hood.getInstance().sendToSmartDash();
+		Turbine.getInstance().updateTeleop(); // first
+		Turret.getInstance().updateTeleop();
+		Turret.getInstance().sendToSmartDash();
 		Shooter.getInstance().updateTeleop();
-		// Elevator.getInstance().manualControl();
-		// Elevator.getInstance().sendToSmartDash();
-		// FuelIntake.getInstance().updateTeleop();
-		// Shooter.getInstance().sendToSmartDash();
-		// GearIntake.getInstance().updateTeleop();
-		// Climber.getInstance().manualControl();
-		// Climber.getInstance().sendToSmartDash();
-		// Drive.getInstance().updateTeleop();
-		// Drive.getInstance().sendToSmartDash();
+		Shooter.getInstance().sendToSmartDash();
+		Elevator.getInstance().updateTeleop();
+		Elevator.getInstance().sendToSmartDash();
+		FuelIntake.getInstance().updateTeleop();
+		GearIntake.getInstance().updateTeleop();
+		GearIntake.getInstance().sendToSmartDash();
+		Climber.getInstance().manualControl();
+		Climber.getInstance().sendToSmartDash();
+		Drive.getInstance().updateTeleop();
+		Drive.getInstance().sendToSmartDash();
 
 		Actuators.actuate();
+		if (t.get() > .1)
+			System.out.println("BAD LOOP SPEEd " + t.get());
 	}
 
 	public static AllianceColor getAllianceColor() {

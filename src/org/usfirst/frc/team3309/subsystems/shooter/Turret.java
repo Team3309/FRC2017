@@ -50,6 +50,7 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	private double lastGoalAngleFromVision = 0;
 	private boolean isFirstLostLogged = false;
 	private boolean isSurvey = false;
+	private double kAngVel = .1;
 
 	public final double LEFT_LIMIT = 10;
 	public final double RIGHT_LIMIT = 170;
@@ -94,12 +95,14 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		calTimer.start();
 		this.getController().reset();
 		goalAngle = getAngle();
+		this.currentState = TurretState.HOME;
 		isSurvey = true;
 	}
 
 	@Override
 	public void initAuto() {
 		calTimer.start();
+		this.currentState = TurretState.SURVEY;
 		this.getController().reset();
 		goalAngle = getAngle();
 		isSurvey = true;
@@ -126,7 +129,9 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 
 		// STATE MATH
 		// if you see the goal, aim at it
-		if (VisionServer.getInstance().hasTargetsToAimAt() && currentState != TurretState.HOME) {
+		if (VisionServer.getInstance().hasTargetsToAimAt()
+				&& (currentState != TurretState.HOME && currentState != TurretState.CLIMBING)
+				&& Math.abs(goalAngle - this.getAngle()) < 180) {
 			currentState = TurretState.USING_VISION;
 			moveTowardsGoal();
 		} else if (currentState == TurretState.SURVEY) {
@@ -149,7 +154,7 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 			correctGoalAngleBounds();
 			if (this.getAngle() > goalAngle - 2 && this.getAngle() < goalAngle + 2
 					&& !VisionServer.getInstance().hasTargetsToAimAt()
-					&& !Shooter.getInstance().isShouldBeShooting()) {
+					&& !Shooter.getInstance().isShouldBeSpinningUp()) {
 				currentState = TurretState.SURVEY;
 			} else {
 				this.changeToPositionMode();
@@ -233,15 +238,16 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		TargetInfo goal = VisionServer.getInstance().getTarget();
 		double goalX = goal.getZ();
 		if (lastGoalX != goalX) {
-			System.out.println("SEE NEW GOAL AIMING");
+			// System.out.println("SEE NEW GOAL AIMING");
 			double degToTurn = ((goalX) / .8) * (VisionServer.FIELD_OF_VIEW_DEGREES);
 			goalAngle = this.getAngle() + degToTurn;
 			this.resetAngVelocityCounts(); // WORK FASTER!!!!!!!
 		} else {
-			System.out.println("have old goal still");
+			// System.out.println("have old goal still");
 			double predictionOffset = -(Sensors.getAngle() - this.robotAngleAtLastGoal);
 			table.putNumber("prediction offset", predictionOffset);
-			goalAngle = lastGoalAngleFromVision + predictionOffset;
+			double angularCompensation = Sensors.getAngularVel() * this.kAngVel;
+			goalAngle = lastGoalAngleFromVision + predictionOffset + angularCompensation;
 		}
 		lastGoalX = goalX;
 		lastVisionAngle = goalAngle;
@@ -274,12 +280,22 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		table.putNumber(this.getName() + " power ", this.turretMC.get());
 		table.putNumber("turret_angle", getAngle());
 		table.putNumber(this.getName() + " Goal Angle", this.goalAngle);
+		kAngVel = table.getNumber("k_AngVel", kAngVel);
+		table.putNumber("k_AngVel", kAngVel);
 		SmartDashboard.putNumber(this.getName() + " get", this.turretMC.get());
+		/*
+		 * if (VisionServer.getInstance().hasTargetsToAimAt()) {
+		 * NetworkTable.getTable("Climber").putNumber(this.getName() + " hyp",
+		 * VisionServer.getInstance().getTarget().getHyp());
+		 * NetworkTable.getTable("Climber").putNumber(this.getName() + " X",
+		 * VisionServer.getInstance().getTarget().getZ()); }
+		 */
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
-			NetworkTable.getTable("Climber").putNumber(this.getName() + " hyp",
-					VisionServer.getInstance().getTarget().getHyp());
-			NetworkTable.getTable("Climber").putNumber(this.getName() + " X",
-					VisionServer.getInstance().getTarget().getZ());
+			NetworkTable.getTable("Climber").putNumber(" X", VisionServer.getInstance().getTarget().getZ());
+			NetworkTable.getTable("Climber").putNumber(" Hyp", VisionServer.getInstance().getTarget().getHyp());
+		} else {
+			NetworkTable.getTable("Climber").putNumber(" X", 1000);
+			NetworkTable.getTable("Climber").putNumber(" Hyp", 1000);
 		}
 		table.putNumber(this.getName() + " closed loop error", this.turretMC.getClosedLoopError());
 		table.putNumber(this.getName() + " error", (turretMC.getError() / 147445) * 360);

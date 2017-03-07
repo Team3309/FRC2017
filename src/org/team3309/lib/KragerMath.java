@@ -16,7 +16,7 @@ public class KragerMath {
 	 * @return
 	 */
 	public static double sinDeg(double a) {
-		System.out.println("ANGLE: " + a + " after " + Math.sin(a * (180 / Math.PI)) + " deg " + Math.sin(a));
+		//System.out.println("ANGLE: " + a + " after " + Math.sin(a * (180 / Math.PI)) + " deg " + Math.sin(a));
 		return Math.sin(a * (Math.PI / 180));
 	}
 
@@ -43,7 +43,7 @@ public class KragerMath {
 	}
 
 	public static double threshold(double input) {
-		if (Math.abs(input) < .1) {
+		if (Math.abs(input) < .3) {
 			return 0;
 		}
 		return input;
@@ -54,6 +54,6 @@ public class KragerMath {
 			return 1;
 		else if (error < 0)
 			return -1;
-		return 0;
+		return 1;
 	}
 }

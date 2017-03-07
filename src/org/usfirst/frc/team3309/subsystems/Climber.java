@@ -35,10 +35,7 @@ public class Climber extends KragerSystem {
 		boolean operatorStartButton = Controls.operatorController.getStartButton();
 		boolean operatorBackButton = Controls.operatorController.getBackButton();
 		if (operatorStartButton) {
-			if (hasHitTop())
-				setClimber(UP_POWER);
-			else
-				setClimber(HOLD_POWER);
+			setClimber(UP_POWER);
 		} else {
 			setClimber(0);
 		}
@@ -65,7 +62,7 @@ public class Climber extends KragerSystem {
 
 	@Override
 	public void sendToSmartDash() {
-		NetworkTable.getTable("Climber").putNumber("current", climberMC.getTalon().getOutputCurrent());
+		//NetworkTable.getTable("Climber").putNumber("current", climberMC.getTalon().getOutputCurrent());
 		SmartDashboard.putNumber("Climber Curret", climberMC.getTalon().getOutputCurrent());
 	}
 

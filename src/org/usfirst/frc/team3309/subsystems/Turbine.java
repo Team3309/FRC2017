@@ -6,10 +6,16 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Timer;
+
 public class Turbine extends ControlledSubsystem {
 
 	private static Turbine instance;
 	private TalonSRXMC hopperMC = new TalonSRXMC(RobotMap.HOPPER_ID);
+	private Spark vibrate = new Spark(2);
 
 	public static Turbine getInstance() {
 		if (instance == null) {
@@ -23,9 +29,15 @@ public class Turbine extends ControlledSubsystem {
 		// this.hopperMC.getTalon().reverseOutput(true);
 	}
 
+	private Timer timer = new Timer();
+
 	@Override
 	public void updateTeleop() {
-		boolean operatorBButton = Controls.operatorController.getBButton(); // sort
+		boolean operatorBButton = Controls.operatorController.getXButton(); // sort
+		if (Shooter.getInstance().isShouldBeSpinningUp())
+			vibrate.set(1);
+		else
+			vibrate.set(0);
 		if (Shooter.getInstance().isShouldBeShooting()) {
 			setHopper(1);
 		} else if (operatorBButton) {
@@ -64,6 +76,7 @@ public class Turbine extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
+		timer.start();
 		// TODO Auto-generated method stub
 
 	}
@@ -76,5 +89,6 @@ public class Turbine extends ControlledSubsystem {
 
 	public void setHopper(double power) {
 		hopperMC.setDesiredOutput(-power);
+
 	}
 }

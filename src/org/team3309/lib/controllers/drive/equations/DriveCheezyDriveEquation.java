@@ -23,14 +23,14 @@ public class DriveCheezyDriveEquation extends Controller {
 
 	private double oldWheel, quickStopAccumulator;
 	private double throttleDeadband = 0.02;
-	private double wheelDeadband = 0.02;
+	private double wheelDeadband = 0.07;
 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
 		double throttle = Controls.driverController.getY(Hand.kLeft);
-		double wheel = KragerMath.threshold(Controls.driverController.getX(Hand.kRight));
+		double wheel = Controls.driverController.getX(Hand.kRight);
 		boolean isQuickTurn = Controls.driverController.getBumper(Hand.kRight);
-		boolean isHighGear = false;
+		boolean isHighGear = true;
 		OutputSignal signal = new OutputSignal();
 		double wheelNonLinearity;
 
@@ -54,29 +54,24 @@ public class DriveCheezyDriveEquation extends Controller {
 		}
 
 		double leftPwm, rightPwm, overPower;
-		double sensitivity;
+		double sensitivity = .25;
 
 		double angularPower;
 		double linearPower;
 
 		// Negative inertia!
 		double negInertiaAccumulator = 0.0;
-		double negInertiaScalar;
+		double negInertiaScalar = 5;
 		if (isHighGear) {
 
 			negInertiaScalar = 5.0;
-			sensitivity = .6;
+			sensitivity = .25;
 		} else {
-			if (wheel * negInertia > 0) {
-				negInertiaScalar = 1.75;
-			} else {
-				if (Math.abs(wheel) > 0.65) {
-					negInertiaScalar = 4.0;
-				} else {
-					negInertiaScalar = 3.0;
-				}
-			}
-			sensitivity = .6;
+			/*
+			 * if (wheel * negInertia > 0) { negInertiaScalar = 1.75; } else {
+			 * if (Math.abs(wheel) > 0.65) { negInertiaScalar = 4.0; } else {
+			 * negInertiaScalar = 3.0; } } sensitivity = .6;
+			 */
 		}
 		double negInertiaPower = negInertia * negInertiaScalar;
 		negInertiaAccumulator += negInertiaPower;

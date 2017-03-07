@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.KragerMath;
 import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
 import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
@@ -114,7 +115,6 @@ public class Drive extends ControlledSubsystem {
 	public void updateAuto() {
 		this.changeToVelocityMode();
 		OutputSignal output = getController().getOutputSignal(getInputState());
-		System.out.println("AIM SPEED lEFT" + output.getLeftMotor());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
 
@@ -133,6 +133,7 @@ public class Drive extends ControlledSubsystem {
 	public void sendToSmartDash() {
 		getController().sendToSmartDash();
 		DashboardHelper.updateTunable(getController());
+		table.putNumber("current", right0.getOutputCurrent());
 		table.putNumber(this.getName() + " right pos", this.getRightPos());
 		table.putNumber(this.getName() + " left pos", this.getLeftPos());
 		table.putNumber(this.getName() + " right vel", this.getRightVel());
@@ -143,6 +144,7 @@ public class Drive extends ControlledSubsystem {
 		table.putNumber(this.getName() + " angle vel", Sensors.getAngularVel());
 		table.putNumber("right error", this.right0.getClosedLoopError());
 		table.putNumber("left error", this.left0.getClosedLoopError());
+		table.putNumber("wheel", KragerMath.threshold(Controls.driverController.getX(Hand.kRight)));
 	}
 
 	@Override
@@ -161,7 +163,6 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
-		System.out.println("INIT TELE");
 		this.setController(new DriveCheezyDriveEquation());
 		this.stopDrive();
 	}

@@ -2,6 +2,7 @@ package org.usfirst.frc.team3309.robot;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.team3309.lib.sensors.CounterSensor;
 import org.team3309.lib.sensors.Sensor;
@@ -10,6 +11,7 @@ import org.usfirst.frc.team3309.subsystems.Drive;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * All the sensors on the robot
@@ -23,12 +25,14 @@ public class Sensors {
 	// private static AHRS navX;
 	private static ADXRS450_Gyro gyro;
 	private static CounterSensor flywheelCounter;
+	public static double rawRPS = 0;
+	private static Timer t = new Timer();
 
 	static {
-		System.out.println("INIT STATIC");
+		t.start();
+		// System.out.println("INIT STATIC");
 		// navX = new AHRS(SPI.Port.kMXP);
 		gyro = new ADXRS450_Gyro();
-		System.out.println("Turret");
 		flywheelCounter = new CounterSensor(RobotMap.FLYWHEEL_SENSOR);
 	}
 
@@ -64,11 +68,17 @@ public class Sensors {
 		double curRPS = 1 / flywheelCounter.getPeriod();
 		// flywheel will never jump 100 RPS; make sure sensor isn't acting
 		// strange
+		rawRPS = curRPS;
+		Random x = new Random(1);
+
 		if (Math.abs(curRPS) > 500) {
-			System.out.println("past " + previousFlywheelCounterRPS);
-			System.out.println("cur " + curRPS);
 			return previousFlywheelCounterRPS;
 		}
+		if (curRPS != previousFlywheelCounterRPS) {
+			t.reset();
+		}
+		if (t.get() > .1 && curRPS != 0)
+			System.out.println(t.get() + " since new value ");
 		previousFlywheelCounterRPS = curRPS;
 		return curRPS;
 	}

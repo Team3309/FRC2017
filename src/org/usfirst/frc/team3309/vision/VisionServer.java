@@ -11,10 +11,15 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.team3309.lib.KragerMath;
+import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class VisionServer implements Runnable {
 
@@ -26,17 +31,22 @@ public class VisionServer implements Runnable {
 	private Shot currentShotToAimTowards = new Shot();
 	private static VisionServer instance;
 	public static double FIELD_OF_VIEW_DEGREES = 45;
+	private static double k_predRPS = .001;
 
 	private static Shot[] shots = {
-			new Shot(125, 10, .17),
-			new Shot(125, 200, .11),
-			new Shot(135, 200, .071),
-			new Shot(140, 200, .045),
-			new Shot(150, 500, .02),
-			new Shot(150, 950, .009),
-			new Shot(165, 1000, .005),
-			new Shot(180, 1200, .001),
-			new Shot(180, 600, -.04)
+			new Shot(105, 1000, .09),
+			new Shot(107, 1000, .05),
+			new Shot(110, 1000, .031),
+			new Shot(108, 1500, .03),
+			new Shot(111, 1500, .022),
+			new Shot(116, 1500, .01),
+			new Shot(119, 1500, .0055),
+			new Shot(121, 1500, .003),
+			new Shot(125, 1500, .0016),
+			new Shot(118, 2000, .0015),
+			new Shot(121, 2000, .00055),
+			new Shot(132, 2000, -.0001),
+			new Shot(121, 2000, -.002)
 	};
 
 	public static VisionServer getInstance() {
@@ -53,9 +63,9 @@ public class VisionServer implements Runnable {
 			adb.runCommand("devices");
 			adb.reversePortForward(PORT, PORT);
 			adb.runCommand("devices");
-			System.out.println("RUN");
 		} catch (Exception e) {
 			e.printStackTrace();
+			(new Thread(this)).stop();
 		}
 	}
 
@@ -143,10 +153,14 @@ public class VisionServer implements Runnable {
 		List<TargetInfo> currentTargets = this.getTargets();
 		// Find the closest preset value to the vision shot
 		if (!this.hasTargetsToAimAt()) {
+			Controls.operatorController.setRumble(RumbleType.kLeftRumble, 0);
 			currentShotToAimTowards = null;
 			return;
 		}
-		System.out.println("into the place");
+		if (Math.abs(this.getTarget().getZ()) < .04)
+			Controls.operatorController.setRumble(RumbleType.kLeftRumble, .6);
+		else
+			Controls.operatorController.setRumble(RumbleType.kLeftRumble, 0);
 		double closestShot = Integer.MAX_VALUE;
 		double currentHyp = this.getTarget().getHyp();
 		Shot shotToBeSet = new Shot();
@@ -162,25 +176,30 @@ public class VisionServer implements Runnable {
 				if (currentHyp > shot.getHyp()) {
 					if (i != 0) {
 						Shot previousShot = shots[i - 1];
-						double slope = (previousShot.getGoalHoodAngle() - shot.getGoalHoodAngle())
-								/ (previousShot.getHyp() - shot.getHyp());
-						double b = previousShot.getGoalHoodAngle() - (slope * previousShot.getHyp());
-						double newOutput = slope * currentHyp + b;
+						// double slope = (previousShot.getGoalHoodAngle() -
+						// shot.getGoalHoodAngle())
+						// / (previousShot.getHyp() - shot.getHyp());
+						// double b = previousShot.getGoalHoodAngle() - (slope *
+						// previousShot.getHyp());
+						// double newOutput = slope * currentHyp + b;
 						// RPS stuff
 						double slopeRPS = (previousShot.getGoalRPS() - shot.getGoalRPS())
 								/ (previousShot.getHyp() - shot.getHyp());
 						double bRPS = previousShot.getGoalRPS() - (slopeRPS * previousShot.getHyp());
 						double newOutputRPS = slopeRPS * currentHyp + bRPS;
 						shotToBeSet.setGoalRPS(newOutputRPS);
-						shotToBeSet.setGoalHoodAngle(newOutput);
+						// shotToBeSet.setGoalHoodAngle(newOutput);
+						double predRPS = KragerMath.sign(slopeRPS) * k_predRPS + newOutputRPS;
 					}
 				} else {
 					if (i != shots.length - 1) {
 						Shot upperShot = shots[i + 1];
-						double slope = (upperShot.getGoalHoodAngle() - shot.getGoalHoodAngle())
-								/ (upperShot.getHyp() - shot.getHyp());
-						double b = upperShot.getGoalHoodAngle() - (slope * upperShot.getHyp());
-						double newOutput = slope * currentHyp + b;
+						// double slope = (upperShot.getGoalHoodAngle() -
+						// shot.getGoalHoodAngle())
+						// / (upperShot.getHyp() - shot.getHyp());
+						/// double b = upperShot.getGoalHoodAngle() - (slope *
+						// upperShot.getHyp());
+						// double newOutput = slope * currentHyp + b;
 						// RPS stuff
 
 						double slopeRPS = (upperShot.getGoalRPS() - shot.getGoalRPS())
@@ -188,14 +207,20 @@ public class VisionServer implements Runnable {
 						double bRPS = upperShot.getGoalRPS() - (slopeRPS * upperShot.getHyp());
 						double newOutputRPS = slopeRPS * currentHyp + bRPS;
 						shotToBeSet.setGoalRPS(newOutputRPS);
-						shotToBeSet.setGoalHoodAngle(newOutput);
+						// shotToBeSet.setGoalHoodAngle(newOutput);
 					}
 				}
 
 			}
 			shotToBeSet.setHyp(currentHyp);
-			System.out.println("shotTobe Set " + shotToBeSet.getGoalHoodAngle());
+			// if (!DriverStation.getInstance().isDisabled())
+			// System.out.println(
+			// "shotTobe Set " + shotToBeSet.getGoalHoodAngle() + " flywheel " +
+			// shotToBeSet.getGoalRPS()
+			// + " Hyp "
+			// + shotToBeSet.getHyp());
 			// shotToBeSet.setGoalHoodAngle(shotToBeSet.getGoalHoodAngle() - 1);
+			// System.out.println("Predictive RPS: " + predRPS);
 			currentShotToAimTowards = shotToBeSet;
 		}
 

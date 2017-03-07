@@ -56,13 +56,13 @@ public class TurretVelocitySuveyController extends FeedForwardWithPIDController 
 		}
 		if (curAngle < Turret.getInstance().LEFT_ABSOLUTE_LIMIT) {
 			desiredAngle = turret.RIGHT_LIMIT;
-			desiredVel = -1.5;
+			desiredVel = -5;
 		} else if (curAngle > Turret.getInstance().RIGHT_ABSOLUTE_LIMIT) {
 			desiredAngle = turret.LEFT_LIMIT;
-			desiredVel = 1.5;
+			desiredVel = 5;
 		}
-		System.out.println("Targetting: " + desiredAngle + " curAngle " + curAngle + " goalVel: " + this.desiredVel
-				+ " veltarget: " + this.desiredVelTarget);
+		//System.out.println("Targetting: " + desiredAngle + " curAngle " + curAngle + " goalVel: " + this.desiredVel
+			//	+ " veltarget: " + this.desiredVelTarget);
 
 		this.setAimVel(this.desiredVel);
 		InputState stateToSendToSuper = new InputState();

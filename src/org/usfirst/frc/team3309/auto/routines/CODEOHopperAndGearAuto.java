@@ -3,11 +3,10 @@ package org.usfirst.frc.team3309.auto.routines;
 import java.util.LinkedList;
 
 import org.team3309.lib.controllers.drive.VelocityChangePoint;
-import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.auto.SteamworksAutoRoutine;
 import org.usfirst.frc.team3309.auto.TimedOutException;
 
-public class HopperAndGearCurvy extends SteamworksAutoRoutine {
+public class CODEOHopperAndGearAuto extends SteamworksAutoRoutine {
 
 	private final double ANGLE_TO_PLACE_GEAR = 60;
 	private final double ANGLE_TO_HIT_HOPPER = 94;
@@ -23,8 +22,8 @@ public class HopperAndGearCurvy extends SteamworksAutoRoutine {
 		changePoints.add(new VelocityChangePoint(3500, 3500, 0, 0)); // 3000
 		changePoints.add(new VelocityChangePoint(3500, 600, 13000));
 		changePoints.add(new VelocityChangePoint(2500, 2500, 21000, -ANGLE_TO_PLACE_GEAR)); // 1000
-		changePoints.add(new VelocityChangePoint(700, 700, 38000, -ANGLE_TO_PLACE_GEAR));
-		this.driveEncoder(41000, 5, changePoints); // 413500
+		changePoints.add(new VelocityChangePoint(700, 700, 37000, -ANGLE_TO_PLACE_GEAR));
+		this.driveEncoder(44000, 5, changePoints); // 413500
 		this.openGearIntake();
 		this.pivotDownGearIntake();
 		// this.shoot();
@@ -59,8 +58,8 @@ public class HopperAndGearCurvy extends SteamworksAutoRoutine {
 		changePoints.add(new VelocityChangePoint(3500, 3500, 0, 0)); // 3000
 		changePoints.add(new VelocityChangePoint(600, 3500, 13000));
 		changePoints.add(new VelocityChangePoint(2500, 2500, 21000, ANGLE_TO_PLACE_GEAR)); // 1000
-		changePoints.add(new VelocityChangePoint(700, 700, 38000, ANGLE_TO_PLACE_GEAR));
-		this.driveEncoder(41000, 5, changePoints); // 413500
+		changePoints.add(new VelocityChangePoint(700, 700, 37000, ANGLE_TO_PLACE_GEAR));
+		this.driveEncoder(44000, 5, changePoints); // 413500
 		this.openGearIntake();
 		this.pivotDownGearIntake();
 		// this.shoot();

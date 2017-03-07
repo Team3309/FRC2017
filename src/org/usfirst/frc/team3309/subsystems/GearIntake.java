@@ -1,25 +1,30 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
-import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.tunable.Dashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
+import com.ctre.CANTalon;
+import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.TalonControlMode;
+
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class GearIntake extends KragerSystem {
 
 	private static final double MIN_VALUE_TO_MOVE = .15;
+	private static final double UP_POSITION = -.37;
+	private static final double DOWN_POSITION = .06;
 	private static GearIntake instance;
 	private boolean hasChangedForThisPress = false;
-	private DoubleSolenoid gearIntakePivot = new DoubleSolenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_A,
-			RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_B);
-	private DoubleSolenoid gearIntakeWrist = new DoubleSolenoid(RobotMap.GEAR_INTAKE_WRIST_SOLENOID_A,
-			RobotMap.GEAR_INTAKE_WRIST_SOLENOID_B);
-	private TalonSRXMC gearIntake = new TalonSRXMC(RobotMap.GEAR_INTAKE_ID);
+	private CANTalon gearIntake = new CANTalon(RobotMap.GEAR_INTAKE_ID);
+	private DoubleSolenoid intake = new DoubleSolenoid(5, 1);
+	private NetworkTable table = NetworkTable.getTable("Intakes");
+	private double goalAngle = 0;
 
 	public static GearIntake getInstance() {
 		if (instance == null) {
@@ -30,36 +35,59 @@ public class GearIntake extends KragerSystem {
 
 	public GearIntake() {
 		super("GearIntake");
+		this.gearIntake.changeControlMode(TalonControlMode.Position);
+		this.gearIntake.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		this.gearIntake.setEncPosition(0);
+		this.gearIntake.setPosition(0);
+		this.gearIntake.setAnalogPosition(0);
+		this.gearIntake.setPulseWidthPosition(0);
+		this.gearIntake.setSetpoint(0);
+		this.gearIntake.reverseOutput(true);
 	}
 
 	@Override
 	public void updateTeleop() {
-		boolean driverStart = Controls.driverController.getStartButton();
+		// boolean driverStart = Controls.driverController.getStartButton();
 		boolean operatorLB = Controls.operatorController.getBumper(Hand.kLeft);
-		boolean driverSelect = Controls.driverController.getBackButton();
+		// boolean driverSelect = Controls.driverController.getBackButton();
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
-		if ((driverStart || operatorRB) && !hasChangedForThisPress) {
-			this.extendPivot();
-			this.extendWrist();
-			this.setGearIntakeRoller(1);
-		} else if ((driverStart || operatorLB)) {
-
-		} else {
-			this.retractPivot();
-			this.retractWrist();
-			this.setGearIntakeRoller(0);
-			hasChangedForThisPress = false;
-		}
-
 		if (operatorLB) {
-			this.setGearIntakeRoller(-1);
+			this.intake.set(Value.kForward);
+		} else {
+			this.intake.set(Value.kReverse);
 		}
+		double error = goalAngle - this.gearIntake.getPosition();
+
+		if (operatorRB) {
+			goalAngle = -.37;
+		} else {
+			goalAngle = .06;
+		}
+		this.gearIntake.changeControlMode(TalonControlMode.Position);
+		this.gearIntake.setSetpoint(goalAngle);
+	}
+
+	public void closeGearIntake() {
+		this.intake.set(Value.kForward);
+	}
+
+	public void openGearIntake() {
+		this.intake.set(Value.kReverse);
+	}
+
+	public void pivotUpGearIntake() {
+		goalAngle = UP_POSITION;
+	}
+
+	public void pivotDownGearIntake() {
+		goalAngle = DOWN_POSITION;
 	}
 
 	@Override
 	public void updateAuto() {
-		// TODO Auto-generated method stub
+		this.gearIntake.changeControlMode(TalonControlMode.Position);
+		this.gearIntake.setSetpoint(goalAngle);
 
 	}
 
@@ -77,71 +105,29 @@ public class GearIntake extends KragerSystem {
 
 	@Override
 	public void sendToSmartDash() {
-
+		table.putNumber("raw angle", gearIntake.getEncPosition());
+		table.putNumber("angle", getAngle());
+		table.putNumber("goal", this.gearIntake.getSetpoint());
+		table.putNumber("error", this.gearIntake.getError());
+		table.putNumber("current", gearIntake.getOutputCurrent());
 	}
 
 	@Override
 	public void manualControl() {
+
 		updateTeleop();
 	}
 
 	public void setGearIntakeRoller(double power) {
-		gearIntake.setDesiredOutput(power);
+		gearIntake.set(power);
 	}
 
 	@Dashboard(displayName = "GearIntakeRollerPower")
 	public double getGearIntakeRollerPower() {
-		return gearIntake.getDesiredOutput();
+		return gearIntake.get();
 	}
 
-	public void retractPivot() {
-		gearIntakePivot.set(Value.kReverse);
+	public double getAngle() {
+		return gearIntake.getPosition();
 	}
-
-	public void extendPivot() {
-		gearIntakePivot.set(Value.kForward);
-	}
-
-	public void togglePivot() {
-		if (gearIntakePivot.get() == Value.kForward)
-			gearIntakePivot.set(Value.kReverse);
-		else
-			gearIntakePivot.set(Value.kForward);
-	}
-
-	public boolean isPivotRetracted() {
-		return gearIntakeWrist.get() == Value.kReverse;
-		// false = retracted, so flip the output
-	}
-
-	@Dashboard(displayName = "isPistonExtended")
-	public boolean isPivotExtended() {
-		return gearIntakeWrist.get() == Value.kForward;// true = extended
-	}
-
-	public void retractWrist() {
-		gearIntakeWrist.set(Value.kReverse);
-	}
-
-	public void extendWrist() {
-		gearIntakeWrist.set(Value.kForward);
-	}
-
-	public void toggleWrist() {
-		if (gearIntakeWrist.get() == Value.kForward)
-			gearIntakeWrist.set(Value.kReverse);
-		else
-			gearIntakeWrist.set(Value.kForward);
-	}
-
-	public boolean isWristRetracted() {
-		return gearIntakeWrist.get() == Value.kReverse; // false = retracted, so
-														// flip the output
-	}
-
-	@Dashboard(displayName = "isWristExtended")
-	public boolean isWristExtended() {
-		return gearIntakeWrist.get() == Value.kForward; // true = extended
-	}
-
 }

@@ -1,13 +1,12 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
-import org.team3309.lib.actuators.TalonSRXMC;
-import org.usfirst.frc.team3309.driverstation.Controls;
-import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
+
+import edu.wpi.first.wpilibj.Timer;
 
 public class Shooter extends KragerSystem {
 
@@ -26,12 +25,22 @@ public class Shooter extends KragerSystem {
 		super("Shooter");
 	}
 
+	Timer startupTimer = new Timer();
+
 	@Override
 	public void updateTeleop() {
-		if (Sensors.getFlywheelRPS() > Flywheel.getInstance().getAimVelRPS() - 50) {
+		if (Flywheel.getInstance().getAimVelRPS() != 0) {
+
+		} else {
+			startupTimer.start();
+			startupTimer.reset();
+		}
+		if (Sensors.getFlywheelRPS() > 60
+				&& Flywheel.getInstance().getAimVelRPS() != 0 && startupTimer.get() > 1.5) {
 			shouldBeShooting = true;
 		} else if (Sensors.getFlywheelRPS() != 0) {
 			shouldBeSpinningUp = true;
+			shouldBeShooting = false;
 		} else {
 			shouldBeShooting = false;
 			shouldBeSpinningUp = false;

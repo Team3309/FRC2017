@@ -6,6 +6,7 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.Timer;
 
 public class FuelIntake extends KragerSystem {
 
@@ -23,8 +24,22 @@ public class FuelIntake extends KragerSystem {
 		super("FuelIntake");
 	}
 
+	Timer t = new Timer();
+
 	@Override
 	public void updateTeleop() {
+		// if (Shooter.getInstance().isShouldBeShooting()) {
+		// if (t.get() > 2)
+		// this.t.reset();
+		// else if (t.get() < .75)
+		// this.fuel.setDesiredOutput(1);
+		// else if (t.get() < 1.25)
+		// this.fuel.setDesiredOutput(0);
+		// else if (t.get() < 2)
+		// this.fuel.setDesiredOutput(-1);
+		// return;
+		//
+		// }
 		double driverRightTrigger = Controls.driverController.getTriggerAxis(Hand.kRight);
 		double driverLeftTrigger = Controls.driverController.getTriggerAxis(Hand.kLeft);
 		double operatorRightTrigger = Controls.operatorController.getTriggerAxis(Hand.kRight);
@@ -45,7 +60,7 @@ public class FuelIntake extends KragerSystem {
 	@Override
 	public void updateAuto() {
 		// use the setFuelIntake method to set
-		
+
 	}
 
 	@Override
@@ -62,6 +77,7 @@ public class FuelIntake extends KragerSystem {
 
 	@Override
 	public void initTeleop() {
+		t.start();
 		// TODO Auto-generated method stub
 
 	}

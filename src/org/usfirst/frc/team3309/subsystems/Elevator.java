@@ -9,13 +9,14 @@ import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class Elevator extends ControlledSubsystem {
 
-	private final double SHOOTING_VELOCITY = 10;
+	private final double SHOOTING_VELOCITY = 9000;
 	private double aimVel = 0;
 	private CANTalon elevator = new CANTalon(RobotMap.ELEVATOR_ID);
 	private CANTalon feedyWheel = new CANTalon(RobotMap.FEEDY_WHEEL_ID);
@@ -30,8 +31,8 @@ public class Elevator extends ControlledSubsystem {
 
 	private Elevator() {
 		super("Elevator");
-		// elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		// elevator.changeControlMode(TalonControlMode.Speed);
+		elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+
 		this.elevator.changeControlMode(TalonControlMode.Speed);
 		table.putNumber("k_aimVel", 0);
 	}
@@ -49,13 +50,12 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		if (Controls.operatorController.getBButton()) {
-			aimVel = table.getNumber("k_aimVel", 0);
-		} else if (Shooter.getInstance().isShouldBeShooting()) {
+		if (Shooter.getInstance().isShouldBeShooting()) {
 			aimVel = SHOOTING_VELOCITY;
 		} else {
 			aimVel = 0;
 		}
+		elevator.changeControlMode(TalonControlMode.Speed);
 		setElevator(aimVel);
 	}
 
@@ -79,13 +79,12 @@ public class Elevator extends ControlledSubsystem {
 		this.getController().sendToSmartDash();
 		DashboardHelper.updateTunable(this.getController());
 		table.putNumber(this.getName() + " Vel", this.elevator.getEncVelocity());
-		table.putNumber(this.getName() + " Pow", this.elevator.getPosition());
-		table.putNumber(this.getName() + " Error", aimVel - elevator.getEncVelocity());
+		table.putNumber(this.getName() + " Pow", this.elevator.get());
+		table.putNumber(this.getName() + " Error", this.elevator.getError());
 	}
 
 	@Override
 	public void manualControl() {
-
 		if (Controls.operatorController.getBButton()) {
 			setElevator(-.5);
 		} else if (Shooter.getInstance().isShouldBeShooting()) {
@@ -97,7 +96,11 @@ public class Elevator extends ControlledSubsystem {
 
 	private void setElevator(double power) {
 		this.elevator.set(power);
-		this.feedyWheel.set(1 * KragerMath.sign(power));
+		if (power != 0)
+			this.feedyWheel.set(1
+					* KragerMath.sign(power));
+		else
+			this.feedyWheel.set(0);
 	}
 
 }
