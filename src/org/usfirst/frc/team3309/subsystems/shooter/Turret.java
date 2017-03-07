@@ -153,8 +153,8 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 			goalAngle = robotAngleOffset + turretGoalWhenLost;
 			correctGoalAngleBounds();
 			if (this.getAngle() > goalAngle - 2 && this.getAngle() < goalAngle + 2
-					&& !VisionServer.getInstance().hasTargetsToAimAt()
-					&& !Shooter.getInstance().isShouldBeSpinningUp()) {
+					&& !VisionServer.getInstance().hasTargetsToAimAt() && !Shooter.getInstance().isShouldBeShooting()) {
+
 				currentState = TurretState.SURVEY;
 			} else {
 				this.changeToPositionMode();

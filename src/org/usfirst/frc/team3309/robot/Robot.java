@@ -139,6 +139,7 @@ public class Robot extends IterativeRobot {
 		Drive.getInstance().updateTeleop();
 		Drive.getInstance().sendToSmartDash();
 
+
 		Actuators.actuate();
 		if (t.get() > .1)
 			System.out.println("BAD LOOP SPEEd " + t.get());
