@@ -4,7 +4,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
-import org.team3309.lib.tunable.IDashboard;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -15,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * @author TheMkrage
  * 
  */
-public abstract class Controller implements IDashboard {
+public abstract class Controller {
 
 	protected String name = "Default";
 	protected String subsystemID = "Default";
@@ -86,6 +85,7 @@ public abstract class Controller implements IDashboard {
 	public void print(String print) {
 		System.out.println(this.getName() + " " + print);
 	}
+
 	public String getSubsystemID() {
 		return subsystemID;
 	}
@@ -94,15 +94,4 @@ public abstract class Controller implements IDashboard {
 		this.subsystemID = subsystemID;
 	}
 
-	@Override
-	public String getTableName() {
-		if (this.subsystemID == null)
-			return "";
-		return this.subsystemID;
-	}
-
-	@Override
-	public String getObjectName() {
-		return this.getName();
-	}
 }

@@ -8,9 +8,6 @@ import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.team3309.lib.controllers.turret.TurretVelocitySuveyController;
-import org.team3309.lib.tunable.Dashboard;
-import org.team3309.lib.tunable.DashboardHelper;
-import org.team3309.lib.tunable.IDashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
@@ -30,7 +27,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Turret extends ControlledSubsystem implements IDashboard {
+public class Turret extends ControlledSubsystem {
 
 	private static Turret instance;
 	private DigitalInput hallEffectSensor = new DigitalInput(RobotMap.HALL_EFFECT_SENSOR);
@@ -223,9 +220,9 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		if (!hasCalibratedSinceRobotInit) {
 			this.turretMC.changeControlMode(TalonControlMode.PercentVbus);
 			if (calTimer.get() < 2)
-				this.turretMC.set(.15);
+				this.turretMC.set(0);
 			else {
-				this.turretMC.set(-.25);
+				// this.turretMC.set(-.25);
 			}
 			if (calTimer.get() > 5)
 				calTimer.reset();
@@ -276,7 +273,7 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 	@Override
 	public void sendToSmartDash() {
 		this.getController().sendToSmartDash();
-		DashboardHelper.updateTunable(this.getController());
+
 		table.putNumber(this.getName() + " power ", this.turretMC.get());
 		table.putNumber("turret_angle", getAngle());
 		table.putNumber(this.getName() + " Goal Angle", this.goalAngle);
@@ -319,7 +316,6 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 		return this.getAngle() + Sensors.getAngle();
 	}
 
-	@Dashboard(tunable = false, displayName = "turret_angle")
 	public double getAngle() {
 		return -((double) turretMC.getEncPosition() / 14745.6) * 360;
 	}
@@ -337,17 +333,6 @@ public class Turret extends ControlledSubsystem implements IDashboard {
 
 	public void callForCalibration() {
 		hasCalibratedSinceRobotInit = false;
-	}
-
-	@Override
-	public String getTableName() {
-		return "Turret";
-	}
-
-	@Override
-	public String getObjectName() {
-		// TODO Auto-generated method stub
-		return "";
 	}
 
 	public void checkForCalibration() {

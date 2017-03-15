@@ -3,12 +3,8 @@ package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.actuators.TalonSRXMC;
-import org.team3309.lib.communications.BlackBox;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
-import org.team3309.lib.tunable.Dashboard;
-import org.team3309.lib.tunable.DashboardHelper;
-import org.team3309.lib.tunable.IDashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
@@ -18,7 +14,7 @@ import org.usfirst.frc.team3309.vision.VisionServer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Flywheel extends ControlledSubsystem implements IDashboard {
+public class Flywheel extends ControlledSubsystem {
 
 	private TalonSRXMC leftTalon = new TalonSRXMC(RobotMap.LEFT_SHOOTER_ID);
 	private TalonSRXMC rightTalon = new TalonSRXMC(RobotMap.RIGHT_SHOOTER_ID);
@@ -29,6 +25,8 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	private double aimAccRPS = 0.0;
 	private double curVel = 0;
 	private double lastVisionRPS = 0;
+	private double offset = 0;
+	private boolean isPressedAlready = false;
 	private NetworkTable table = NetworkTable.getTable("Flywheel");
 
 	/**
@@ -38,7 +36,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 
 	private Flywheel() {
 		super("Flywheel");
-		this.setController(new FeedForwardWithPIDController(0.0035, 0, 0.013, 0.000000001, 0.00));
+		this.setController(new FeedForwardWithPIDController(0.00415, 0, 0.013, 0.00000008, 0.00));
 		this.getController().setName("Flywheel Speed");
 		this.rightTalon.setReversed(true);
 		((FeedForwardWithPIDController) this.getController()).setTHRESHOLD(10);
@@ -71,12 +69,16 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	@Override
 	public void updateAuto() {
 		curVel = this.getRPS();
-		if (VisionServer.getInstance().hasTargetsToAimAt()) {
-			aimVelRPS = 180;
-			// aimVelRPS = VisionServer.getInstance().getRPS();
-			lastVisionRPS = aimVelRPS;
+		if (Shooter.getInstance().isShouldBeShooting()) {
+			// aimVelRPS = 180;
+			if (VisionServer.getInstance().hasTargetsToAimAt()) {
+				aimVelRPS = VisionServer.getInstance().getRPS();
+				lastVisionRPS = aimVelRPS;
+			} else {
+				aimVelRPS = lastVisionRPS;
+			}
 		} else if (Shooter.getInstance().isShouldBeSpinningUp()) {
-			aimVelRPS = 180;
+			aimVelRPS = 120;
 
 		}
 		shootLikeRobie();
@@ -85,9 +87,22 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	@Override
 	public void updateTeleop() {
 		curVel = this.getRPS();
+
+		if (Controls.operatorController.getPOV() == 180 && !isPressedAlready) {
+			offset -= 1;
+			isPressedAlready = true;
+		} else if (Controls.operatorController.getPOV() == 0 && !isPressedAlready) {
+			offset += 1;
+			isPressedAlready = true;
+		} else if (Controls.operatorController.getPOV() == 0 || Controls.operatorController.getPOV() == 180) {
+
+		} else {
+			isPressedAlready = false;
+		}
 		// Find our base aim vel
-		//System.out.println("constnats: " + ((FeedForwardWithPIDController) this.getController()).getkV() + " kP "
-			//	+ ((FeedForwardWithPIDController) this.getController()).kP);
+		// System.out.println("constnats: " + ((FeedForwardWithPIDController)
+		// this.getController()).getkV() + " kP "
+		// + ((FeedForwardWithPIDController) this.getController()).kP);
 		if (Controls.operatorController.getYButton() || Controls.driverController.getYButton()) {
 			this.testVel();
 		} else if (Controls.operatorController.getAButton()) {
@@ -101,10 +116,14 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 				aimVelRPS = lastVisionRPS;
 			}
 		} else {
+			offset = 0;
 			aimVelRPS = 0;
 			aimAccRPS = 0;
 		}
+		aimVelRPS += offset;
+
 		shootLikeRobie();
+
 	}
 
 	// ANGLE CLOCKWISE POSITIVE
@@ -174,7 +193,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 			this.setShooter(0);
 		} else {
 			if (curVel < 30) {
-				output = .5;
+				output = .65;
 			}
 			// System.out.println(aimVelRPS);
 			// System.out.println(output);
@@ -189,7 +208,6 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 		return input;
 	}
 
-	@Dashboard(displayName = "Percent")
 	public double getPercent() {
 		if (aimVelRPS == 0)
 			return 0;
@@ -203,7 +221,7 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 	@Override
 	public void sendToSmartDash() {
 		getController().sendToSmartDash();
-		DashboardHelper.updateTunable(this.getController());
+
 		SmartDashboard.putNumber(this.getName() + " RPS", curVel);
 		table.putNumber(this.getName() + " RPS", getRPS());
 		table.putNumber(this.getName() + " Goal", this.aimVelRPS);
@@ -212,13 +230,11 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 		SmartDashboard.putNumber(this.getName() + " Right", rightTalon.getDesiredOutput());
 	}
 
-	@Dashboard(displayName = "rps")
 	private double getRPS() {
 		// System.out.println(Sensors.getFlywheelRPS());
 		return Sensors.getFlywheelRPS();
 	}
 
-	@Dashboard(displayName = "aimVel")
 	public double getAimVelRPS() {
 		return aimVelRPS;
 	}
@@ -235,31 +251,20 @@ public class Flywheel extends ControlledSubsystem implements IDashboard {
 		this.aimAccRPS = aimAccRPS;
 	}
 
-	@Dashboard(displayName = "isShooterInRange")
 	public boolean isShooterInRange() {
 		if (this.getRPS() < aimVelRPS + 6 && this.getRPS() > aimVelRPS - 6)
 			return true;
 		return false;
 	}
 
-	@Dashboard(displayName = "RPM")
 	private double getRPM() {
 		return 60 * Sensors.getFlywheelRPS();
 	}
 
 	private void setShooter(double power) {
+
 		leftTalon.setDesiredOutput(power);
 		rightTalon.setDesiredOutput(power);
-	}
-
-	@Override
-	public String getTableName() {
-		return "Flywheel";
-	}
-
-	@Override
-	public String getObjectName() {
-		return "";
 	}
 
 }

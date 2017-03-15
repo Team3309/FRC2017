@@ -4,11 +4,8 @@ import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
-import org.team3309.lib.tunable.Dashboard;
-import org.team3309.lib.tunable.IDashboard;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Basic PID Controller. The isCompleted Method will always return false.
@@ -16,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * @author TheMkrage
  *
  */
-public abstract class PIDController extends Controller implements IDashboard {
+public abstract class PIDController extends Controller {
 
 	private boolean useSmartDash = true;
 
@@ -31,27 +28,19 @@ public abstract class PIDController extends Controller implements IDashboard {
 	/**
 	 * Gains
 	 */
-	@Dashboard(displayName = "kP", tunable = true)
 	public double kP;
-	@Dashboard(displayName = "kD", tunable = true)
 	public double kD;
-	@Dashboard(displayName = "kI", tunable = true)
 	public double kI;
 	/**
 	 * Limit of the Integral. mIntegral is capped off at the kILimit.
 	 */
-	@Dashboard(displayName = "kILimit", tunable = true)
 	public double kILimit = .5;
 	/**
 	 * Stores previous error
 	 */
-	@Dashboard(displayName = "error")
 	protected double previousError = 0;
-	@Dashboard(displayName = "pValue")
 	protected double previousPValue = 0;
-	@Dashboard(displayName = "iValue")
 	protected double previousIValue = 0;
-	@Dashboard(displayName = "dValue")
 	protected double previousDValue = 0;
 	/**
 	 * Running Integral term to use between loops.
@@ -77,7 +66,6 @@ public abstract class PIDController extends Controller implements IDashboard {
 	/**
 	 * Last Output of this loop
 	 */
-	@Dashboard(displayName = "lastOutput")
 	protected double previousOutput = 0;
 
 	public PIDController(double kP, double kI, double kD) {

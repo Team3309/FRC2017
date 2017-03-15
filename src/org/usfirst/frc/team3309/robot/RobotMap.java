@@ -1,4 +1,5 @@
 package org.usfirst.frc.team3309.robot;
+
 //7777777
 public class RobotMap {
 
@@ -12,8 +13,9 @@ public class RobotMap {
 	public static final int DRIVE_LEFT_1_ID = 15;
 	public static final int DRIVE_LEFT_2_ID = 16;
 	public static final int CLIMBER_ID = 5;
-	public static final int FUEL_INTAKE_ID = 7;
-	public static final int GEAR_INTAKE_ID = 6;
+	public static final int FUEL_INTAKE_ID = 6;
+	public static final int GEAR_INTAKE_ID = 7;
+	
 	public static final int HOPPER_ID = 13;
 	public static final int LEFT_SHOOTER_ID = 10;
 	public static final int RIGHT_SHOOTER_ID = 11;
@@ -21,6 +23,7 @@ public class RobotMap {
 	public static final int FEEDY_WHEEL_ID = 12;
 
 	// DIO
+	
 	public static final int FLYWHEEL_SENSOR = 8;
 	public static final int HALL_EFFECT_SENSOR = 3;
 
@@ -31,7 +34,7 @@ public class RobotMap {
 	public static final int GEAR_INTAKE_WRIST_SOLENOID_B = 5;
 	public static final int GEAR_INTAKE_STOPPER = 4;
 
-	public static final int SHIFTER = 6; // 7 o ncomp
+	public static final int SHIFTER = 7; // 7 o ncomp
 
 	// PWM
 	public static final int SERVO = 9;

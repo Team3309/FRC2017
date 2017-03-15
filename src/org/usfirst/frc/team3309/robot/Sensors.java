@@ -69,7 +69,6 @@ public class Sensors {
 		// flywheel will never jump 100 RPS; make sure sensor isn't acting
 		// strange
 		rawRPS = curRPS;
-		Random x = new Random(1);
 
 		if (Math.abs(curRPS) > 500) {
 			return previousFlywheelCounterRPS;
@@ -77,8 +76,8 @@ public class Sensors {
 		if (curRPS != previousFlywheelCounterRPS) {
 			t.reset();
 		}
-		if (t.get() > .1 && curRPS != 0)
-			System.out.println(t.get() + " since new value ");
+		//if (t.get() > .1 && curRPS != 0)
+			//System.out.println(t.get() + " since new value ");
 		previousFlywheelCounterRPS = curRPS;
 		return curRPS;
 	}

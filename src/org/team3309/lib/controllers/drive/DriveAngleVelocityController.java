@@ -50,8 +50,9 @@ public class DriveAngleVelocityController extends Controller {
 	public boolean isCompleted() {
 
 		boolean isDone = doneTimer.isConditionMaintained(Drive.getInstance().isAngleCloseTo(goalAngle));
-		System.out.println("is done " + isDone);
-		System.out.println("cur Angle " + Drive.getInstance().getAngle() + " goalAngle " + goalAngle);
+		// System.out.println("is done " + isDone);
+		// System.out.println("cur Angle " + Drive.getInstance().getAngle() + "
+		// goalAngle " + goalAngle);
 		if (isDone)
 			Drive.getInstance().stopDrive();
 		return isDone;

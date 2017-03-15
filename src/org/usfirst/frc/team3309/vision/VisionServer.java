@@ -33,20 +33,25 @@ public class VisionServer implements Runnable {
 	public static double FIELD_OF_VIEW_DEGREES = 45;
 	private static double k_predRPS = .001;
 
-	private static Shot[] shots = {
-			new Shot(105, 1000, .09),
-			new Shot(107, 1000, .05),
-			new Shot(110, 1000, .031),
-			new Shot(108, 1500, .03),
-			new Shot(111, 1500, .022),
-			new Shot(116, 1500, .01),
-			new Shot(119, 1500, .0055),
-			new Shot(121, 1500, .003),
-			new Shot(125, 1500, .0016),
-			new Shot(118, 2000, .0015),
-			new Shot(121, 2000, .00055),
-			new Shot(132, 2000, -.0001),
-			new Shot(121, 2000, -.002)
+	private static Shot[] shots = { new Shot(101, 1000, .09),
+			new Shot(103, 1000, .07),
+			new Shot(105, 1000, .047),
+			new Shot(111, 1000, .031),
+			new Shot(104, 1500, .03),
+			new Shot(110, 1500, .019),
+			new Shot(115, 1500, .01),
+			new Shot(120, 1500, .0055),
+			new Shot(124, 1500, .003),
+			new Shot(127, 1500, .0016), // to here
+			new Shot(115, 2000, .0015),
+			new Shot(119, 2000, .00055),
+			new Shot(122, 2000, .0002),
+			new Shot(124, 2200, .00019),
+			new Shot(128, 2200, 0),
+			new Shot(130, 2200, -.00055),
+			new Shot(132, 2200, -.01),
+			new Shot(135, 2200, -.015),
+			new Shot(142, 2200, -.02)
 	};
 
 	public static VisionServer getInstance() {
@@ -144,7 +149,7 @@ public class VisionServer implements Runnable {
 					e.printStackTrace();
 				}
 			}
-
+			
 		}
 	}
 
@@ -236,8 +241,12 @@ public class VisionServer implements Runnable {
 	}
 
 	public TargetInfo getTarget() {
-		if (this.hasTargetsToAimAt())
-			return targets.get(0);
+		try {
+			if (this.hasTargetsToAimAt())
+				return targets.get(0);
+		} catch (Exception e) {
+
+		}
 		return new TargetInfo(0, 0);
 	}
 

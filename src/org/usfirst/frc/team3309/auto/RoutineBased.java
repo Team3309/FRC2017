@@ -193,14 +193,10 @@ public class RoutineBased {
 
 	public void shoot() {
 		System.out.println("SHOOTING NOW");
-		while (!VisionServer.getInstance().hasTargetsToAimAt()
-				&& Math.abs(VisionServer.getInstance().getTarget().getHyp()) < .2) {
-		}
 		Shooter.getInstance().setShouldBeShooting(true);
 	}
 
 	public void spinUp() {
-		System.out.println("Spinning NOW");
 		Shooter.getInstance().setShouldBeSpinningUp(true);
 	}
 

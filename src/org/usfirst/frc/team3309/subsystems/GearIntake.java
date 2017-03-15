@@ -1,7 +1,6 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
-import org.team3309.lib.tunable.Dashboard;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
@@ -18,7 +17,7 @@ public class GearIntake extends KragerSystem {
 
 	private static final double MIN_VALUE_TO_MOVE = .15;
 	private static final double UP_POSITION = -.37;
-	private static final double DOWN_POSITION = .06;
+	private static final double DOWN_POSITION = .07;
 	private static GearIntake instance;
 	private boolean hasChangedForThisPress = false;
 	private CANTalon gearIntake = new CANTalon(RobotMap.GEAR_INTAKE_ID);
@@ -122,7 +121,6 @@ public class GearIntake extends KragerSystem {
 		gearIntake.set(power);
 	}
 
-	@Dashboard(displayName = "GearIntakeRollerPower")
 	public double getGearIntakeRollerPower() {
 		return gearIntake.get();
 	}

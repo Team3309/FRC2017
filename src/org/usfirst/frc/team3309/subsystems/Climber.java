@@ -1,20 +1,18 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
-import org.team3309.lib.actuators.TalonSRXMC;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.ctre.CANTalon;
+import com.ctre.CANTalon.TalonControlMode;
 
 public class Climber extends KragerSystem {
 
 	private static Climber instance;
-	private TalonSRXMC climberMC = new TalonSRXMC(RobotMap.CLIMBER_ID);
+	private CANTalon climberMC = new CANTalon(RobotMap.CLIMBER_ID);
 	private final double CURRENT_LIMIT = 8;
-	private final double UP_POWER = 1;
+	private final double UP_POWER = .5;
 	private final double HOLD_POWER = .3;
 	private int loopsAboveCurrentLimit = 0;
 	private boolean hasStartedClimbing = false;
@@ -32,15 +30,16 @@ public class Climber extends KragerSystem {
 
 	@Override
 	public void updateTeleop() {
+		this.climberMC.changeControlMode(TalonControlMode.PercentVbus);
 		boolean operatorStartButton = Controls.operatorController.getStartButton();
 		boolean operatorBackButton = Controls.operatorController.getBackButton();
-		if (operatorStartButton) {
+		if (operatorStartButton || Controls.driverController.getStartButton()) {
 			setClimber(UP_POWER);
 		} else {
 			setClimber(0);
 		}
 		// check if a cancel on turret auto correction has occurred
-		if (operatorBackButton)
+		if (operatorBackButton || Controls.driverController.getBackButton())
 			this.hasStartedClimbing = false;
 	}
 
@@ -62,8 +61,10 @@ public class Climber extends KragerSystem {
 
 	@Override
 	public void sendToSmartDash() {
-		//NetworkTable.getTable("Climber").putNumber("current", climberMC.getTalon().getOutputCurrent());
-		SmartDashboard.putNumber("Climber Curret", climberMC.getTalon().getOutputCurrent());
+		// NetworkTable.getTable("Climber").putNumber("current",
+		// climberMC.getTalon().getOutputCurrent());
+		// SmartDashboard.putNumber("Climber Curret",
+		// climberMC.getTalon().getOutputCurrent());
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class Climber extends KragerSystem {
 	}
 
 	public boolean hasHitTop() {
-		if (climberMC.getTalon().getOutputCurrent() > CURRENT_LIMIT) {
+		if (climberMC.getOutputCurrent() > CURRENT_LIMIT) {
 			loopsAboveCurrentLimit++;
 		} else {
 			loopsAboveCurrentLimit = 0;
@@ -84,7 +85,7 @@ public class Climber extends KragerSystem {
 		if (power != 0) {
 			hasStartedClimbing = true;
 		}
-		climberMC.setDesiredOutput(power);
+		climberMC.set(power);
 	}
 
 	public boolean isClimbing() {

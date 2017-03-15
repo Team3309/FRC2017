@@ -5,6 +5,7 @@ import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
+import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.Timer;
 
@@ -12,6 +13,7 @@ public class Shooter extends KragerSystem {
 
 	private boolean shouldBeShooting = false;
 	private boolean shouldBeSpinningUp = false;
+	private boolean shouldBeShootingAuto = false;
 	private static Shooter instance;
 
 	public static Shooter getInstance() {
@@ -49,6 +51,7 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void updateAuto() {
+
 	}
 
 	@Override

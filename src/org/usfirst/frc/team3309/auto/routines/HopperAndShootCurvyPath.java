@@ -13,31 +13,35 @@ public class HopperAndShootCurvyPath extends SteamworksAutoRoutine {
 
 	@Override
 	public void redRoutine() throws TimedOutException, InterruptedException {
-		this.spinUp();
+
 		this.openGearIntake();
-		this.pivotUpGearIntake();
+		// this.pivotUpGearIntake();
 		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
 		// do a curvy path to the shooting locations
 		changePoints.add(new VelocityChangePoint(3000, 0));
-		changePoints.add(new VelocityChangePoint(600, 3500, 17000));
+		changePoints.add(new VelocityChangePoint(600, 3500, 14000));
 		changePoints.add(new VelocityChangePoint(1000, 1000, 31000, ANGLE_COMING_OUT_OF_TURN));
 		this.driveEncoder(40000, 9, changePoints);
+		this.spinUp();
 		this.shoot();
+		this.waitForEndOfAuto();
 	}
 
 	@Override
 
 	public void blueRoutine() throws TimedOutException, InterruptedException {
-		this.spinUp();
+
 		this.openGearIntake();
-		this.pivotUpGearIntake();
+		// this.pivotUpGearIntake();
 		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
 		// do a curvy path to the shooting locations
 		changePoints.add(new VelocityChangePoint(3000, 0));
-		changePoints.add(new VelocityChangePoint(3500, 600, 17000));
+		changePoints.add(new VelocityChangePoint(3500, 600, 14000));
 		changePoints.add(new VelocityChangePoint(1000, 1000, 31000, -ANGLE_COMING_OUT_OF_TURN));
 		this.driveEncoder(40000, 9, changePoints);
+		this.spinUp();
 		this.shoot();
+		this.waitForEndOfAuto();
 	}
 
 }

@@ -2,9 +2,11 @@ package org.usfirst.frc.team3309.robot;
 
 import org.usfirst.frc.team3309.auto.AllianceColor;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
+import org.usfirst.frc.team3309.auto.routines.CompBotOriginalHopperAndGearAuto;
+import org.usfirst.frc.team3309.auto.routines.GearAndZoneBoilerSide;
 import org.usfirst.frc.team3309.auto.routines.GearIntakeMiddleCurvy;
-import org.usfirst.frc.team3309.auto.routines.HopperAndGearCurvy;
 import org.usfirst.frc.team3309.auto.routines.HopperAndShootCurvyPath;
+import org.usfirst.frc.team3309.auto.routines.NoAutoRoutine;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
@@ -18,6 +20,7 @@ import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
@@ -42,8 +45,11 @@ public class Robot extends IterativeRobot {
 		Sensors.read();
 		mainAutoChooser.addObject("Gear Curvey", new GearIntakeMiddleCurvy());
 		mainAutoChooser.addObject("Hopper Curvey", new HopperAndShootCurvyPath());
-		mainAutoChooser.addObject("Gear and Hopper Curvey", new HopperAndGearCurvy());
-
+		mainAutoChooser.addObject("Gear and Hopper Curvey OG", new CompBotOriginalHopperAndGearAuto());
+		// mainAutoChooser.addObject("Gear and Hopper Curvey", new
+		// HopperAndGearCurvy());
+		mainAutoChooser.addObject("Gear and Zone BOILER SIDE", new GearAndZoneBoilerSide());
+		mainAutoChooser.addObject("No Auto", new NoAutoRoutine());
 		redBlueAutoChooser.addObject("Red", AllianceColor.RED);
 		redBlueAutoChooser.addObject("Blue", AllianceColor.BLUE);
 		SmartDashboard.putData("Color", redBlueAutoChooser);
@@ -61,10 +67,10 @@ public class Robot extends IterativeRobot {
 		Hood.getInstance();
 		Turret.getInstance().callForCalibration();
 
-		t.start();
 		(new Thread(VisionServer.getInstance())).start();
-		CameraServer.getInstance().startAutomaticCapture();
+		UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
 		c.start();
+		cam.setFPS(15);
 		// cServer.startAutomaticCapture("cam0", 0);
 	}
 
@@ -94,15 +100,13 @@ public class Robot extends IterativeRobot {
 
 	public void autonomousPeriodic() {
 		Sensors.read();
-		indicatorLight.setVoltage(5);
+		// indicatorLight.setVoltage(5);
 		try {
 			Systems.update();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Flywheel.getInstance().sendToSmartDash();
-		Hood.getInstance().sendToSmartDash();
-		Drive.getInstance().sendToSmartDash();
+
 		Actuators.actuate();
 
 	}
@@ -113,36 +117,29 @@ public class Robot extends IterativeRobot {
 			autoThread.stop();
 	}
 
-	private Timer t = new Timer();
-
 	public void teleopPeriodic() {
-		t.reset();
 		Sensors.read();
-		// Systems.update();
-		indicatorLight.setVoltage(5);
+		// indicatorLight.setVoltage(5);
 		Flywheel.getInstance().updateTeleop();
-		Flywheel.getInstance().sendToSmartDash();
+		// Flywheel.getInstance().sendToSmartDash();
 		Hood.getInstance().updateTeleop();
-		Hood.getInstance().sendToSmartDash();
+		// Hood.getInstance().sendToSmartDash();
 		Turbine.getInstance().updateTeleop(); // first
 		Turret.getInstance().updateTeleop();
-		Turret.getInstance().sendToSmartDash();
+		// Turret.getInstance().sendToSmartDash();
 		Shooter.getInstance().updateTeleop();
-		Shooter.getInstance().sendToSmartDash();
+		// Shooter.getInstance().sendToSmartDash();
+		// Elevator.getInstance().sendToSmartDash();
 		Elevator.getInstance().updateTeleop();
-		Elevator.getInstance().sendToSmartDash();
 		FuelIntake.getInstance().updateTeleop();
 		GearIntake.getInstance().updateTeleop();
-		GearIntake.getInstance().sendToSmartDash();
+		// GearIntake.getInstance().sendToSmartDash();
 		Climber.getInstance().manualControl();
-		Climber.getInstance().sendToSmartDash();
+		// Climber.getInstance().sendToSmartDash();
 		Drive.getInstance().updateTeleop();
-		Drive.getInstance().sendToSmartDash();
-
+		// Drive.getInstance().sendToSmartDash();
 
 		Actuators.actuate();
-		if (t.get() > .1)
-			System.out.println("BAD LOOP SPEEd " + t.get());
 	}
 
 	public static AllianceColor getAllianceColor() {

@@ -33,14 +33,14 @@ public class Turbine extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		boolean operatorBButton = Controls.operatorController.getXButton(); // sort
+		boolean operatorXButton = Controls.operatorController.getXButton(); // sort
 		if (Shooter.getInstance().isShouldBeSpinningUp())
 			vibrate.set(1);
 		else
 			vibrate.set(0);
 		if (Shooter.getInstance().isShouldBeShooting()) {
 			setHopper(1);
-		} else if (operatorBButton) {
+		} else if (operatorXButton) {
 			setHopper(-.5);
 		} else {
 			setHopper(0);
@@ -49,6 +49,7 @@ public class Turbine extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
+		this.vibrate.set(1);
 		if (Shooter.getInstance().isShouldBeShooting()) {
 			setHopper(1);
 		} else {

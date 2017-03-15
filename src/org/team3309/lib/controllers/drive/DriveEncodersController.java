@@ -4,7 +4,6 @@ import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
-import org.team3309.lib.tunable.Dashboard;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
 
@@ -21,12 +20,9 @@ public class DriveEncodersController extends Controller {
 	// protected PIDPositionController angController = new
 	// PIDPositionController(0.166, 0.001, 0.002);
 	protected PIDPositionController angController = new PIDPositionController(40, 0, 0);
-	@Dashboard(displayName = "Goal Encoder")
 	protected double goalEncoder;
 	protected double goalAngle;
-	@Dashboard(displayName = "LinearOutput")
 	private double pastLinearOutput = 0;
-	@Dashboard(displayName = "PastOutput")
 	private double pastAngOutput = 0;
 
 	public DriveEncodersController(double goal) {

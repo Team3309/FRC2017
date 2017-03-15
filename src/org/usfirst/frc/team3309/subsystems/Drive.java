@@ -7,8 +7,6 @@ import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
-import org.team3309.lib.tunable.Dashboard;
-import org.team3309.lib.tunable.DashboardHelper;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
@@ -46,8 +44,6 @@ public class Drive extends ControlledSubsystem {
 	private boolean isLowGear = true;
 	private boolean hasPIDBreakStarted = false;
 
-	@Dashboard(displayName = "k_test Velocity", tunable = true)
-
 	public static Drive getInstance() {
 		if (drive == null)
 			drive = new Drive();
@@ -64,6 +60,7 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
+
 		this.changeToPercentMode();
 		if (Controls.driverController.getAButton() && !hasPIDBreakStarted) {
 			DriveAngleVelocityController drivePIDBreak = new DriveAngleVelocityController(this.getAngle());
@@ -132,9 +129,9 @@ public class Drive extends ControlledSubsystem {
 	@Override
 	public void sendToSmartDash() {
 		getController().sendToSmartDash();
-		DashboardHelper.updateTunable(getController());
 		table.putNumber("current", right0.getOutputCurrent());
 		table.putNumber(this.getName() + " right pos", this.getRightPos());
+
 		table.putNumber(this.getName() + " left pos", this.getLeftPos());
 		table.putNumber(this.getName() + " right vel", this.getRightVel());
 		table.putNumber(this.getName() + " left vel", -this.getLeftVel());
@@ -165,11 +162,23 @@ public class Drive extends ControlledSubsystem {
 	public void initTeleop() {
 		this.setController(new DriveCheezyDriveEquation());
 		this.stopDrive();
+		this.right0.setVoltageRampRate(10);
+		this.right1.setVoltageRampRate(10);
+		this.right2.setVoltageRampRate(10);
+		this.left0.setVoltageRampRate(10);
+		this.left1.setVoltageRampRate(10);
+		this.left2.setVoltageRampRate(10);
 	}
 
 	@Override
 	public void initAuto() {
 		this.setController(new BlankController());
+		this.right0.setVoltageRampRate(0);
+		this.right1.setVoltageRampRate(0);
+		this.right2.setVoltageRampRate(0);
+		this.left0.setVoltageRampRate(0);
+		this.left1.setVoltageRampRate(0);
+		this.left2.setVoltageRampRate(0);
 	}
 
 	/**
@@ -291,27 +300,22 @@ public class Drive extends ControlledSubsystem {
 		return false;
 	}
 
-	@Dashboard(displayName = "angle")
 	public double getAngle() {
 		return Sensors.getAngle();
 	}
 
-	@Dashboard(displayName = "leftVel")
 	public double getLeftVel() {
 		return this.left0.getAnalogInVelocity();
 	}
 
-	@Dashboard(displayName = "leftPos")
 	public double getLeftPos() {
 		return this.left0.getAnalogInPosition();
 	}
 
-	@Dashboard(displayName = "rightVel")
 	public double getRightVel() {
 		return this.right0.getAnalogInVelocity();
 	}
 
-	@Dashboard(displayName = "rightPos")
 	public double getRightPos() {
 		return this.right0.getAnalogInPosition();
 	}

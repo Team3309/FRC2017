@@ -2,18 +2,14 @@ package org.team3309.lib.controllers.generic;
 
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
-import org.team3309.lib.tunable.Dashboard;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class FeedForwardWithPIDController extends PIDController {
-	@Dashboard(displayName = "kA", tunable = true)
 	private double kA = 0.0;
-	@Dashboard(displayName = "kV", tunable = true)
 	private double kV = 0.0;
 	private double aimAcc = 0.0;
-	@Dashboard(displayName = "aimVel")
+
 	private double aimVel = 0.0;
 
 	/**
@@ -110,7 +106,7 @@ public class FeedForwardWithPIDController extends PIDController {
 		NetworkTable table = NetworkTable.getTable(this.subsystemID);
 		kA = table.getNumber("k_A " + this.getName(), kA);
 		kV = table.getNumber("k_V " + this.getName(), kV);
-		//System.out.println("KV " + kV);
+		// System.out.println("KV " + kV);
 		table.putNumber(this.getName() + " aimVel", this.aimVel);
 		table.putNumber(this.getName() + " aimAcc", this.aimAcc);
 		table.putNumber("k_A " + this.getName(), kA);

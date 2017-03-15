@@ -7,8 +7,6 @@ import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class DriveAngleController extends PIDPositionController {
 	double startingAngle = 0;
 	double goalAngle = 0;

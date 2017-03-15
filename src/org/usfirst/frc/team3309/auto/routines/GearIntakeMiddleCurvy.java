@@ -14,6 +14,7 @@ public class GearIntakeMiddleCurvy extends AutoRoutine {
 		changePoints.add(new VelocityChangePoint(100, 0));
 		changePoints.add(new VelocityChangePoint(30, 9000));
 		this.driveEncoder(500, 10, changePoints);
+		this.openGearIntake();
 	}
 
 }
