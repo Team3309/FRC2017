@@ -1,10 +1,12 @@
 package org.usfirst.frc.team3309.robot;
 
+import org.team3309.lib.KragerTimer;
 import org.usfirst.frc.team3309.auto.AllianceColor;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
 import org.usfirst.frc.team3309.auto.routines.CompBotOriginalHopperAndGearAuto;
-import org.usfirst.frc.team3309.auto.routines.GearAndZoneBoilerSide;
 import org.usfirst.frc.team3309.auto.routines.GearIntakeMiddleCurvy;
+import org.usfirst.frc.team3309.auto.routines.GearMiddleStraight;
+import org.usfirst.frc.team3309.auto.routines.GearStraightBoilerSide;
 import org.usfirst.frc.team3309.auto.routines.HopperAndShootCurvyPath;
 import org.usfirst.frc.team3309.auto.routines.NoAutoRoutine;
 import org.usfirst.frc.team3309.driverstation.Controls;
@@ -27,7 +29,6 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -46,9 +47,8 @@ public class Robot extends IterativeRobot {
 		mainAutoChooser.addObject("Gear Curvey", new GearIntakeMiddleCurvy());
 		mainAutoChooser.addObject("Hopper Curvey", new HopperAndShootCurvyPath());
 		mainAutoChooser.addObject("Gear and Hopper Curvey OG", new CompBotOriginalHopperAndGearAuto());
-		// mainAutoChooser.addObject("Gear and Hopper Curvey", new
-		// HopperAndGearCurvy());
-		mainAutoChooser.addObject("Gear and Zone BOILER SIDE", new GearAndZoneBoilerSide());
+		mainAutoChooser.addObject("Gear BOILER SIDE Straight", new GearStraightBoilerSide());
+		mainAutoChooser.addObject("Gear Middle Straight", new GearMiddleStraight());
 		mainAutoChooser.addObject("No Auto", new NoAutoRoutine());
 		redBlueAutoChooser.addObject("Red", AllianceColor.RED);
 		redBlueAutoChooser.addObject("Blue", AllianceColor.BLUE);
@@ -71,19 +71,15 @@ public class Robot extends IterativeRobot {
 		UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
 		c.start();
 		cam.setFPS(15);
-		// cServer.startAutomaticCapture("cam0", 0);
 	}
 
 	public void disabledInit() {
-		NetworkTable table = NetworkTable.getTable("Drivetrain");
-		table.putNumber("k_PWM", 0);
+
 	}
 
 	public void disabledPeriodic() {
-		NetworkTable table = NetworkTable.getTable("Drivetrain");
 		// Systems.smartDashboard();
 		Turret.getInstance().checkForCalibration();
-		// System.out.println("RAW " + indicatorLight.getRaw());
 		if (Turret.getInstance().hasCalibratedSinceRobotInit)
 			indicatorLight.setVoltage(2.5);
 		else
@@ -100,15 +96,12 @@ public class Robot extends IterativeRobot {
 
 	public void autonomousPeriodic() {
 		Sensors.read();
-		// indicatorLight.setVoltage(5);
 		try {
 			Systems.update();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		Actuators.actuate();
-
 	}
 
 	public void teleopInit() {
@@ -117,29 +110,41 @@ public class Robot extends IterativeRobot {
 			autoThread.stop();
 	}
 
+	private KragerTimer profileTimer = new KragerTimer();
+
 	public void teleopPeriodic() {
+		profileTimer.reset();
+		profileTimer.start();
+
 		Sensors.read();
-		// indicatorLight.setVoltage(5);
+		indicatorLight.setVoltage(5);
+		profileTimer.log("Sensors");
+
 		Flywheel.getInstance().updateTeleop();
-		// Flywheel.getInstance().sendToSmartDash();
 		Hood.getInstance().updateTeleop();
-		// Hood.getInstance().sendToSmartDash();
-		Turbine.getInstance().updateTeleop(); // first
+		Turbine.getInstance().updateTeleop();
 		Turret.getInstance().updateTeleop();
-		// Turret.getInstance().sendToSmartDash();
 		Shooter.getInstance().updateTeleop();
-		// Shooter.getInstance().sendToSmartDash();
-		// Elevator.getInstance().sendToSmartDash();
+		profileTimer.log("Shooter");
 		Elevator.getInstance().updateTeleop();
 		FuelIntake.getInstance().updateTeleop();
 		GearIntake.getInstance().updateTeleop();
-		// GearIntake.getInstance().sendToSmartDash();
 		Climber.getInstance().manualControl();
-		// Climber.getInstance().sendToSmartDash();
+		profileTimer.log("Climber");
 		Drive.getInstance().updateTeleop();
-		// Drive.getInstance().sendToSmartDash();
+		profileTimer.log("Subsystems");
+		Flywheel.getInstance().sendToSmartDash();
+		Hood.getInstance().sendToSmartDash();
+		Turret.getInstance().sendToSmartDash();
+		Shooter.getInstance().sendToSmartDash();
+		Elevator.getInstance().sendToSmartDash();
+		GearIntake.getInstance().sendToSmartDash();
+		Climber.getInstance().sendToSmartDash();
+		Drive.getInstance().sendToSmartDash();
+		profileTimer.log("Smart Dash");
 
 		Actuators.actuate();
+		profileTimer.log("Actuators");
 	}
 
 	public static AllianceColor getAllianceColor() {

@@ -100,7 +100,6 @@ public class RoutineBased {
 	public void driveEncoder(double goal, double timeout) {
 		Sensors.resetDrive();
 		DriveEncodersController x = new DriveEncodersController(goal);
-		System.out.println("SETTINGF");
 		Drive.getInstance().setController(x);
 		try {
 			this.waitForController(x, timeout);
@@ -192,8 +191,12 @@ public class RoutineBased {
 	}
 
 	public void shoot() {
-		System.out.println("SHOOTING NOW");
 		Shooter.getInstance().setShouldBeShooting(true);
+	}
+
+	public void stopShooting() {
+		Shooter.getInstance().setShouldBeShooting(false);
+		Shooter.getInstance().setShouldBeSpinningUp(false);
 	}
 
 	public void spinUp() {

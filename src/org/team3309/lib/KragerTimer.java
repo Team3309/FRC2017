@@ -19,8 +19,21 @@ public class KragerTimer extends Timer {
 	 */
 	private boolean isConditionMaintained = false;
 
+	public KragerTimer() {
+
+	}
+
 	public KragerTimer(double timeToComplete) {
 		this.timeToComplete = timeToComplete;
+	}
+
+	/**
+	 * Log a time along with a message
+	 * 
+	 * @param message
+	 */
+	public void log(String message) {
+		System.out.println("TIMER: " + this.get() + " " + message);
 	}
 
 	/**

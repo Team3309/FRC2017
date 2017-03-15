@@ -26,10 +26,8 @@ public class Sensors {
 	private static ADXRS450_Gyro gyro;
 	private static CounterSensor flywheelCounter;
 	public static double rawRPS = 0;
-	private static Timer t = new Timer();
 
 	static {
-		t.start();
 		// System.out.println("INIT STATIC");
 		// navX = new AHRS(SPI.Port.kMXP);
 		gyro = new ADXRS450_Gyro();
@@ -73,11 +71,6 @@ public class Sensors {
 		if (Math.abs(curRPS) > 500) {
 			return previousFlywheelCounterRPS;
 		}
-		if (curRPS != previousFlywheelCounterRPS) {
-			t.reset();
-		}
-		//if (t.get() > .1 && curRPS != 0)
-			//System.out.println(t.get() + " since new value ");
 		previousFlywheelCounterRPS = curRPS;
 		return curRPS;
 	}

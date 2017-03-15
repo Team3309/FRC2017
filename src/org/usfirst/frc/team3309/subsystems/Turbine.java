@@ -6,10 +6,7 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.Timer;
 
 public class Turbine extends ControlledSubsystem {
 
@@ -28,8 +25,6 @@ public class Turbine extends ControlledSubsystem {
 		super("Turbine");
 		// this.hopperMC.getTalon().reverseOutput(true);
 	}
-
-	private Timer timer = new Timer();
 
 	@Override
 	public void updateTeleop() {
@@ -77,7 +72,6 @@ public class Turbine extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
-		timer.start();
 		// TODO Auto-generated method stub
 
 	}

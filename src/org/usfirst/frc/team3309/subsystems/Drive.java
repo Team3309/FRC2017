@@ -62,17 +62,6 @@ public class Drive extends ControlledSubsystem {
 	public void updateTeleop() {
 
 		this.changeToPercentMode();
-		if (Controls.driverController.getAButton() && !hasPIDBreakStarted) {
-			DriveAngleVelocityController drivePIDBreak = new DriveAngleVelocityController(this.getAngle());
-			drivePIDBreak.setCompletable(false);
-			drivePIDBreak.turningController.setConstants(6, 0, 16);
-			this.setController(drivePIDBreak);
-			hasPIDBreakStarted = true;
-		} else {
-			if (!Controls.driverController.getAButton())
-				hasPIDBreakStarted = false;
-			this.setController(new DriveCheezyDriveEquation());
-		}
 
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
 			isLowGear = false;
@@ -146,15 +135,6 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-		// double lol = .3;
-		// if (driverRemote.getAButton()) {
-		// setRight(lol);
-		// setLeft(-lol);
-		//
-		// } else {
-		// setRight(0);
-		// setLeft(0);
-		// }
 		updateTeleop();
 	}
 

@@ -151,7 +151,6 @@ public class Turret extends ControlledSubsystem {
 			correctGoalAngleBounds();
 			if (this.getAngle() > goalAngle - 2 && this.getAngle() < goalAngle + 2
 					&& !VisionServer.getInstance().hasTargetsToAimAt() && !Shooter.getInstance().isShouldBeShooting()) {
-
 				currentState = TurretState.SURVEY;
 			} else {
 				this.changeToPositionMode();
@@ -256,6 +255,12 @@ public class Turret extends ControlledSubsystem {
 		table.putNumber("k_aim Turret Pos", goalAngle);
 	}
 
+	public void turnToAngleAndSurvey(double newGoal) {
+		currentState = TurretState.HOLD;
+		robotAngleWhenGoalLost = Sensors.getAngle();
+		goalAngle = newGoal;
+	}
+
 	@Override
 	public void updateAuto() {
 		updateTeleop();
@@ -280,13 +285,6 @@ public class Turret extends ControlledSubsystem {
 		kAngVel = table.getNumber("k_AngVel", kAngVel);
 		table.putNumber("k_AngVel", kAngVel);
 		SmartDashboard.putNumber(this.getName() + " get", this.turretMC.get());
-		/*
-		 * if (VisionServer.getInstance().hasTargetsToAimAt()) {
-		 * NetworkTable.getTable("Climber").putNumber(this.getName() + " hyp",
-		 * VisionServer.getInstance().getTarget().getHyp());
-		 * NetworkTable.getTable("Climber").putNumber(this.getName() + " X",
-		 * VisionServer.getInstance().getTarget().getZ()); }
-		 */
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 			NetworkTable.getTable("Climber").putNumber(" X", VisionServer.getInstance().getTarget().getZ());
 			NetworkTable.getTable("Climber").putNumber(" Hyp", VisionServer.getInstance().getTarget().getHyp());

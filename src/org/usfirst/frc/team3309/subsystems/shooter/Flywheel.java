@@ -262,7 +262,6 @@ public class Flywheel extends ControlledSubsystem {
 	}
 
 	private void setShooter(double power) {
-
 		leftTalon.setDesiredOutput(power);
 		rightTalon.setDesiredOutput(power);
 	}

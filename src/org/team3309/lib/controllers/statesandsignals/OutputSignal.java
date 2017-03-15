@@ -12,6 +12,7 @@ import java.util.HashMap;
 @SuppressWarnings("serial")
 public class OutputSignal extends HashMap<String, Double> {
 
+	
 	public OutputSignal() {
 		super();
 		this.setMotor(0);

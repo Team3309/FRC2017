@@ -13,7 +13,6 @@ public class Climber extends KragerSystem {
 	private CANTalon climberMC = new CANTalon(RobotMap.CLIMBER_ID);
 	private final double CURRENT_LIMIT = 8;
 	private final double UP_POWER = .5;
-	private final double HOLD_POWER = .3;
 	private int loopsAboveCurrentLimit = 0;
 	private boolean hasStartedClimbing = false;
 
