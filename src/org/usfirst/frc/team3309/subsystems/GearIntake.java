@@ -9,6 +9,7 @@ import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -17,6 +18,7 @@ public class GearIntake extends KragerSystem {
 
 	private static final double MIN_VALUE_TO_MOVE = .15;
 	private static final double UP_POSITION = -.37;
+	private Spark vibrate = new Spark(2);
 	private static final double DOWN_POSITION = .07;
 	private static GearIntake instance;
 	private boolean hasChangedForThisPress = false;
@@ -51,8 +53,15 @@ public class GearIntake extends KragerSystem {
 		// boolean driverSelect = Controls.driverController.getBackButton();
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
+		if (Controls.operatorController.getTriggerAxis(Hand.kRight) > .1) {
+			vibrate.set(-Controls.operatorController.getTriggerAxis(Hand.kRight));
+		} else {
+			vibrate.set(Controls.operatorController.getTriggerAxis(Hand.kLeft));
+		}
+
 		if (operatorLB) {
 			this.intake.set(Value.kForward);
+
 		} else {
 			this.intake.set(Value.kReverse);
 		}

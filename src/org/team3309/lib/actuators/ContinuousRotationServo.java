@@ -7,7 +7,7 @@ public class ContinuousRotationServo extends PWM {
 	public ContinuousRotationServo(int channel) {
 		super(channel);
 
-		setBounds(1.0, 1.485, 1.5, 1.515, 2.0);
+		setBounds(.5, 1.485, 1.5, 1.515, 2.52);
 		enableDeadbandElimination(true);
 	}
 
@@ -24,7 +24,7 @@ public class ContinuousRotationServo extends PWM {
 			// this.setZeroLatch();
 			this.setDisabled();
 		} else {
-			setSpeed(value);
+			this.setSpeed(value);
 		}
 	}
 }

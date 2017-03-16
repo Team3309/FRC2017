@@ -164,7 +164,7 @@ public class Turret extends ControlledSubsystem {
 
 		if (turretMC.getControlMode() == TalonControlMode.Position) {
 			// Stop when you are close enough
-			if (this.getAngle() > goalAngle - .5 && this.getAngle() < goalAngle + .5) {
+			if (this.getAngle() > goalAngle - .5 && this.getAngle() < goalAngle + .4) {
 				this.turretMC.changeControlMode(TalonControlMode.PercentVbus);
 				this.turretMC.set(0);
 			} else {

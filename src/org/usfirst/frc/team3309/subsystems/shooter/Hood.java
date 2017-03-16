@@ -170,7 +170,7 @@ public class Hood extends ControlledSubsystem {
 	public void manualControl() {
 		// setHood(table.getNumber("k_pow", 0));
 		if (Controls.operatorController.getAButton())
-			setHood(.02);
+			setHood(180);
 		else
 			setHood(0);
 		// else if (Controls.operatorController.getXButton())

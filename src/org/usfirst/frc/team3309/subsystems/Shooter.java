@@ -51,7 +51,7 @@ public class Shooter extends KragerSystem {
 
 	@Override
 	public void updateAuto() {
-
+		
 	}
 
 	@Override

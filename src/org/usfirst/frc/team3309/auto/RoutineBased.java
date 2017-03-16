@@ -190,7 +190,11 @@ public class RoutineBased {
 		mDrive.stopDrive();
 	}
 
+	// once vision sees a goal, start shooting
 	public void shoot() {
+		while (!VisionServer.getInstance().hasTargetsToAimAt()) {
+			KragerTimer.delayMS(100);
+		}
 		Shooter.getInstance().setShouldBeShooting(true);
 	}
 
