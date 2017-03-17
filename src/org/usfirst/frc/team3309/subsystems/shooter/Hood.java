@@ -40,9 +40,9 @@ public class Hood extends ControlledSubsystem {
 
 	private Hood() {
 		super("Hood");
-		// NetworkTable.getTable("Climber").putNumber("k_pow", 0);
+		NetworkTable.getTable("Climber").putNumber("k_pow", 0);
 		this.setController(new PIDPositionController(.00018, .0000004, -.00011));
-
+		table.putNumber("k_pow", 0);
 	}
 
 	/**
@@ -168,15 +168,7 @@ public class Hood extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-		// setHood(table.getNumber("k_pow", 0));
-		if (Controls.operatorController.getAButton())
-			setHood(180);
-		else
-			setHood(0);
-		// else if (Controls.operatorController.getXButton())
-		// setHood(-.02);
-		// else'
-		// setHood(0.0);
+		setHood(table.getNumber("k_pow", 0));
 	}
 
 	@Override

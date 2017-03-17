@@ -58,8 +58,7 @@ public class FuelIntake extends KragerSystem {
 
 	@Override
 	public void manualControl() {
-		updateTeleop();
-
+		this.setFuelIntake(.25);
 	}
 
 	@Override
