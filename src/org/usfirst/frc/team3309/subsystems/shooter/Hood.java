@@ -21,7 +21,7 @@ public class Hood extends ControlledSubsystem {
 	private static final double MIN_ANGLE = 20;
 	private static final double DEFAULT_ANGLE = 0;
 	private static final double MAX_ANGLE = 2280;
-	private static final double MIN_RAW = 3450; // 3400 is comp, 3900 is comp
+	private static final double MIN_RAW = 3900; // 3400 is comp, 3900 is prac
 	private static final double MAX_POW = .1;
 	private static final double MIN_POW_UP = .0001;
 	private static final double MIN_POW_DOWN = .015;

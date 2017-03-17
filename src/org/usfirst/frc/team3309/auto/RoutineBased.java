@@ -198,6 +198,7 @@ public class RoutineBased {
 		Shooter.getInstance().setShouldBeShooting(true);
 	}
 
+
 	public void stopShooting() {
 		Shooter.getInstance().setShouldBeShooting(false);
 		Shooter.getInstance().setShouldBeSpinningUp(false);
@@ -208,11 +209,12 @@ public class RoutineBased {
 	}
 
 	public void closeGearIntake() {
-		GearIntake.getInstance().closeGearIntake();
 	}
+	
+	
 
 	public void openGearIntake() {
-		GearIntake.getInstance().openGearIntake();
+		
 	}
 
 	public void pivotUpGearIntake() {

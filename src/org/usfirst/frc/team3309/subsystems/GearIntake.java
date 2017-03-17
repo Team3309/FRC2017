@@ -23,9 +23,9 @@ public class GearIntake extends KragerSystem {
 	private static GearIntake instance;
 	private boolean hasChangedForThisPress = false;
 	private CANTalon gearIntake = new CANTalon(RobotMap.GEAR_INTAKE_ID);
-	private DoubleSolenoid intakePivot = new DoubleSolenoid(5, 1);
+	private DoubleSolenoid intakePivot = new DoubleSolenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_A,
+			RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_B);
 	private NetworkTable table = NetworkTable.getTable("Intakes");
-	private double goalAngle = 0;
 
 	public static GearIntake getInstance() {
 		if (instance == null) {
@@ -36,8 +36,8 @@ public class GearIntake extends KragerSystem {
 
 	public GearIntake() {
 		super("GearIntake");
-		this.gearIntake.changeControlMode(TalonControlMode.Position);
-		this.gearIntake.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+		this.gearIntake.changeControlMode(TalonControlMode.PercentVbus);
+		// this.gearIntake.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
 		this.gearIntake.setEncPosition(0);
 		this.gearIntake.setPosition(0);
 		this.gearIntake.setAnalogPosition(0);
@@ -53,50 +53,30 @@ public class GearIntake extends KragerSystem {
 		// boolean driverSelect = Controls.driverController.getBackButton();
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
-		if (Controls.operatorController.getTriggerAxis(Hand.kRight) > .1) {
-			// vibrate.set(-Controls.operatorController.getTriggerAxis(Hand.kRight));
+		if (operatorRB) {
+			pivotDownGearIntake();
 		} else {
-			// vibrate.set(Controls.operatorController.getTriggerAxis(Hand.kLeft));
+			pivotUpGearIntake();
 		}
 
 		if (operatorLB) {
-			this.intakePivot.set(Value.kForward);
-
+			this.gearIntake.set(1);
 		} else {
-			this.intakePivot.set(Value.kReverse);
+			this.gearIntake.set(.05);
 		}
-		double error = goalAngle - this.gearIntake.getPosition();
-
-		if (operatorRB) {
-			goalAngle = -.37;
-		} else {
-			goalAngle = .06;
-		}
-		this.gearIntake.changeControlMode(TalonControlMode.Position);
-		this.gearIntake.setSetpoint(goalAngle);
-	}
-
-	public void closeGearIntake() {
-		this.intake.set(Value.kForward);
-	}
-
-	public void openGearIntake() {
-		this.intake.set(Value.kReverse);
-	}
-
-	public void pivotUpGearIntake() {
-		goalAngle = UP_POSITION;
 	}
 
 	public void pivotDownGearIntake() {
-		goalAngle = DOWN_POSITION;
+		this.intakePivot.set(Value.kForward);
+	}
+
+	public void pivotUpGearIntake() {
+		this.intakePivot.set(Value.kReverse);
 	}
 
 	@Override
 	public void updateAuto() {
-		this.gearIntake.changeControlMode(TalonControlMode.Position);
-		this.gearIntake.setSetpoint(goalAngle);
-
+		this.gearIntake.changeControlMode(TalonControlMode.PercentVbus);
 	}
 
 	@Override

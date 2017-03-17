@@ -246,6 +246,7 @@ public class Flywheel extends ControlledSubsystem {
 	public double getAimAccRPS() {
 		return aimAccRPS;
 	}
+	
 
 	public void setAimAccRPS(double aimAccRPS) {
 		this.aimAccRPS = aimAccRPS;

@@ -191,7 +191,6 @@ public class Drive extends ControlledSubsystem {
 
 	public void setRightLeft(double right, double left) {
 		setLeft(left);
-		System.out.println("right left " + right + " " + left);
 		setRight(right);
 	}
 
