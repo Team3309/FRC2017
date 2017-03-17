@@ -60,15 +60,12 @@ public class Drive extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-
-		this.changeToPercentMode();
+		this.setController(new DriveCheezyDriveEquation());
 
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
 			isLowGear = false;
 		} else
 			isLowGear = true;
-
-		// System.out.println("right pos " + this.getRightPos());
 		shifter.set(isLowGear);
 		OutputSignal output = getController().getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
@@ -95,6 +92,7 @@ public class Drive extends ControlledSubsystem {
 		left0.changeControlMode(TalonControlMode.PercentVbus);
 		left1.changeControlMode(TalonControlMode.PercentVbus);
 		left2.changeControlMode(TalonControlMode.PercentVbus);
+
 	}
 
 	@Override
@@ -193,6 +191,7 @@ public class Drive extends ControlledSubsystem {
 
 	public void setRightLeft(double right, double left) {
 		setLeft(left);
+		System.out.println("right left " + right + " " + left);
 		setRight(right);
 	}
 

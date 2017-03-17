@@ -12,7 +12,7 @@ public class Turbine extends ControlledSubsystem {
 
 	private static Turbine instance;
 	private TalonSRXMC hopperMC = new TalonSRXMC(RobotMap.HOPPER_ID);
-	
+	private Spark vibrate = new Spark(2);
 
 	public static Turbine getInstance() {
 		if (instance == null) {
@@ -23,16 +23,11 @@ public class Turbine extends ControlledSubsystem {
 
 	private Turbine() {
 		super("Turbine");
-		// this.hopperMC.getTalon().reverseOutput(true);
 	}
 
 	@Override
 	public void updateTeleop() {
 		boolean operatorXButton = Controls.operatorController.getXButton(); // sort
-		/*if (Shooter.getInstance().isShouldBeSpinningUp())
-			vibrate.set(1);
-		else
-			vibrate.set(0);*/
 		if (Shooter.getInstance().isShouldBeShooting()) {
 			setHopper(1);
 		} else if (operatorXButton) {
@@ -44,7 +39,6 @@ public class Turbine extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		//this.vibrate.set(1);
 		if (Shooter.getInstance().isShouldBeShooting()) {
 			setHopper(1);
 		} else {
@@ -84,6 +78,10 @@ public class Turbine extends ControlledSubsystem {
 
 	public void setHopper(double power) {
 		hopperMC.setDesiredOutput(-power);
-
+		if (power != 0) {
+			this.vibrate.set(1);
+		} else {
+			this.vibrate.set(0);
+		}
 	}
 }

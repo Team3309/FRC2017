@@ -34,7 +34,7 @@ public class RobotMap {
 	public static final int GEAR_INTAKE_WRIST_SOLENOID_B = 5;
 	public static final int GEAR_INTAKE_STOPPER = 4;
 
-	public static final int SHIFTER = 7; // 7 o ncomp
+	public static final int SHIFTER = 6; // 7 o ncomp 6 on practice
 
 	// PWM
 	public static final int SERVO = 9;

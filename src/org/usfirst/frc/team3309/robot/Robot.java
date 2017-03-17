@@ -121,11 +121,11 @@ public class Robot extends IterativeRobot {
 		indicatorLight.setVoltage(5);
 		profileTimer.log("Sensors");
 
-		//Flywheel.getInstance().updateTeleop();
-		Hood.getInstance().manualControl();
+		Flywheel.getInstance().updateTeleop();
+		Hood.getInstance().updateTeleop();
 		Turbine.getInstance().updateTeleop();
 		Turret.getInstance().updateTeleop();
-		//Shooter.getInstance().updateTeleop();
+		Shooter.getInstance().updateTeleop();
 		profileTimer.log("Shooter");
 		Elevator.getInstance().updateTeleop();
 		FuelIntake.getInstance().updateTeleop();
@@ -146,7 +146,6 @@ public class Robot extends IterativeRobot {
 
 		Actuators.actuate();
 		profileTimer.log("Actuators");
-
 	}
 
 	public static AllianceColor getAllianceColor() {

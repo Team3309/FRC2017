@@ -18,12 +18,12 @@ public class GearIntake extends KragerSystem {
 
 	private static final double MIN_VALUE_TO_MOVE = .15;
 	private static final double UP_POSITION = -.37;
-	private Spark vibrate = new Spark(2);
+
 	private static final double DOWN_POSITION = .07;
 	private static GearIntake instance;
 	private boolean hasChangedForThisPress = false;
 	private CANTalon gearIntake = new CANTalon(RobotMap.GEAR_INTAKE_ID);
-	private DoubleSolenoid intake = new DoubleSolenoid(5, 1);
+	private DoubleSolenoid intakePivot = new DoubleSolenoid(5, 1);
 	private NetworkTable table = NetworkTable.getTable("Intakes");
 	private double goalAngle = 0;
 
@@ -54,16 +54,16 @@ public class GearIntake extends KragerSystem {
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
 		if (Controls.operatorController.getTriggerAxis(Hand.kRight) > .1) {
-			vibrate.set(-Controls.operatorController.getTriggerAxis(Hand.kRight));
+			// vibrate.set(-Controls.operatorController.getTriggerAxis(Hand.kRight));
 		} else {
-			vibrate.set(Controls.operatorController.getTriggerAxis(Hand.kLeft));
+			// vibrate.set(Controls.operatorController.getTriggerAxis(Hand.kLeft));
 		}
 
 		if (operatorLB) {
-			this.intake.set(Value.kForward);
+			this.intakePivot.set(Value.kForward);
 
 		} else {
-			this.intake.set(Value.kReverse);
+			this.intakePivot.set(Value.kReverse);
 		}
 		double error = goalAngle - this.gearIntake.getPosition();
 
