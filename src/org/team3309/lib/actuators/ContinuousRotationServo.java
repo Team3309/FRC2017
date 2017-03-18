@@ -18,10 +18,10 @@ public class ContinuousRotationServo extends PWM {
 	}
 
 	public void set(double value) {
-		this.setPosition(value);
-		/*
-		 * if (value == 0) { // setSpeed(0); // this.setZeroLatch();
-		 * this.setDisabled(); } else { this.setPosition(value); }
-		 */
+		if (value == 0) { // setSpeed(0); // this.setZeroLatch();
+			this.setDisabled();
+		} else {
+			this.setPosition(value);
+		}
 	}
 }

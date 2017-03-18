@@ -34,24 +34,24 @@ public class VisionServer implements Runnable {
 	private static double k_predRPS = .001;
 
 	private static Shot[] shots = { new Shot(101, 1000, .09),
-			new Shot(103, 1000, .07),
-			new Shot(105, 1000, .047),
-			new Shot(111, 1000, .031),
-			new Shot(104, 1500, .03),
-			new Shot(110, 1500, .019),
-			new Shot(115, 1500, .01),
-			new Shot(120, 1500, .0055),
-			new Shot(124, 1500, .003),
-			new Shot(127, 1500, .0016), // to here
-			new Shot(115, 2000, .0015),
-			new Shot(119, 2000, .00055),
-			new Shot(122, 2000, .0002),
-			new Shot(124, 2200, .00019),
-			new Shot(128, 2200, 0),
-			new Shot(130, 2200, -.00055),
-			new Shot(132, 2200, -.01),
-			new Shot(135, 2200, -.015),
-			new Shot(142, 2200, -.02)
+			new Shot(103, 0, .07),
+			new Shot(105, 0, .047),
+			new Shot(111, 0, .031),
+			new Shot(104, .5, .03),
+			new Shot(110, .5, .019),
+			new Shot(115, .5, .01),
+			new Shot(120, .5, .0055),
+			new Shot(124, .5, .003),
+			new Shot(127, .5, .0016), // to here
+			new Shot(115, .85, .0015),
+			new Shot(119, .85, .00055),
+			new Shot(122, .85, .0002),
+			new Shot(124, 1, .00019),
+			new Shot(128, 1, 0),
+			new Shot(130, 1, -.00055),
+			new Shot(132, 1, -.01),
+			new Shot(135, 1, -.015),
+			new Shot(142, 1, -.02)
 	};
 
 	public static VisionServer getInstance() {
@@ -149,7 +149,7 @@ public class VisionServer implements Runnable {
 					e.printStackTrace();
 				}
 			}
-			
+
 		}
 	}
 
