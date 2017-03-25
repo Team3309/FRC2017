@@ -13,6 +13,7 @@ import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Shooter;
+import org.usfirst.frc.team3309.subsystems.shooter.Turret.TurretState;
 import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
@@ -36,8 +37,8 @@ public class Turret extends ControlledSubsystem {
 	public boolean hasCalibratedSinceRobotInit = false;
 	// angle and loops since it last of spotted
 	private HashMap<Integer, Integer> hash = new HashMap<Integer, Integer>();
-	public double RIGHT_ABSOLUTE_LIMIT = 270;
-	public double LEFT_ABSOLUTE_LIMIT = -90;
+	public double RIGHT_ABSOLUTE_LIMIT = 20;
+	public double LEFT_ABSOLUTE_LIMIT = -360;
 	private double lastGoalX = 0;
 	private double lastVisionAngle = getAngle();
 	private NetworkTable table = NetworkTable.getTable("Turret");
@@ -49,13 +50,12 @@ public class Turret extends ControlledSubsystem {
 	private boolean isSurvey = false;
 	private double kAngVel = .1;
 
-	public final double LEFT_LIMIT = 10;
-	public final double RIGHT_LIMIT = 170;
-	public final double MAX_ACC = 1.5; // 180 deg/s*s
+	public final double LEFT_LIMIT = -260;
+	public final double RIGHT_LIMIT = -80;
+	public final double MAX_ACC = 5; // 180 deg/s*s
 	public final double MAX_VEL = 30; // 180 deg/s*s
 
 	private TurretState currentState = TurretState.HOME;
-	private Timer calTimer = new Timer();
 
 	public enum TurretState {
 		SURVEY, HOME, CLIMBING, HOLD, USING_VISION
@@ -89,7 +89,6 @@ public class Turret extends ControlledSubsystem {
 
 	@Override
 	public void initTeleop() {
-		calTimer.start();
 		this.getController().reset();
 		goalAngle = getAngle();
 		this.currentState = TurretState.HOME;
@@ -98,7 +97,6 @@ public class Turret extends ControlledSubsystem {
 
 	@Override
 	public void initAuto() {
-		calTimer.start();
 		this.currentState = TurretState.SURVEY;
 		this.getController().reset();
 		goalAngle = getAngle();
@@ -127,15 +125,14 @@ public class Turret extends ControlledSubsystem {
 		// STATE MATH
 		// if you see the goal, aim at it
 		if (VisionServer.getInstance().hasTargetsToAimAt()
-				&& (currentState != TurretState.HOME && currentState != TurretState.CLIMBING)
-				&& Math.abs(goalAngle - this.getAngle()) < 180) {
+				&& (currentState != TurretState.HOME && currentState != TurretState.CLIMBING)) {
 			currentState = TurretState.USING_VISION;
 			moveTowardsGoal();
 		} else if (currentState == TurretState.SURVEY) {
 			survey();
 		} else if (currentState == TurretState.CLIMBING) {
 			this.changeToPositionMode();
-			goalAngle = 90;
+			goalAngle = -80;
 		} else if (currentState == TurretState.HOME) {
 			this.changeToPositionMode();
 			goalAngle = 0;
@@ -218,13 +215,7 @@ public class Turret extends ControlledSubsystem {
 	private void calibrate() {
 		if (!hasCalibratedSinceRobotInit) {
 			this.turretMC.changeControlMode(TalonControlMode.PercentVbus);
-			if (calTimer.get() < 2)
-				this.turretMC.set(0);
-			else {
-				// this.turretMC.set(-.25);
-			}
-			if (calTimer.get() > 5)
-				calTimer.reset();
+			this.turretMC.set(0);
 			this.checkForCalibration();
 		}
 	}
@@ -256,7 +247,7 @@ public class Turret extends ControlledSubsystem {
 	}
 
 	public void turnToAngleAndSurvey(double newGoal) {
-		currentState = TurretState.HOLD;
+		currentState = TurretState.USING_VISION;
 		robotAngleWhenGoalLost = Sensors.getAngle();
 		goalAngle = newGoal;
 	}
@@ -287,7 +278,8 @@ public class Turret extends ControlledSubsystem {
 		SmartDashboard.putNumber(this.getName() + " get", this.turretMC.get());
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 			NetworkTable.getTable("Climber").putNumber(" X", VisionServer.getInstance().getTarget().getZ());
-			NetworkTable.getTable("Climber").putNumber(" Hyp", VisionServer.getInstance().getTarget().getHyp());
+			NetworkTable.getTable("Climber").putNumber(" HYP-RAW", VisionServer.getInstance().getTarget().getHyp());
+			NetworkTable.getTable("Climber").putNumber(" Hyp", VisionServer.getInstance().getTarget().getHyp() * 1000);
 		} else {
 			NetworkTable.getTable("Climber").putNumber(" X", 1000);
 			NetworkTable.getTable("Climber").putNumber(" Hyp", 1000);
@@ -341,5 +333,14 @@ public class Turret extends ControlledSubsystem {
 			this.turretMC.setForwardSoftLimit(this.LEFT_ABSOLUTE_LIMIT);
 			this.turretMC.setReverseSoftLimit(this.RIGHT_ABSOLUTE_LIMIT);
 		}
+	}
+
+	public TurretState getState() {
+		return currentState;
+	}
+
+	public void returnHome() {
+		currentState = TurretState.HOME;
+
 	}
 }

@@ -1,9 +1,14 @@
 package org.team3309.lib.controllers.drive;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.team3309.lib.controllers.Controller;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
+import org.usfirst.frc.team3309.auto.Operation;
+import org.usfirst.frc.team3309.auto.TimedOutException;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Drive;
 
@@ -22,6 +27,7 @@ public class DriveEncodersController extends Controller {
 	protected PIDPositionController angController = new PIDPositionController(40, 0, 0);
 	protected double goalEncoder;
 	protected double goalAngle;
+	private LinkedList<Operation> operations = new LinkedList<Operation>();
 	private double pastLinearOutput = 0;
 	private double pastAngOutput = 0;
 
@@ -50,6 +56,25 @@ public class DriveEncodersController extends Controller {
 
 	@Override
 	public OutputSignal getOutputSignal(InputState inputState) {
+		double currentEncoder = Drive.getInstance().getDistanceTraveled();
+		double closestPoint = Integer.MAX_VALUE;
+		Operation currentOperation = null;
+		for (Operation operation : operations) {
+			if (Math.abs(currentEncoder) > Math.abs(operation.encoder)) {
+				if (Math.abs(Math.abs(currentEncoder) - Math.abs(operation.encoder)) < closestPoint) {
+					currentOperation = operation;
+					closestPoint = Math.abs(Math.abs(currentEncoder) - Math.abs(operation.encoder));
+				}
+			}
+		}
+		if (currentOperation != null) {
+			try {
+				currentOperation.perform();
+			} catch (InterruptedException | TimedOutException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		// Input States for the two controllers
 		InputState inputForLinear = new InputState();
 		InputState inputForAng = new InputState();
@@ -77,5 +102,9 @@ public class DriveEncodersController extends Controller {
 	public void sendToSmartDash() {
 		linearController.sendToSmartDash();
 		angController.sendToSmartDash();
+	}
+
+	public void setOperation(LinkedList<Operation> operations2) {
+		this.operations = operations2;
 	}
 }

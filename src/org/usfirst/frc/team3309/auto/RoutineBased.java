@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3309.auto;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.Controller;
@@ -108,6 +109,18 @@ public class RoutineBased {
 		mDrive.stopDrive();
 	}
 
+	public void driveEncoderOperations(double goal, double timeout, LinkedList<Operation> operations) {
+		Sensors.resetDrive();
+		DriveEncodersController x = new DriveEncodersController(goal);
+		x.setOperation(operations);
+		Drive.getInstance().setController(x);
+		try {
+			this.waitForController(x, timeout);
+		} catch (Exception e) {
+		}
+		mDrive.stopDrive();
+	}
+
 	public void driveEncoder(double goal, double timeout, LinkedList<VelocityChangePoint> arrayOfVel) {
 		Sensors.resetDrive();
 		DriveEncoderVelocityWithSetPointsController x = new DriveEncoderVelocityWithSetPointsController(goal);
@@ -195,9 +208,10 @@ public class RoutineBased {
 		while (!VisionServer.getInstance().hasTargetsToAimAt()) {
 			KragerTimer.delayMS(100);
 		}
+		Shooter.getInstance().setShouldBeSpinningUp(true);
+		KragerTimer.delayMS(500);
 		Shooter.getInstance().setShouldBeShooting(true);
 	}
-
 
 	public void stopShooting() {
 		Shooter.getInstance().setShouldBeShooting(false);
@@ -209,12 +223,15 @@ public class RoutineBased {
 	}
 
 	public void closeGearIntake() {
+		GearIntake.getInstance().setGearIntakeRoller(1);
+		KragerTimer.delayMS(1000);
+		GearIntake.getInstance().setGearIntakeRoller(0);
 	}
-	
-	
 
 	public void openGearIntake() {
-		
+		GearIntake.getInstance().setGearIntakeRoller(-1);
+		KragerTimer.delayMS(1000);
+		GearIntake.getInstance().setGearIntakeRoller(0);
 	}
 
 	public void pivotUpGearIntake() {

@@ -98,6 +98,7 @@ public class Drive extends ControlledSubsystem {
 	@Override
 	public void updateAuto() {
 		this.changeToVelocityMode();
+		this.setLowGear();
 		OutputSignal output = getController().getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
@@ -141,6 +142,7 @@ public class Drive extends ControlledSubsystem {
 		this.setController(new DriveCheezyDriveEquation());
 		this.stopDrive();
 		this.right0.setVoltageRampRate(10);
+
 		this.right1.setVoltageRampRate(10);
 		this.right2.setVoltageRampRate(10);
 		this.left0.setVoltageRampRate(10);

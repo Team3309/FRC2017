@@ -21,7 +21,7 @@ public class TargetInfo {
 	}
 
 	public double getZ() {
-		return z; // comp bot had a +.04
+		return z + .03; // comp bot had a +.04
 	}
 
 	public double getHyp() {

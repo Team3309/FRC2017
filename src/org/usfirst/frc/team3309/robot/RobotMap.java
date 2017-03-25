@@ -13,9 +13,9 @@ public class RobotMap {
 	public static final int DRIVE_LEFT_1_ID = 15;
 	public static final int DRIVE_LEFT_2_ID = 16;
 	public static final int CLIMBER_ID = 5;
-	public static final int FUEL_INTAKE_ID = 7; // 6 on comp
-	public static final int GEAR_INTAKE_ID = 6; // 7 on comp
-	
+	public static final int FUEL_INTAKE_ID = 6; // 6 on comp
+	public static final int GEAR_INTAKE_ID = 7; // 7 on comp
+
 	public static final int HOPPER_ID = 13;
 	public static final int LEFT_SHOOTER_ID = 10;
 	public static final int RIGHT_SHOOTER_ID = 11;
@@ -23,24 +23,24 @@ public class RobotMap {
 	public static final int FEEDY_WHEEL_ID = 12;
 
 	// DIO
-	
+
 	public static final int FLYWHEEL_SENSOR = 8;
 	public static final int HALL_EFFECT_SENSOR = 3;
 
 	// PNEUMATICS
 	public static final int GEAR_INTAKE_PIVOT_SOLENOID_A = 0;
-	public static final int GEAR_INTAKE_PIVOT_SOLENOID_B = 7; // 6 0j c0k-
+	public static final int GEAR_INTAKE_PIVOT_SOLENOID_B = 6; // 6 0j c0k-
 	public static final int GEAR_INTAKE_WRIST_SOLENOID_A = 1;
 	public static final int GEAR_INTAKE_WRIST_SOLENOID_B = 5;
-	public static final int GEAR_INTAKE_STOPPER = 4;
-
-	public static final int SHIFTER = 6; // 7 o ncomp 6 on practice
+	public static final int LIGHT_RING = 3;
+	public static final int SHIFTER = 7; // 7 o ncomp 6 on practice
 
 	// PWM
 	public static final int SERVO = 9;
 
 	// ANALOG IN
 	public static final int HOOD_SENSOR = 3;
+	public static final int GEAR_HAS_SENSOR = 2;
 
 	// Analog OUT
 	public static final int INDICATOR_LIGHT = 0;

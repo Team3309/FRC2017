@@ -2,14 +2,15 @@ package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
 import org.usfirst.frc.team3309.driverstation.Controls;
+import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
+import org.usfirst.frc.team3309.robot.Sensors;
+import org.usfirst.frc.team3309.vision.VisionServer;
 
 import com.ctre.CANTalon;
-import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -18,10 +19,9 @@ public class GearIntake extends KragerSystem {
 
 	private static final double MIN_VALUE_TO_MOVE = .15;
 	private static final double UP_POSITION = -.37;
-
+	private boolean hasZippedInwards = false;
 	private static final double DOWN_POSITION = .07;
 	private static GearIntake instance;
-	private boolean hasChangedForThisPress = false;
 	private CANTalon gearIntake = new CANTalon(RobotMap.GEAR_INTAKE_ID);
 	private DoubleSolenoid intakePivot = new DoubleSolenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_A,
 			RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_B);
@@ -54,29 +54,43 @@ public class GearIntake extends KragerSystem {
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
 		if (operatorRB) {
-			pivotDownGearIntake();
-		} else {
 			pivotUpGearIntake();
+		} else {
+			hasZippedInwards = false;
+			pivotDownGearIntake();
 		}
 
-		if (operatorLB) {
-			this.gearIntake.set(1);
+		if (Controls.operatorController.getTriggerAxis(Hand.kRight) > .1) {
+			this.setGearIntakeRoller(Controls.operatorController.getTriggerAxis(Hand.kRight));
+		} else if (Controls.operatorController.getTriggerAxis(Hand.kLeft) > .1) {
+			this.setGearIntakeRoller(-Controls.operatorController.getTriggerAxis(Hand.kLeft));
 		} else {
-			this.gearIntake.set(.05);
+			if (operatorRB) {
+				this.setGearIntakeRoller(.1);
+			} else
+				this.gearIntake.set(0);
+		}
+		if ((VisionServer.getInstance().hasTargetsToAimAt() && VisionServer.getInstance().getTarget().getHyp() > .1
+				&& VisionServer.getInstance().getTarget().getHyp() < .18) || this.hasGear()) {
+
+			Robot.indicatorLight.setVoltage(5);
+		} else {
+			Robot.indicatorLight.setVoltage(3.125);
 		}
 	}
 
 	public void pivotDownGearIntake() {
-		this.intakePivot.set(Value.kForward);
+		this.intakePivot.set(Value.kReverse);
 	}
 
 	public void pivotUpGearIntake() {
-		this.intakePivot.set(Value.kReverse);
+		this.intakePivot.set(Value.kForward);
 	}
 
 	@Override
 	public void updateAuto() {
 		this.gearIntake.changeControlMode(TalonControlMode.PercentVbus);
+
 	}
 
 	@Override
@@ -98,6 +112,7 @@ public class GearIntake extends KragerSystem {
 		table.putNumber("goal", this.gearIntake.getSetpoint());
 		table.putNumber("error", this.gearIntake.getError());
 		table.putNumber("current", gearIntake.getOutputCurrent());
+		table.putNumber("avgVolt", Sensors.getAverageGearVal());
 	}
 
 	@Override
@@ -107,7 +122,11 @@ public class GearIntake extends KragerSystem {
 	}
 
 	public void setGearIntakeRoller(double power) {
-		gearIntake.set(power);
+
+		if (this.hasGear() && power >= 0)
+			gearIntake.set(-.35);
+		else
+			gearIntake.set(-power);
 	}
 
 	public double getGearIntakeRollerPower() {
@@ -116,5 +135,9 @@ public class GearIntake extends KragerSystem {
 
 	public double getAngle() {
 		return gearIntake.getPosition();
+	}
+
+	public boolean hasGear() {
+		return Sensors.hasGear();
 	}
 }

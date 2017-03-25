@@ -38,6 +38,7 @@ public class TurretVelocitySuveyController extends FeedForwardWithPIDController 
 	}
 
 	@Override
+	
 	public OutputSignal getOutputSignal(InputState inputState) {
 		double curAngle = inputState.getAngularPos();
 		Turret.getInstance().survey();

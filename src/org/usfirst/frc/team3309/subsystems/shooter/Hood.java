@@ -4,6 +4,7 @@ import org.team3309.lib.KragerSystem;
 import org.team3309.lib.actuators.ContinuousRotationServo;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
+import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -15,6 +16,8 @@ public class Hood extends KragerSystem {
 	private static Hood mHood;
 	private double goalAngle = 0;
 	private double lastVisionAngle = 0;
+	private boolean isHoldingVisionAngle = false;
+	private int counts = 0;
 	private ContinuousRotationServo servo = new ContinuousRotationServo(RobotMap.SERVO);
 	private NetworkTable table = NetworkTable.getTable("Hood");
 
@@ -40,28 +43,44 @@ public class Hood extends KragerSystem {
 			testPosControl();
 		} else if (Controls.operatorController.getBButton()) {
 			if (VisionServer.getInstance().hasTargetsToAimAt()) {
-				goalAngle = VisionServer.getInstance().getHoodAngle();
+				if (!isHoldingVisionAngle)
+					goalAngle = VisionServer.getInstance().getHoodAngle();
+				else
+					goalAngle = lastVisionAngle;
+				isHoldingVisionAngle = true;
 				System.out.println("VISION HOOD " + goalAngle);
 				lastVisionAngle = goalAngle;
 			} else {
 				goalAngle = lastVisionAngle;
 			}
 		} else {
-			testPosControl();
+			isHoldingVisionAngle = false;
+			goalAngle = 0;
 		}
-		this.servo.setPosition(goalAngle);
+		this.setHood(goalAngle);
 	}
 
 	@Override
 	public void updateAuto() {
 		// just needs to do what vision says
-		if (VisionServer.getInstance().hasTargetsToAimAt()) {
-			goalAngle = VisionServer.getInstance().getHoodAngle();
-			System.out.println("VISION HOOD " + goalAngle);
-			lastVisionAngle = goalAngle;
+		if (Shooter.getInstance().isShouldBeShooting()) {
+			if (VisionServer.getInstance().hasTargetsToAimAt()) {
+				if (!isHoldingVisionAngle)
+					goalAngle = VisionServer.getInstance().getHoodAngle();
+				else
+					goalAngle = lastVisionAngle;
+				isHoldingVisionAngle = true;
+
+				System.out.println("VISION HOOD " + goalAngle);
+				lastVisionAngle = goalAngle;
+			} else {
+				goalAngle = lastVisionAngle;
+			}
 		} else {
-			goalAngle = lastVisionAngle;
+			isHoldingVisionAngle = false;
+			this.setHood(0);
 		}
+		this.setHood(goalAngle);
 	}
 
 	public void testPosControl() {

@@ -17,7 +17,7 @@ public class HopperAndShootCurvyPath extends SteamworksAutoRoutine {
 
 	@Override
 	public void redRoutine() throws TimedOutException, InterruptedException {
-
+		//Turret.getInstance().turnToAngleAndSurvey(-270);
 		this.openGearIntake();
 		LinkedList<Operation> operations = new LinkedList<Operation>();
 		operations.add(new SpinUpOperation(32000));

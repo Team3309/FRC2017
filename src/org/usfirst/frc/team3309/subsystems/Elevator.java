@@ -3,7 +3,9 @@ package org.usfirst.frc.team3309.subsystems;
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerMath;
 import org.team3309.lib.controllers.statesandsignals.InputState;
+import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
+import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
@@ -47,7 +49,7 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateTeleop() {
-		if (Shooter.getInstance().isShouldBeShooting()) {
+		if (Shooter.getInstance().isShouldBeShooting() && Flywheel.getInstance().isShooterInRange()) {
 			aimVel = SHOOTING_VELOCITY;
 		} else {
 			aimVel = 0;
@@ -58,7 +60,7 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
-		if (Shooter.getInstance().isShouldBeShooting()) {
+		if (Shooter.getInstance().isShouldBeShooting() && Flywheel.getInstance().isShooterInRange()) {
 			aimVel = SHOOTING_VELOCITY;
 		} else {
 			aimVel = 0;
@@ -86,7 +88,7 @@ public class Elevator extends ControlledSubsystem {
 
 	@Override
 	public void manualControl() {
-		if (Shooter.getInstance().isShouldBeShooting()) {
+		if (Controls.operatorController.getYButton()) {
 			aimVel = .95;
 		} else {
 			aimVel = 0;
@@ -96,12 +98,15 @@ public class Elevator extends ControlledSubsystem {
 	}
 
 	private void setElevator(double power) {
-		this.elevator.set(power);
-		if (power != 0)
+
+		if (power == 0) {
+			this.elevator.changeControlMode(TalonControlMode.PercentVbus);
+			this.feedyWheel.set(0);
+		} else {
 			this.feedyWheel.set(1
 					* KragerMath.sign(power));
-		else
-			this.feedyWheel.set(0);
+		}
+		this.elevator.set(power);
 	}
 
 }

@@ -54,7 +54,7 @@ public class DriveCheezyDriveEquation extends Controller {
 		}
 
 		double leftPwm, rightPwm, overPower;
-		double sensitivity = .25;
+		double sensitivity = .3;
 
 		double angularPower;
 		double linearPower;
@@ -65,7 +65,6 @@ public class DriveCheezyDriveEquation extends Controller {
 		if (isHighGear) {
 
 			negInertiaScalar = 5.0;
-			sensitivity = .25;
 		} else {
 			/*
 			 * if (wheel * negInertia > 0) { negInertiaScalar = 1.75; } else {

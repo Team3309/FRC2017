@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -39,7 +39,7 @@ public class Robot extends IterativeRobot {
 	private Thread autoThread;
 	private Compressor c = new Compressor();
 	// private CameraServer cServer = CameraServer.getInstance();
-	private AnalogOutput indicatorLight = new AnalogOutput(RobotMap.INDICATOR_LIGHT);
+	public static AnalogOutput indicatorLight = new AnalogOutput(RobotMap.INDICATOR_LIGHT);
 
 	public void robotInit() {
 		// Main Auto Chooser
@@ -81,10 +81,13 @@ public class Robot extends IterativeRobot {
 		// Systems.smartDashboard();
 		Turret.getInstance().checkForCalibration();
 		if (Turret.getInstance().hasCalibratedSinceRobotInit)
-			indicatorLight.setVoltage(2.5);
+			indicatorLight.setVoltage(1.875);
 		else
 			indicatorLight.setVoltage(0);
 		Controls.operatorController.setRumble(RumbleType.kLeftRumble, 0);
+		Controls.operatorController.setRumble(RumbleType.kRightRumble, 0);
+		Controls.driverController.setRumble(RumbleType.kLeftRumble, 0);
+		Controls.driverController.setRumble(RumbleType.kRightRumble, 0);
 	}
 
 	public void autonomousInit() {
@@ -95,12 +98,16 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void autonomousPeriodic() {
+		Drive.getInstance().setLowGear();
 		Sensors.read();
 		try {
 			Systems.update();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		//LightRing.getInstance().update();
+		Systems.smartDashboard();
 		Actuators.actuate();
 	}
 
@@ -111,6 +118,8 @@ public class Robot extends IterativeRobot {
 	}
 
 	private KragerTimer profileTimer = new KragerTimer();
+	private boolean isSmartDash = true;
+	private boolean isActuating = true;
 
 	public void teleopPeriodic() {
 		profileTimer.reset();
@@ -118,34 +127,39 @@ public class Robot extends IterativeRobot {
 
 		profileTimer.log("NEW LOOP -------------------------");
 		Sensors.read();
-		indicatorLight.setVoltage(5);
-		profileTimer.log("Sensors");
 
-		Flywheel.getInstance().updateTeleop();
-		Hood.getInstance().updateTeleop();
-		Turbine.getInstance().updateTeleop();
-		Turret.getInstance().updateTeleop();
-		Shooter.getInstance().updateTeleop();
-		profileTimer.log("Shooter");
-		Elevator.getInstance().updateTeleop();
-		FuelIntake.getInstance().updateTeleop();
-		GearIntake.getInstance().updateTeleop();
-		Climber.getInstance().manualControl();
-		profileTimer.log("Climber");
-		Drive.getInstance().updateTeleop();
+		profileTimer.log("Sensors");
+		if (isActuating) {
+			Flywheel.getInstance().updateTeleop();
+			Hood.getInstance().updateTeleop();
+			Turbine.getInstance().updateTeleop();
+			Turret.getInstance().updateTeleop();
+			Shooter.getInstance().updateTeleop();
+			LightRing.getInstance().update();
+			profileTimer.log("Shooter");
+			Elevator.getInstance().updateTeleop();
+			FuelIntake.getInstance().updateTeleop();
+			GearIntake.getInstance().updateTeleop();
+			Climber.getInstance().manualControl();
+			profileTimer.log("Climber");
+			Drive.getInstance().updateTeleop();
+		}
 		profileTimer.log("Subsystems");
-		Flywheel.getInstance().sendToSmartDash();
-		Hood.getInstance().sendToSmartDash();
-		Turret.getInstance().sendToSmartDash();
-		Shooter.getInstance().sendToSmartDash();
-		Elevator.getInstance().sendToSmartDash();
-		GearIntake.getInstance().sendToSmartDash();
-		Climber.getInstance().sendToSmartDash();
-		Drive.getInstance().sendToSmartDash();
+		if (isSmartDash) {
+			Flywheel.getInstance().sendToSmartDash();
+			Hood.getInstance().sendToSmartDash();
+			Turret.getInstance().sendToSmartDash();
+			Shooter.getInstance().sendToSmartDash();
+			Elevator.getInstance().sendToSmartDash();
+			GearIntake.getInstance().sendToSmartDash();
+			Climber.getInstance().sendToSmartDash();
+			Drive.getInstance().sendToSmartDash();
+		}
 		profileTimer.log("Smart Dash");
 
 		Actuators.actuate();
 		profileTimer.log("Actuators");
+		// KragerTimer.delayMS(50);
 	}
 
 	public static AllianceColor getAllianceColor() {

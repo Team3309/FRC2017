@@ -50,7 +50,7 @@ public abstract class PIDController extends Controller {
 	 * Tells if Controller ends when it maintains a low error for a certain
 	 * amount of time.
 	 */
-	protected boolean completable = true;
+	protected boolean completable = false;
 	/**
 	 * Margin of how close the error can be close to 0.
 	 */
@@ -165,7 +165,7 @@ public abstract class PIDController extends Controller {
 		if (completable) {
 			return this.doneTimer.isConditionMaintained(Math.abs(previousError) < THRESHOLD);
 		}
-		return this.doneTimer.isConditionMaintained(false);
+		return false;
 	}
 
 	public void printConstants() {

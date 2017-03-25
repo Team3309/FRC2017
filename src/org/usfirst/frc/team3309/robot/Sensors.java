@@ -2,7 +2,6 @@ package org.usfirst.frc.team3309.robot;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import org.team3309.lib.sensors.CounterSensor;
 import org.team3309.lib.sensors.Sensor;
@@ -10,14 +9,13 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.subsystems.Drive;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 
 /**
  * All the sensors on the robot
  * 
- * @author Krager
- *
+ * @author*
  */
 public class Sensors {
 
@@ -25,6 +23,7 @@ public class Sensors {
 	// private static AHRS navX;
 	private static ADXRS450_Gyro gyro;
 	private static CounterSensor flywheelCounter;
+	private static AnalogInput gearSensor = new AnalogInput(RobotMap.GEAR_HAS_SENSOR);
 	public static double rawRPS = 0;
 
 	static {
@@ -37,7 +36,7 @@ public class Sensors {
 	private static double previousFlywheelCounterRPS = 0;
 
 	public static void read() {
-		if (!DriverStation.getInstance().isDisabled() && Controls.driverController.getYButton()) {
+		if (DriverStation.getInstance().isDisabled() && Controls.driverController.getYButton()) {
 			Sensors.resetDrive();
 			gyro.calibrate();
 		}
@@ -77,6 +76,14 @@ public class Sensors {
 
 	public static double getAngularVel() {
 		return gyro.getRate();
+	}
+
+	public static double getAverageGearVal() {
+		return gearSensor.getAverageVoltage();
+	}
+
+	public static boolean hasGear() {
+		return gearSensor.getAverageVoltage() > 1.5;
 	}
 
 }

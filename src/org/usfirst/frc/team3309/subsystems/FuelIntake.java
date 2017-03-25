@@ -7,7 +7,6 @@ import org.usfirst.frc.team3309.robot.RobotMap;
 import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.Timer;
 
 public class FuelIntake extends KragerSystem {
 
@@ -36,12 +35,13 @@ public class FuelIntake extends KragerSystem {
 			setFuelIntake(driverRightTrigger);
 		} else if (driverLeftTrigger > MIN_VALUE_TO_MOVE) {
 			setFuelIntake(-driverLeftTrigger);
-		} else if (operatorRightTrigger > MIN_VALUE_TO_MOVE) {
-			setFuelIntake(operatorRightTrigger);
-		} else if (operatorLeftTrigger > MIN_VALUE_TO_MOVE) {
-			setFuelIntake(-operatorLeftTrigger);
-		} else {
-			setFuelIntake(0);
+		} /*
+			 * else if (operatorRightTrigger > MIN_VALUE_TO_MOVE) {
+			 * setFuelIntake(operatorRightTrigger); } else if
+			 * (operatorLeftTrigger > MIN_VALUE_TO_MOVE) {
+			 * setFuelIntake(-operatorLeftTrigger); }
+			 */else {
+			setFuelIntake(-Controls.operatorController.getY(Hand.kLeft));
 		}
 	}
 

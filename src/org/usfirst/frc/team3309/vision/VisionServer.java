@@ -33,25 +33,28 @@ public class VisionServer implements Runnable {
 	public static double FIELD_OF_VIEW_DEGREES = 45;
 	private static double k_predRPS = .001;
 
-	private static Shot[] shots = { new Shot(101, 1000, .09),
-			new Shot(103, 0, .07),
-			new Shot(105, 0, .047),
-			new Shot(111, 0, .031),
-			new Shot(104, .5, .03),
-			new Shot(110, .5, .019),
-			new Shot(115, .5, .01),
-			new Shot(120, .5, .0055),
-			new Shot(124, .5, .003),
-			new Shot(127, .5, .0016), // to here
-			new Shot(115, .85, .0015),
-			new Shot(119, .85, .00055),
-			new Shot(122, .85, .0002),
-			new Shot(124, 1, .00019),
-			new Shot(128, 1, 0),
-			new Shot(130, 1, -.00055),
-			new Shot(132, 1, -.01),
-			new Shot(135, 1, -.015),
-			new Shot(142, 1, -.02)
+	// private static Shot[] shots = { new Shot(98, .01, .23),
+	// new Shot(99, .01, .161),
+	// new Shot(99, .05, .16),
+	// new Shot(102, .05, .101),
+	// new Shot(100, .4, .1),
+	// new Shot(102, .4, .071),
+	// new Shot(104, .6, .07),
+	// new Shot(106, .6, .051),
+	// new Shot(106, 1, .05),
+	// new Shot(113, 1, .031) // to here)
+	// };
+	// ross
+	private static Shot[] shots = { new Shot(98, .01, .23),
+			new Shot(99, .01, .161),
+			new Shot(100, .05, .16),
+			new Shot(103, .05, .101),
+			new Shot(99, .4, .1),
+			new Shot(101, .4, .071),
+			new Shot(103, .6, .07),
+			new Shot(105, .6, .051),
+			new Shot(105, 1, .05),
+			new Shot(111, 1, .031) // to here)
 	};
 
 	public static VisionServer getInstance() {
@@ -83,6 +86,7 @@ public class VisionServer implements Runnable {
 				JSONObject target = (JSONObject) targetObj;
 				double y = target.getDouble("y");
 				double z = target.getDouble("z");
+
 				targetInfos.add(new TargetInfo(y, z));
 			}
 			targets = targetInfos;
@@ -158,14 +162,9 @@ public class VisionServer implements Runnable {
 		List<TargetInfo> currentTargets = this.getTargets();
 		// Find the closest preset value to the vision shot
 		if (!this.hasTargetsToAimAt()) {
-			Controls.operatorController.setRumble(RumbleType.kLeftRumble, 0);
 			currentShotToAimTowards = null;
 			return;
 		}
-		if (Math.abs(this.getTarget().getZ()) < .04)
-			Controls.operatorController.setRumble(RumbleType.kLeftRumble, .6);
-		else
-			Controls.operatorController.setRumble(RumbleType.kLeftRumble, 0);
 		double closestShot = Integer.MAX_VALUE;
 		double currentHyp = this.getTarget().getHyp();
 		Shot shotToBeSet = new Shot();

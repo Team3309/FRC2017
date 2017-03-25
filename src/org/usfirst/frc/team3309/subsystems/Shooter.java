@@ -37,8 +37,7 @@ public class Shooter extends KragerSystem {
 			startupTimer.start();
 			startupTimer.reset();
 		}
-		if (Sensors.getFlywheelRPS() > 60
-				&& Flywheel.getInstance().getAimVelRPS() != 0 && startupTimer.get() > 1.5) {
+		if (Flywheel.getInstance().getAimVelRPS() != 0 && startupTimer.get() > .5) {
 			shouldBeShooting = true;
 		} else if (Sensors.getFlywheelRPS() != 0) {
 			shouldBeSpinningUp = true;

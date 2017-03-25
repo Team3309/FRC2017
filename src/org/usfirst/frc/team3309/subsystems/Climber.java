@@ -7,12 +7,15 @@ import org.usfirst.frc.team3309.robot.RobotMap;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Climber extends KragerSystem {
 
 	private static Climber instance;
 	private CANTalon climberMC = new CANTalon(RobotMap.CLIMBER_ID);
 	private final double CURRENT_LIMIT = 8;
-	private final double UP_POWER = .5;
+	private final double UP_POWER = 1.0;
 	private int loopsAboveCurrentLimit = 0;
 	private boolean hasStartedClimbing = false;
 
@@ -60,10 +63,8 @@ public class Climber extends KragerSystem {
 
 	@Override
 	public void sendToSmartDash() {
-		// NetworkTable.getTable("Climber").putNumber("current",
-		// climberMC.getTalon().getOutputCurrent());
-		// SmartDashboard.putNumber("Climber Curret",
-		// climberMC.getTalon().getOutputCurrent());
+		NetworkTable.getTable("Climber").putNumber("current",
+				climberMC.getOutputCurrent());
 	}
 
 	@Override
