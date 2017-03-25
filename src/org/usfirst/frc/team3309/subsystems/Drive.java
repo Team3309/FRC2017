@@ -2,7 +2,7 @@ package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerMath;
-import org.team3309.lib.controllers.drive.DriveAngleVelocityController;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.drive.equations.DriveCheezyDriveEquation;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
@@ -11,7 +11,6 @@ import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 
-import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
@@ -32,12 +31,12 @@ public class Drive extends ControlledSubsystem {
 	 */
 	private static final double DRIVE_GYRO_LENIENCY = 5;
 	private static Drive drive;
-	private CANTalon right0 = new CANTalon(RobotMap.DRIVE_RIGHT_0_ID);
-	private CANTalon right1 = new CANTalon(RobotMap.DRIVE_RIGHT_1_ID);
-	private CANTalon right2 = new CANTalon(RobotMap.DRIVE_RIGHT_2_ID);
-	private CANTalon left0 = new CANTalon(RobotMap.DRIVE_LEFT_0_ID);
-	private CANTalon left1 = new CANTalon(RobotMap.DRIVE_LEFT_1_ID);
-	private CANTalon left2 = new CANTalon(RobotMap.DRIVE_LEFT_2_ID);
+	private TalonSRXMC right0 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_0_ID);
+	private TalonSRXMC right1 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_1_ID);
+	private TalonSRXMC right2 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_2_ID);
+	private TalonSRXMC left0 = new TalonSRXMC(RobotMap.DRIVE_LEFT_0_ID);
+	private TalonSRXMC left1 = new TalonSRXMC(RobotMap.DRIVE_LEFT_1_ID);
+	private TalonSRXMC left2 = new TalonSRXMC(RobotMap.DRIVE_LEFT_2_ID);
 	private NetworkTable table = NetworkTable.getTable("Drivetrain");
 	private Solenoid shifter = new Solenoid(RobotMap.SHIFTER);
 

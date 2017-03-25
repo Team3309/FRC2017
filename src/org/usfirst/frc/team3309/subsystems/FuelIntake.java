@@ -1,10 +1,9 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
-
-import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
@@ -12,7 +11,7 @@ public class FuelIntake extends KragerSystem {
 
 	private double MIN_VALUE_TO_MOVE = .15;
 	public static FuelIntake instance;
-	private CANTalon fuel = new CANTalon(RobotMap.FUEL_INTAKE_ID);
+	private TalonSRXMC fuel = new TalonSRXMC(RobotMap.FUEL_INTAKE_ID);
 
 	public static FuelIntake getInstance() {
 		if (instance == null)

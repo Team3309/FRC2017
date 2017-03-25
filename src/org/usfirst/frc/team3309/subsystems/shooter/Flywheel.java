@@ -2,6 +2,7 @@
 package org.usfirst.frc.team3309.subsystems.shooter;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.generic.FeedForwardWithPIDController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
@@ -10,7 +11,6 @@ import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
-import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
@@ -19,8 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Flywheel extends ControlledSubsystem {
 
-	private CANTalon leftTalon = new CANTalon(RobotMap.LEFT_SHOOTER_ID);
-	private CANTalon rightTalon = new CANTalon(RobotMap.RIGHT_SHOOTER_ID);
+	private TalonSRXMC leftTalon = new TalonSRXMC(RobotMap.LEFT_SHOOTER_ID);
+	private TalonSRXMC rightTalon = new TalonSRXMC(RobotMap.RIGHT_SHOOTER_ID);
 
 	private double maxAccRPS = 60.0;
 	private double aimVelRPS = 0.0;

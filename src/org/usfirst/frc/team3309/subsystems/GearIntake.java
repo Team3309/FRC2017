@@ -1,13 +1,13 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
-import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -22,7 +22,7 @@ public class GearIntake extends KragerSystem {
 	private boolean hasZippedInwards = false;
 	private static final double DOWN_POSITION = .07;
 	private static GearIntake instance;
-	private CANTalon gearIntake = new CANTalon(RobotMap.GEAR_INTAKE_ID);
+	private TalonSRXMC gearIntake = new TalonSRXMC(RobotMap.GEAR_INTAKE_ID);
 	private DoubleSolenoid intakePivot = new DoubleSolenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_A,
 			RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_B);
 	private NetworkTable table = NetworkTable.getTable("Intakes");

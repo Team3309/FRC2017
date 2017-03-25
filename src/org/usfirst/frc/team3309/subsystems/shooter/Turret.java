@@ -3,6 +3,7 @@ package org.usfirst.frc.team3309.subsystems.shooter;
 import java.util.HashMap;
 
 import org.team3309.lib.ControlledSubsystem;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.generic.BlankController;
 import org.team3309.lib.controllers.generic.PIDPositionController;
 import org.team3309.lib.controllers.statesandsignals.InputState;
@@ -13,18 +14,15 @@ import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Shooter;
-import org.usfirst.frc.team3309.subsystems.shooter.Turret.TurretState;
 import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
-import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.FeedbackDeviceStatus;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -32,7 +30,7 @@ public class Turret extends ControlledSubsystem {
 
 	private static Turret instance;
 	private DigitalInput hallEffectSensor = new DigitalInput(RobotMap.HALL_EFFECT_SENSOR);
-	private CANTalon turretMC = new CANTalon(RobotMap.TURRET_ID, 10);
+	private TalonSRXMC turretMC = new TalonSRXMC(RobotMap.TURRET_ID, 10);
 
 	public boolean hasCalibratedSinceRobotInit = false;
 	// angle and loops since it last of spotted

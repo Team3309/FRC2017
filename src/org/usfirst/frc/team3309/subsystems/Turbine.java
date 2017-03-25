@@ -78,7 +78,7 @@ public class Turbine extends ControlledSubsystem {
 	}
 
 	public void setHopper(double power) {
-		hopperMC.setDesiredOutput(-power);
+		hopperMC.set(-power);
 		if (power != 0) {
 			this.vibrate.set(1);
 		} else {

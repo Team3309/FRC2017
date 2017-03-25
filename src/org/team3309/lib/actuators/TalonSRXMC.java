@@ -2,48 +2,21 @@ package org.team3309.lib.actuators;
 
 import com.ctre.CANTalon;
 
-public class TalonSRXMC extends Actuator {
+public class TalonSRXMC extends CANTalon {
 
-	private CANTalon talon;
-	private boolean isReversed = false;
-	private double desiredOutput = 0.0;
-	private double lastPosition = 0;
-	private double lastVelocity = 0;
+	private TalonControlMode currentControlMode = TalonControlMode.PercentVbus;
 
 	public TalonSRXMC(int port) {
-		talon = new CANTalon(port);
+		super(port);
+	}
+
+	public TalonSRXMC(int turretId, int i) {
+		super(turretId, i);
 	}
 
 	@Override
-	protected void output() {
-		// System.out.println("DES " + desiredOutput);
-		talon.set(desiredOutput);
-		// if(talon.)
-
+	public void changeControlMode(TalonControlMode controlMode) {
+		if (!controlMode.equals(currentControlMode))
+			super.changeControlMode(controlMode);
 	}
-
-	public double getPosition() {
-		return lastPosition;
-	}
-
-	public boolean isReversed() {
-		return isReversed;
-	}
-
-	public void setReversed(boolean isReversed) {
-		this.isReversed = isReversed;
-	}
-
-	public double getDesiredOutput() {
-		return desiredOutput;
-	}
-
-	public void setDesiredOutput(double desiredOutput) {
-		this.desiredOutput = desiredOutput;
-	}
-
-	public CANTalon getTalon() {
-		return talon;
-	}
-
 }

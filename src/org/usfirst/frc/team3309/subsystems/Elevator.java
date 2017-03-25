@@ -2,12 +2,12 @@ package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.KragerMath;
+import org.team3309.lib.actuators.TalonSRXMC;
 import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 
-import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
@@ -17,8 +17,8 @@ public class Elevator extends ControlledSubsystem {
 
 	private final double SHOOTING_VELOCITY = 9000;
 	private double aimVel = 0;
-	private CANTalon elevator = new CANTalon(RobotMap.ELEVATOR_ID);
-	private CANTalon feedyWheel = new CANTalon(RobotMap.FEEDY_WHEEL_ID);
+	private TalonSRXMC elevator = new TalonSRXMC(RobotMap.ELEVATOR_ID);
+	private TalonSRXMC feedyWheel = new TalonSRXMC(RobotMap.FEEDY_WHEEL_ID);
 	private NetworkTable table = NetworkTable.getTable("Elevator");
 	private static Elevator instance;
 
