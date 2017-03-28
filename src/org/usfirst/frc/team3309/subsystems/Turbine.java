@@ -31,8 +31,6 @@ public class Turbine extends ControlledSubsystem {
 		boolean operatorXButton = Controls.operatorController.getXButton(); // sort
 		if (Shooter.getInstance().isShouldBeShooting() && Flywheel.getInstance().isShooterInRange()) {
 			setHopper(1);
-		} else if (operatorXButton) {
-			setHopper(-.5);
 		} else {
 			setHopper(0);
 		}

@@ -30,6 +30,7 @@ public class Flywheel extends ControlledSubsystem {
 	private double lastVisionRPS = 0;
 	private double offset = 0;
 	private boolean isPressedAlready = false;
+	private boolean isFirstFilter = true;
 	private NetworkTable table = NetworkTable.getTable("Flywheel");
 
 	/**
@@ -97,9 +98,16 @@ public class Flywheel extends ControlledSubsystem {
 		if (Shooter.getInstance().isShouldBeShooting()) {
 			// aimVelRPS = 180;
 			if (VisionServer.getInstance().hasTargetsToAimAt()) {
-				aimVelRPS = VisionServer.getInstance().getRPS();
+				aimVelRPS = VisionServer.getInstance().getRPS() + 7;
+
+				if (Math.abs(aimVelRPS - lastVisionRPS) > 10 && isFirstFilter) {
+					aimVelRPS = lastVisionRPS;
+				}
+				isFirstFilter = false;
+				System.out.println("FLYWHEEL VISION AIM " + aimVelRPS);
 				lastVisionRPS = aimVelRPS;
 			} else {
+				isFirstFilter = true;
 				aimVelRPS = lastVisionRPS;
 			}
 		} else if (Shooter.getInstance().isShouldBeSpinningUp()) {
@@ -107,6 +115,7 @@ public class Flywheel extends ControlledSubsystem {
 
 		} else {
 			aimVelRPS = 0;
+			isFirstFilter = true;
 		}
 		talonSet(aimVelRPS);
 		// shootLikeRobie();
@@ -138,9 +147,15 @@ public class Flywheel extends ControlledSubsystem {
 		} else if (Controls.operatorController.getBButton()) {
 			if (VisionServer.getInstance().hasTargetsToAimAt()) {
 				aimVelRPS = VisionServer.getInstance().getRPS();
+
+				if (Math.abs(aimVelRPS - lastVisionRPS) > 10 && isFirstFilter) {
+					aimVelRPS = lastVisionRPS;
+				}
+				isFirstFilter = false;
 				System.out.println("FLYWHEEL VISION AIM " + aimVelRPS);
 				lastVisionRPS = aimVelRPS;
 			} else {
+				isFirstFilter = true;
 				aimVelRPS = lastVisionRPS;
 			}
 		} else {

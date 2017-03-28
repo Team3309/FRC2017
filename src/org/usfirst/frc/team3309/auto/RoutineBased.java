@@ -209,7 +209,6 @@ public class RoutineBased {
 			KragerTimer.delayMS(100);
 		}
 		Shooter.getInstance().setShouldBeSpinningUp(true);
-		KragerTimer.delayMS(500);
 		Shooter.getInstance().setShouldBeShooting(true);
 	}
 

@@ -10,9 +10,11 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.team3309.lib.controllers.statesandsignals.OutputSignal;
 import org.team3309.lib.controllers.turret.TurretVelocitySuveyController;
 import org.usfirst.frc.team3309.driverstation.Controls;
+import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.Climber;
+import org.usfirst.frc.team3309.subsystems.GearIntake;
 import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.vision.TargetInfo;
 import org.usfirst.frc.team3309.vision.VisionServer;
@@ -107,7 +109,13 @@ public class Turret extends ControlledSubsystem {
 			calibrate();
 			return;
 		}
-
+		if (GearIntake.getInstance().hasGear()) {
+			Robot.indicatorLight.setVoltage(3.6);
+		} else if (VisionServer.getInstance().hasTargetsToAimAt() && lastGoalX <= .4) {
+			Robot.indicatorLight.setVoltage(5);
+		} else {
+			Robot.indicatorLight.setVoltage(2.44);
+		}
 		// STATE UPDATES
 		// If climbing,
 		if (Climber.getInstance().isClimbing()) {
@@ -126,6 +134,7 @@ public class Turret extends ControlledSubsystem {
 				&& (currentState != TurretState.HOME && currentState != TurretState.CLIMBING)) {
 			currentState = TurretState.USING_VISION;
 			moveTowardsGoal();
+
 		} else if (currentState == TurretState.SURVEY) {
 			survey();
 		} else if (currentState == TurretState.CLIMBING) {
@@ -222,6 +231,7 @@ public class Turret extends ControlledSubsystem {
 		changeToPositionMode();
 		TargetInfo goal = VisionServer.getInstance().getTarget();
 		double goalX = goal.getZ();
+
 		if (lastGoalX != goalX) {
 			// System.out.println("SEE NEW GOAL AIMING");
 			double degToTurn = ((goalX) / .8) * (VisionServer.FIELD_OF_VIEW_DEGREES);
@@ -277,6 +287,7 @@ public class Turret extends ControlledSubsystem {
 		if (VisionServer.getInstance().hasTargetsToAimAt()) {
 			NetworkTable.getTable("Climber").putNumber(" X", VisionServer.getInstance().getTarget().getZ());
 			NetworkTable.getTable("Climber").putNumber(" HYP-RAW", VisionServer.getInstance().getTarget().getHyp());
+			SmartDashboard.putNumber(" HYP-RAW", VisionServer.getInstance().getTarget().getHyp());
 			NetworkTable.getTable("Climber").putNumber(" Hyp", VisionServer.getInstance().getTarget().getHyp() * 1000);
 		} else {
 			NetworkTable.getTable("Climber").putNumber(" X", 1000);

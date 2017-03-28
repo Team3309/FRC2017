@@ -26,11 +26,11 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 		this.setFuelIntake(0);
 		this.driveEncoder(10000, 1.25);
 		this.pivotUpGearIntake();
-		this.driveEncoder(-1000, .75);
+		this.driveEncoder(-2000, .75);
 		GearIntake.getInstance().setGearIntakeRoller(1);
 		KragerTimer.delayMS(250);
 		GearIntake.getInstance().setGearIntakeRoller(0);
-		this.driveEncoder(19500, 2.5);
+		this.driveEncoder(20500, 2.5);
 		GearIntake.getInstance().setGearIntakeRoller(-.5);
 		this.pivotDownGearIntake();
 		openGearIntake();
@@ -45,9 +45,10 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 
 		this.driveEncoder(25000, 9, changePoints);
 
+		this.spinUp();
 		KragerTimer.delayMS(1000);
-		if (Turret.getInstance().hasCalibratedSinceRobotInit)
-			shoot();
+
+		shoot();
 		KragerTimer.delayMS(4000);
 	}
 
@@ -60,11 +61,11 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 		this.setFuelIntake(0);
 		this.driveEncoder(10000, 1.25);
 		this.pivotUpGearIntake();
-		this.driveEncoder(-1000, .75);
+		this.driveEncoder(-2000, .75);
 		GearIntake.getInstance().setGearIntakeRoller(1);
 		KragerTimer.delayMS(250);
 		GearIntake.getInstance().setGearIntakeRoller(0);
-		this.driveEncoder(19500, 2.5);
+		this.driveEncoder(20500, 2.5);
 		GearIntake.getInstance().setGearIntakeRoller(-.5);
 		this.pivotDownGearIntake();
 		openGearIntake();
@@ -79,9 +80,9 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 
 		this.driveEncoder(25000, 9, changePoints);
 
+		this.spinUp();
 		KragerTimer.delayMS(1000);
-		if (Turret.getInstance().hasCalibratedSinceRobotInit)
-			shoot();
+		shoot();
 		KragerTimer.delayMS(4000);
 	}
 }

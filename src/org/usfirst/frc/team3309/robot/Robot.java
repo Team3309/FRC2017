@@ -81,9 +81,9 @@ public class Robot extends IterativeRobot {
 		// Systems.smartDashboard();
 		Turret.getInstance().checkForCalibration();
 		if (Turret.getInstance().hasCalibratedSinceRobotInit)
-			indicatorLight.setVoltage(1.875);
+			indicatorLight.setVoltage(1.46);
 		else
-			indicatorLight.setVoltage(0);
+			indicatorLight.setVoltage(.49);
 		Controls.operatorController.setRumble(RumbleType.kLeftRumble, 0);
 		Controls.operatorController.setRumble(RumbleType.kRightRumble, 0);
 		Controls.driverController.setRumble(RumbleType.kLeftRumble, 0);
@@ -98,16 +98,17 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void autonomousPeriodic() {
+		c.stop();
 		Drive.getInstance().setLowGear();
 		Sensors.read();
 		try {
 			Systems.update();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//LightRing.getInstance().update();
-		Systems.smartDashboard();
+		// LightRing.getInstance().update();
+		// Systems.smartDashboard();
 		Actuators.actuate();
 	}
 
@@ -122,6 +123,7 @@ public class Robot extends IterativeRobot {
 	private boolean isActuating = true;
 
 	public void teleopPeriodic() {
+		c.start();
 		profileTimer.reset();
 		profileTimer.start();
 
@@ -159,7 +161,7 @@ public class Robot extends IterativeRobot {
 
 		Actuators.actuate();
 		profileTimer.log("Actuators");
-		// KragerTimer.delayMS(50);
+		KragerTimer.delayMS(20);
 	}
 
 	public static AllianceColor getAllianceColor() {

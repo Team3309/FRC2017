@@ -13,8 +13,8 @@ public class RobotMap {
 	public static final int DRIVE_LEFT_1_ID = 15;
 	public static final int DRIVE_LEFT_2_ID = 16;
 	public static final int CLIMBER_ID = 5;
-	public static final int FUEL_INTAKE_ID = 6; // 6 on comp
-	public static final int GEAR_INTAKE_ID = 7; // 7 on comp
+	public static final int FUEL_INTAKE_ID = 7; // 6 on comp
+	public static final int GEAR_INTAKE_ID = 6; // 7 on comp
 
 	public static final int HOPPER_ID = 13;
 	public static final int LEFT_SHOOTER_ID = 10;

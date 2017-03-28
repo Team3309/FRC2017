@@ -30,7 +30,9 @@ public class FuelIntake extends KragerSystem {
 		double driverLeftTrigger = Controls.driverController.getTriggerAxis(Hand.kLeft);
 		double operatorRightTrigger = Controls.operatorController.getTriggerAxis(Hand.kRight);
 		double operatorLeftTrigger = Controls.operatorController.getTriggerAxis(Hand.kLeft);
-		if (driverRightTrigger > MIN_VALUE_TO_MOVE) {
+		if (GearIntake.getInstance().intakeTimer.get() < 1 || Controls.operatorController.getXButton()) {
+			this.setFuelIntake(1);
+		} else if (driverRightTrigger > MIN_VALUE_TO_MOVE) {
 			setFuelIntake(driverRightTrigger);
 		} else if (driverLeftTrigger > MIN_VALUE_TO_MOVE) {
 			setFuelIntake(-driverLeftTrigger);

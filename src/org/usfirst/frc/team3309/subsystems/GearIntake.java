@@ -1,12 +1,11 @@
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
+import org.team3309.lib.KragerTimer;
 import org.team3309.lib.actuators.TalonSRXMC;
 import org.usfirst.frc.team3309.driverstation.Controls;
-import org.usfirst.frc.team3309.robot.Robot;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
-import org.usfirst.frc.team3309.vision.VisionServer;
 
 import com.ctre.CANTalon.TalonControlMode;
 
@@ -19,7 +18,8 @@ public class GearIntake extends KragerSystem {
 
 	private static final double MIN_VALUE_TO_MOVE = .15;
 	private static final double UP_POSITION = -.37;
-	private boolean hasZippedInwards = false;
+	private boolean hasZippedInwards = true;
+	public KragerTimer intakeTimer = new KragerTimer();
 	private static final double DOWN_POSITION = .07;
 	private static GearIntake instance;
 	private TalonSRXMC gearIntake = new TalonSRXMC(RobotMap.GEAR_INTAKE_ID);
@@ -44,6 +44,7 @@ public class GearIntake extends KragerSystem {
 		this.gearIntake.setPulseWidthPosition(0);
 		this.gearIntake.setSetpoint(0);
 		this.gearIntake.reverseOutput(true);
+		intakeTimer.start();
 	}
 
 	@Override
@@ -54,9 +55,14 @@ public class GearIntake extends KragerSystem {
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
 		if (operatorRB) {
+			hasZippedInwards = false;
 			pivotUpGearIntake();
 		} else {
-			hasZippedInwards = false;
+			if (!hasZippedInwards) {
+				this.intakeTimer.reset();
+				this.intakeTimer.start();
+			}
+			hasZippedInwards = true;
 			pivotDownGearIntake();
 		}
 
@@ -70,13 +76,7 @@ public class GearIntake extends KragerSystem {
 			} else
 				this.gearIntake.set(0);
 		}
-		if ((VisionServer.getInstance().hasTargetsToAimAt() && VisionServer.getInstance().getTarget().getHyp() > .1
-				&& VisionServer.getInstance().getTarget().getHyp() < .18) || this.hasGear()) {
 
-			Robot.indicatorLight.setVoltage(5);
-		} else {
-			Robot.indicatorLight.setVoltage(3.125);
-		}
 	}
 
 	public void pivotDownGearIntake() {
@@ -124,9 +124,9 @@ public class GearIntake extends KragerSystem {
 	public void setGearIntakeRoller(double power) {
 
 		if (this.hasGear() && power >= 0)
-			gearIntake.set(-.35);
+			gearIntake.set(.35);
 		else
-			gearIntake.set(-power);
+			gearIntake.set(power);
 	}
 
 	public double getGearIntakeRollerPower() {

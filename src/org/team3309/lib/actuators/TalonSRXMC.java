@@ -16,7 +16,9 @@ public class TalonSRXMC extends CANTalon {
 
 	@Override
 	public void changeControlMode(TalonControlMode controlMode) {
-		if (!controlMode.equals(currentControlMode))
+		if (!controlMode.equals(currentControlMode)) {
+			currentControlMode = controlMode;
 			super.changeControlMode(controlMode);
+		}
 	}
 }
