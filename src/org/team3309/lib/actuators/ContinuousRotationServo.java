@@ -21,7 +21,7 @@ public class ContinuousRotationServo extends PWM {
 		if (value == 0) { // setSpeed(0); // this.setZeroLatch();
 			this.setDisabled();
 		} else {
-			this.setPosition(value);
+			this.setPosition(1 - value); // practice bot hood has 1 -
 		}
 	}
 }
