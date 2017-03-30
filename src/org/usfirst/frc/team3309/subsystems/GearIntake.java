@@ -25,6 +25,8 @@ public class GearIntake extends KragerSystem {
 	private TalonSRXMC gearIntake = new TalonSRXMC(RobotMap.GEAR_INTAKE_ID);
 	private DoubleSolenoid intakePivot = new DoubleSolenoid(RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_A,
 			RobotMap.GEAR_INTAKE_PIVOT_SOLENOID_B);
+	private DoubleSolenoid intakeClamp = new DoubleSolenoid(RobotMap.GEAR_INTAKE_WRIST_SOLENOID_A,
+			RobotMap.GEAR_INTAKE_WRIST_SOLENOID_B);
 	private NetworkTable table = NetworkTable.getTable("Intakes");
 
 	public static GearIntake getInstance() {
