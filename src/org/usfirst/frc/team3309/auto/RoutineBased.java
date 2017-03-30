@@ -17,6 +17,7 @@ import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class RoutineBased {
 
@@ -222,15 +223,11 @@ public class RoutineBased {
 	}
 
 	public void closeGearIntake() {
-		GearIntake.getInstance().setGearIntakeRoller(1);
-		KragerTimer.delayMS(1000);
-		GearIntake.getInstance().setGearIntakeRoller(0);
+		GearIntake.getInstance().closeGearIntake();
 	}
 
 	public void openGearIntake() {
-		GearIntake.getInstance().setGearIntakeRoller(-1);
-		KragerTimer.delayMS(1000);
-		GearIntake.getInstance().setGearIntakeRoller(0);
+		GearIntake.getInstance().openGearIntake();
 	}
 
 	public void pivotUpGearIntake() {

@@ -67,18 +67,29 @@ public class GearIntake extends KragerSystem {
 			hasZippedInwards = true;
 			pivotDownGearIntake();
 		}
-
-		if (Controls.operatorController.getTriggerAxis(Hand.kRight) > .1) {
+		
+		if (Math.abs(Controls.operatorController.getTriggerAxis(Hand.kRight)) > .1) {
 			this.setGearIntakeRoller(Controls.operatorController.getTriggerAxis(Hand.kRight));
-		} else if (Controls.operatorController.getTriggerAxis(Hand.kLeft) > .1) {
-			this.setGearIntakeRoller(-Controls.operatorController.getTriggerAxis(Hand.kLeft));
-		} else {
-			if (operatorRB) {
-				this.setGearIntakeRoller(.1);
-			} else
-				this.gearIntake.set(0);
+		}else if (Math.abs(Controls.operatorController.getTriggerAxis(Hand.kLeft)) > .1) {
+			this.setGearIntakeRoller(Controls.operatorController.getTriggerAxis(Hand.kLeft));
+		}else {
+			this.setGearIntakeRoller(0);
 		}
 
+		if (operatorLB) {
+			closeGearIntake();
+		} else {
+			openGearIntake();
+		}
+
+	}
+
+	public void closeGearIntake() {
+		this.intakeClamp.set(Value.kForward);
+	}
+
+	public void openGearIntake() {
+		this.intakeClamp.set(Value.kReverse);
 	}
 
 	public void pivotDownGearIntake() {
