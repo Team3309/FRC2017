@@ -83,7 +83,7 @@ public class Sensors {
 	}
 
 	public static boolean hasGear() {
-		return gearSensor.getAverageVoltage() > 1.5;
+		return gearSensor.getAverageVoltage() > .7;
 	}
 
 }

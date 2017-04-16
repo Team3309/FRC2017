@@ -28,12 +28,12 @@ public class RobotMap {
 	public static final int HALL_EFFECT_SENSOR = 3;
 
 	// PNEUMATICS
-	public static final int GEAR_INTAKE_PIVOT_SOLENOID_A = 0;
-	public static final int GEAR_INTAKE_PIVOT_SOLENOID_B = 6; // 6 0j c0k-
-	public static final int GEAR_INTAKE_WRIST_SOLENOID_A = 5;
-	public static final int GEAR_INTAKE_WRIST_SOLENOID_B = 1;
+	public static final int GEAR_INTAKE_PIVOT_SOLENOID_A = 7;
+	public static final int GEAR_INTAKE_PIVOT_SOLENOID_B = 0; // 6 0j c0k-
+	public static final int GEAR_INTAKE_WRIST_SOLENOID_A = 1;
+	public static final int GEAR_INTAKE_WRIST_SOLENOID_B = 5;
 	public static final int LIGHT_RING = 3;
-	public static final int SHIFTER = 7; // 7 o ncomp 6 on practice
+	public static final int SHIFTER = 6; // 7 o ncomp 6 on practice
 
 	// PWM
 	public static final int SERVO = 9;

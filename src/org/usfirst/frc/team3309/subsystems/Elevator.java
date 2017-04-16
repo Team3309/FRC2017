@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class Elevator extends ControlledSubsystem {
 
-	private final double SHOOTING_VELOCITY = 9000;
+	private final double SHOOTING_VELOCITY = 12000;
 	private double aimVel = 0;
 	private TalonSRXMC elevator = new TalonSRXMC(RobotMap.ELEVATOR_ID);
 	private TalonSRXMC feedyWheel = new TalonSRXMC(RobotMap.FEEDY_WHEEL_ID);
@@ -31,7 +31,7 @@ public class Elevator extends ControlledSubsystem {
 	private Elevator() {
 		super("Elevator");
 		elevator.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-
+		this.feedyWheel.changeControlMode(TalonControlMode.PercentVbus);
 		this.elevator.changeControlMode(TalonControlMode.Speed);
 		table.putNumber("k_aimVel", 0);
 	}
@@ -82,6 +82,8 @@ public class Elevator extends ControlledSubsystem {
 		table.putNumber(this.getName() + " Vel", this.elevator.getEncVelocity());
 		table.putNumber(this.getName() + " Pow", this.elevator.get());
 		table.putNumber(this.getName() + " Error", this.elevator.getError());
+		table.putNumber("el curren", elevator.getOutputCurrent());
+		table.putNumber("feedy curren", feedyWheel.getOutputCurrent());
 		// System.out.println("state " +
 		// this.elevator.isSensorPresent(FeedbackDevice.QuadEncoder));
 	}
@@ -93,12 +95,11 @@ public class Elevator extends ControlledSubsystem {
 		} else {
 			aimVel = 0;
 		}
-		elevator.changeControlMode(TalonControlMode.PercentVbus);
+
 		setElevator(aimVel);
 	}
 
 	private void setElevator(double power) {
-
 		if (power == 0) {
 			this.elevator.changeControlMode(TalonControlMode.PercentVbus);
 			this.feedyWheel.set(0);
@@ -107,6 +108,10 @@ public class Elevator extends ControlledSubsystem {
 					* KragerMath.sign(power));
 		}
 		this.elevator.set(power);
+	}
+
+	public double getSpeed() {
+		return this.elevator.getSpeed();
 	}
 
 }

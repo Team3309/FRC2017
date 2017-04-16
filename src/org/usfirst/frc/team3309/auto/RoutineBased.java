@@ -14,6 +14,7 @@ import org.usfirst.frc.team3309.subsystems.Drive;
 import org.usfirst.frc.team3309.subsystems.FuelIntake;
 import org.usfirst.frc.team3309.subsystems.GearIntake;
 import org.usfirst.frc.team3309.subsystems.Shooter;
+import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -39,6 +40,20 @@ public class RoutineBased {
 			}
 			KragerTimer.delayMS(100);
 		}
+	}
+
+	public void outtakeIntakeAndPivotGear() {
+		this.setFuelIntake(1);
+		GearIntake.getInstance().setGearIntakeRoller(.5);
+		KragerTimer.delayMS(500);
+		this.setFuelIntake(0);
+		this.driveEncoder(10000, 1.25);
+		this.closeGearIntake();
+		this.pivotUpGearIntake();
+		this.driveEncoder(-2000, 1.5);
+		GearIntake.getInstance().setGearIntakeRoller(1);
+		KragerTimer.delayMS(750);
+		GearIntake.getInstance().setGearIntakeRoller(0);
 	}
 
 	/**
@@ -206,11 +221,20 @@ public class RoutineBased {
 
 	// once vision sees a goal, start shooting
 	public void shoot() {
-		while (!VisionServer.getInstance().hasTargetsToAimAt()) {
+		KragerTimer timeout = new KragerTimer();
+		timeout.start();
+		while (!VisionServer.getInstance().hasTargetsToAimAt() && !Flywheel.getInstance().isShooterInRange()
+				&& timeout.get() < 5) {
 			KragerTimer.delayMS(100);
+			Shooter.getInstance().setShouldBeSpinningUp(true);
 		}
-		Shooter.getInstance().setShouldBeSpinningUp(true);
+		if (timeout.get() > 5)
+			return;
+		// KragerTimer.delayMS(200);
+		while (Flywheel.getInstance().getRPS() < Flywheel.getInstance().getAimVelRPS() - 5)
+			Shooter.getInstance().setShouldBeSpinningUp(true);
 		Shooter.getInstance().setShouldBeShooting(true);
+
 	}
 
 	public void stopShooting() {
@@ -236,6 +260,15 @@ public class RoutineBased {
 
 	public void pivotDownGearIntake() {
 		GearIntake.getInstance().pivotDownGearIntake();
+	}
+
+	public void placeGear() {
+		this.pivotDownGearIntake();
+		KragerTimer.delayMS(300);
+		GearIntake.getInstance().setGearIntakeRoller(-.7);
+
+		KragerTimer.delayMS(750);
+		GearIntake.getInstance().setGearIntakeRoller(0);
 	}
 
 	public void setFuelIntake(double power) {

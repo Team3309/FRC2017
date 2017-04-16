@@ -56,7 +56,7 @@ public class GearIntake extends KragerSystem {
 		// boolean driverSelect = Controls.driverController.getBackButton();
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
-		if (operatorRB) {
+		if (operatorRB || Controls.operatorController.getXButton()) {
 			hasZippedInwards = false;
 			pivotUpGearIntake();
 		} else {
@@ -67,13 +67,16 @@ public class GearIntake extends KragerSystem {
 			hasZippedInwards = true;
 			pivotDownGearIntake();
 		}
-		
+
 		if (Math.abs(Controls.operatorController.getTriggerAxis(Hand.kRight)) > .1) {
 			this.setGearIntakeRoller(Controls.operatorController.getTriggerAxis(Hand.kRight));
-		}else if (Math.abs(Controls.operatorController.getTriggerAxis(Hand.kLeft)) > .1) {
-			this.setGearIntakeRoller(Controls.operatorController.getTriggerAxis(Hand.kLeft));
-		}else {
-			this.setGearIntakeRoller(0);
+		} else if (Math.abs(Controls.operatorController.getTriggerAxis(Hand.kLeft)) > .1) {
+			this.setGearIntakeRoller(-Controls.operatorController.getTriggerAxis(Hand.kLeft) / 1.2);
+		} else {
+			if (this.isGearIntakeDown())
+				this.setGearIntakeRoller(0);
+			else
+				this.setGearIntakeRoller(.15);
 		}
 
 		if (operatorLB) {
@@ -98,6 +101,10 @@ public class GearIntake extends KragerSystem {
 
 	public void pivotUpGearIntake() {
 		this.intakePivot.set(Value.kForward);
+	}
+
+	public boolean isGearIntakeDown() {
+		return intakePivot.get() == Value.kReverse;
 	}
 
 	@Override
@@ -136,10 +143,7 @@ public class GearIntake extends KragerSystem {
 
 	public void setGearIntakeRoller(double power) {
 
-		if (this.hasGear() && power >= 0)
-			gearIntake.set(.35);
-		else
-			gearIntake.set(power);
+		gearIntake.set(power);
 	}
 
 	public double getGearIntakeRollerPower() {

@@ -9,7 +9,11 @@ import org.usfirst.frc.team3309.auto.SteamworksAutoRoutine;
 import org.usfirst.frc.team3309.auto.TimedOutException;
 import org.usfirst.frc.team3309.auto.operations.GearIntakeRollerSetOperation;
 import org.usfirst.frc.team3309.auto.operations.PivotUpOperation;
+import org.usfirst.frc.team3309.auto.operations.ShootOperation;
+import org.usfirst.frc.team3309.auto.operations.SpinUpOperation;
+import org.usfirst.frc.team3309.auto.operations.TurretTurnAndSurveyOperation;
 import org.usfirst.frc.team3309.subsystems.GearIntake;
+import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
 
 public class GearMiddleStraight extends SteamworksAutoRoutine {
@@ -18,77 +22,61 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 
 	@Override
 	public void redRoutine() throws TimedOutException, InterruptedException {
-
-		Turret.getInstance().returnHome();
-		this.setFuelIntake(1);
-		GearIntake.getInstance().setGearIntakeRoller(.5);
-		KragerTimer.delayMS(500);
-		this.setFuelIntake(0);
-		this.driveEncoder(10000, 1.25);
-		this.closeGearIntake();
-		KragerTimer.delayMS(500);
-		this.pivotUpGearIntake();
-		this.driveEncoder(-2000, .75);
-		GearIntake.getInstance().setGearIntakeRoller(1);
-		KragerTimer.delayMS(250);
-		GearIntake.getInstance().setGearIntakeRoller(0);
-		this.driveEncoder(20500, 2.5);
-		GearIntake.getInstance().setGearIntakeRoller(-.5);
-		openGearIntake();
-		this.pivotDownGearIntake();
-
-		GearIntake.getInstance().setGearIntakeRoller(-1);
-		Turret.getInstance().turnToAngleAndSurvey(-330);
-		// this.spinUp();
-		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
-		// do a curvy path to the shooting locations
-		changePoints.add(new VelocityChangePoint(-3000, 0));
-		changePoints.add(new VelocityChangePoint(-600, -3500, 2000));
-		changePoints.add(new VelocityChangePoint(-2000, -2000, 15000, -90));
-
-		this.driveEncoder(25000, 9, changePoints);
-
 		this.spinUp();
-		KragerTimer.delayMS(1000);
-
-		shoot();
-		KragerTimer.delayMS(4000);
-	}
-
-	@Override
-	public void blueRoutine() throws TimedOutException, InterruptedException {
 		Turret.getInstance().returnHome();
-		this.setFuelIntake(1);
-		GearIntake.getInstance().setGearIntakeRoller(.5);
-		KragerTimer.delayMS(500);
-		this.setFuelIntake(0);
-		this.driveEncoder(10000, 1.25);
-		this.closeGearIntake();
-		KragerTimer.delayMS(500);
-		this.pivotUpGearIntake();
-		this.driveEncoder(-2000, .75);
-		GearIntake.getInstance().setGearIntakeRoller(1);
-		KragerTimer.delayMS(250);
-		GearIntake.getInstance().setGearIntakeRoller(0);
+		this.outtakeIntakeAndPivotGear();
 		this.driveEncoder(20500, 2.5);
-		GearIntake.getInstance().setGearIntakeRoller(-.5);
-		openGearIntake();
-		this.pivotDownGearIntake();
-
-		GearIntake.getInstance().setGearIntakeRoller(-1);
-		Turret.getInstance().turnToAngleAndSurvey(-135);
+		placeGear();
 		// this.spinUp();
+		KragerTimer.delayMS(250);
+		// this.pivotUpGearIntake();
 		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
 		// do a curvy path to the shooting locations
 		changePoints.add(new VelocityChangePoint(-3000, 0));
 		changePoints.add(new VelocityChangePoint(-3500, -600, 2000));
-		changePoints.add(new VelocityChangePoint(-2000, -2000, 15000, 90));
+		changePoints.add(new VelocityChangePoint(-1000, -1000, 15000, 90));
+		this.driveEncoder(15001, 9, changePoints);
 
-		this.driveEncoder(25000, 9, changePoints);
+		// this.setFuelIntake(1);
 
+		LinkedList<Operation> operations = new LinkedList<Operation>();
+		operations.add(new TurretTurnAndSurveyOperation(15000, 0));
+
+		LinkedList<VelocityChangePoint> changePoints1 = new LinkedList<VelocityChangePoint>();
+		// do a curvy path to the shooting locations
+		changePoints1.add(new VelocityChangePoint(3000, 0));
+		this.driveEncoder(25000, 9, changePoints1, operations);
+		this.shoot();
+		Flywheel.getInstance().resetVisionVals();
+	}
+
+	@Override
+	public void blueRoutine() throws TimedOutException, InterruptedException {
 		this.spinUp();
-		KragerTimer.delayMS(1000);
-		shoot();
-		KragerTimer.delayMS(4000);
+		Turret.getInstance().returnHome();
+		this.outtakeIntakeAndPivotGear();
+		this.driveEncoder(20500, 2.5);
+		placeGear();
+		// this.spinUp();
+		KragerTimer.delayMS(250);
+		// this.pivotUpGearIntake();
+		LinkedList<VelocityChangePoint> changePoints = new LinkedList<VelocityChangePoint>();
+		// do a curvy path to the shooting locations
+		changePoints.add(new VelocityChangePoint(-3000, 0));
+		changePoints.add(new VelocityChangePoint(-600, -3500, 2000));
+		changePoints.add(new VelocityChangePoint(-1000, -1000, 15000, -90));
+		this.driveEncoder(15001, 9, changePoints);
+
+		// this.setFuelIntake(1);
+
+		LinkedList<Operation> operations = new LinkedList<Operation>();
+		operations.add(new TurretTurnAndSurveyOperation(15000, 0));
+
+		LinkedList<VelocityChangePoint> changePoints1 = new LinkedList<VelocityChangePoint>();
+		// do a curvy path to the shooting locations
+		changePoints1.add(new VelocityChangePoint(3000, 0));
+		this.driveEncoder(25000, 9, changePoints1, operations);
+		this.shoot();
+		Flywheel.getInstance().resetVisionVals();
 	}
 }

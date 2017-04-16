@@ -85,6 +85,11 @@ public class DriveCheezyDriveEquation extends Controller {
 		}
 		linearPower = throttle;
 
+		if (throttle > .4) {
+			sensitivity = .15;
+		} else {
+			sensitivity = .3;
+		}
 		// Quickturn!
 		if (isQuickTurn) {
 			if (Math.abs(linearPower) < 0.2) {

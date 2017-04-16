@@ -15,30 +15,17 @@ public class GearMiddleWithHopper extends SteamworksAutoRoutine {
 
 	@Override
 	public void redRoutine() throws TimedOutException, InterruptedException {
-
+		this.spinUp();
 		Turret.getInstance().returnHome();
-		this.setFuelIntake(1);
-		GearIntake.getInstance().setGearIntakeRoller(.5);
-		KragerTimer.delayMS(500);
-		this.setFuelIntake(0);
-		this.driveEncoder(10000, 1.25);
-		this.pivotUpGearIntake();
-		this.driveEncoder(-2000, .75);
-		GearIntake.getInstance().setGearIntakeRoller(1);
-		KragerTimer.delayMS(250);
-		GearIntake.getInstance().setGearIntakeRoller(0);
+		this.outtakeIntakeAndPivotGear();
 		this.driveEncoder(20500, 2.5);
-		GearIntake.getInstance().setGearIntakeRoller(-.5);
-		this.pivotDownGearIntake();
-		openGearIntake();
-		GearIntake.getInstance().setGearIntakeRoller(-1);
+		placeGear();
 		// backup and turn towards Hopper
 		this.driveEncoder(-15000, 2);
 		this.turnToAngle(45, 1.5);
 		this.driveEncoder(15000, 2);
 		Turret.getInstance().turnToAngleAndSurvey(90);
 
-		this.spinUp();
 		KragerTimer.delayMS(1000);
 
 		shoot();
@@ -47,29 +34,16 @@ public class GearMiddleWithHopper extends SteamworksAutoRoutine {
 
 	@Override
 	public void blueRoutine() throws TimedOutException, InterruptedException {
+		this.spinUp();
 		Turret.getInstance().returnHome();
-		this.setFuelIntake(1);
-		GearIntake.getInstance().setGearIntakeRoller(.5);
-		KragerTimer.delayMS(500);
-		this.setFuelIntake(0);
-		this.driveEncoder(10000, 1.25);
-		this.pivotUpGearIntake();
-		this.driveEncoder(-2000, .75);
-		GearIntake.getInstance().setGearIntakeRoller(1);
-		KragerTimer.delayMS(250);
-		GearIntake.getInstance().setGearIntakeRoller(0);
+		this.outtakeIntakeAndPivotGear();
 		this.driveEncoder(20500, 2.5);
-		GearIntake.getInstance().setGearIntakeRoller(-.5);
-		this.pivotDownGearIntake();
-		openGearIntake();
-		GearIntake.getInstance().setGearIntakeRoller(-1);
+		placeGear();
 		// backup and turn towards Hopper
 		this.driveEncoder(-15000, 2);
 		this.turnToAngle(-45, 1.5);
 		this.driveEncoder(15000, 2);
 		Turret.getInstance().turnToAngleAndSurvey(-90);
-
-		this.spinUp();
 		KragerTimer.delayMS(1000);
 
 		shoot();

@@ -1,9 +1,12 @@
 package org.usfirst.frc.team3309.auto.operations;
 
+import org.team3309.lib.KragerTimer;
 import org.usfirst.frc.team3309.auto.Operation;
 import org.usfirst.frc.team3309.auto.TimedOutException;
+import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 
 public class ShootOperation extends Operation {
+	
 	public ShootOperation(int encoderGoal) {
 		super(encoderGoal);
 	}
@@ -12,5 +15,6 @@ public class ShootOperation extends Operation {
 	public void perform() throws InterruptedException, TimedOutException {
 		this.spinUp();
 		this.shoot();
+		Flywheel.getInstance().resetVisionVals();
 	}
 }

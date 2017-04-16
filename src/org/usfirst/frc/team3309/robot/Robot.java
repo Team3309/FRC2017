@@ -3,11 +3,16 @@ package org.usfirst.frc.team3309.robot;
 import org.team3309.lib.KragerTimer;
 import org.usfirst.frc.team3309.auto.AllianceColor;
 import org.usfirst.frc.team3309.auto.AutoRoutine;
+import org.usfirst.frc.team3309.auto.routines.BoilerGearAndCloseHopperStraight;
+import org.usfirst.frc.team3309.auto.routines.BoilerGearStraightAndPreloads;
+import org.usfirst.frc.team3309.auto.routines.BoilerSideGearAndIntakeAndShoot;
+import org.usfirst.frc.team3309.auto.routines.CloseHopperAndShootCurvy;
 import org.usfirst.frc.team3309.auto.routines.CompBotOriginalHopperAndGearAuto;
+import org.usfirst.frc.team3309.auto.routines.FarHopperAndShootCurvyPath;
+import org.usfirst.frc.team3309.auto.routines.FarSideGearStraight;
 import org.usfirst.frc.team3309.auto.routines.GearMiddleStraight;
-import org.usfirst.frc.team3309.auto.routines.GearStraightBoilerSide;
-import org.usfirst.frc.team3309.auto.routines.HopperAndShootCurvyPath;
 import org.usfirst.frc.team3309.auto.routines.NoAutoRoutine;
+import org.usfirst.frc.team3309.auto.routines.TurnInPlaceAutoRoutine;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.subsystems.Climber;
 import org.usfirst.frc.team3309.subsystems.Drive;
@@ -42,10 +47,15 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		// Main Auto Chooser
 		Sensors.read();
-		mainAutoChooser.addObject("Hopper Curvey", new HopperAndShootCurvyPath());
-		mainAutoChooser.addObject("Gear and Hopper Curvey OG", new CompBotOriginalHopperAndGearAuto());
-		mainAutoChooser.addObject("Gear BOILER SIDE Straight", new GearStraightBoilerSide());
-		mainAutoChooser.addObject("Gear Middle Straight", new GearMiddleStraight());
+		mainAutoChooser.addObject("Close Hopper", new CloseHopperAndShootCurvy());
+		mainAutoChooser.addObject("Far Hopper", new FarHopperAndShootCurvyPath());
+		mainAutoChooser.addObject("Far Side Gear", new FarSideGearStraight());
+		mainAutoChooser.addObject("Boiler Gear and Close Hopper Curvy", new CompBotOriginalHopperAndGearAuto());
+		mainAutoChooser.addObject("Boiler Gear and Close Hopper Straight", new BoilerGearAndCloseHopperStraight());
+		mainAutoChooser.addObject("Boiler Gear Straight, Shoot Preloads", new BoilerGearStraightAndPreloads());
+		mainAutoChooser.addObject("Boiler Gear,Intake, and Shoot", new BoilerSideGearAndIntakeAndShoot());
+		mainAutoChooser.addObject("Middle Gear Straight, Shoot Preloads", new GearMiddleStraight());
+		mainAutoChooser.addObject("TurnInPlace", new TurnInPlaceAutoRoutine());
 		mainAutoChooser.addObject("No Auto", new NoAutoRoutine());
 		redBlueAutoChooser.addObject("Red", AllianceColor.RED);
 		redBlueAutoChooser.addObject("Blue", AllianceColor.BLUE);
@@ -105,8 +115,9 @@ public class Robot extends IterativeRobot {
 			e.printStackTrace();
 		}
 		// LightRing.getInstance().update();
-		// Systems.smartDashboard();
+		Systems.smartDashboard();
 		Actuators.actuate();
+		KragerTimer.delayMS(20);
 	}
 
 	public void teleopInit() {
@@ -124,26 +135,27 @@ public class Robot extends IterativeRobot {
 		profileTimer.reset();
 		profileTimer.start();
 
-		profileTimer.log("NEW LOOP -------------------------");
+		// profileTimer.log("NEW LOOP -------------------------");
 		Sensors.read();
 
-		profileTimer.log("Sensors");
+		// profileTimer.log("Sensors");
 		if (isActuating) {
+			Shooter.getInstance().updateTeleop();
 			Flywheel.getInstance().updateTeleop();
 			Hood.getInstance().updateTeleop();
 			Turbine.getInstance().updateTeleop();
 			Turret.getInstance().updateTeleop();
-			Shooter.getInstance().updateTeleop();
+
 			LightRing.getInstance().update();
-			profileTimer.log("Shooter");
+			// profileTimer.log("Shooter");
 			Elevator.getInstance().updateTeleop();
 			FuelIntake.getInstance().updateTeleop();
 			GearIntake.getInstance().updateTeleop();
 			Climber.getInstance().manualControl();
-			profileTimer.log("Climber");
+			// profileTimer.log("Climber");
 			Drive.getInstance().updateTeleop();
 		}
-		profileTimer.log("Subsystems");
+		// profileTimer.log("Subsystems");
 		if (isSmartDash) {
 			Flywheel.getInstance().sendToSmartDash();
 			Hood.getInstance().sendToSmartDash();
@@ -153,11 +165,12 @@ public class Robot extends IterativeRobot {
 			GearIntake.getInstance().sendToSmartDash();
 			Climber.getInstance().sendToSmartDash();
 			Drive.getInstance().sendToSmartDash();
+			Turbine.getInstance().sendToSmartDash();
 		}
-		profileTimer.log("Smart Dash");
+		// profileTimer.log("Smart Dash");
 
 		Actuators.actuate();
-		profileTimer.log("Actuators");
+		// profileTimer.log("Actuators");
 		KragerTimer.delayMS(20);
 	}
 

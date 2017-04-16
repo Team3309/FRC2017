@@ -45,15 +45,30 @@ public class VisionServer implements Runnable {
 	// new Shot(106, 1, .05),
 	// new Shot(113, 1, .031) // to here)
 	// };
-	// ross
-	private static Shot[] shots = { new Shot(125, .01, .23),
-			new Shot(130, .01, .161),
-			new Shot(120, .05, .16),
-			new Shot(134, .05, .101),
-			new Shot(128, .25, .1),
-			new Shot(131, .25, .07),
-			new Shot(134, .25, .051),
-			new Shot(137, .25, .031) // to here)
+	// private static Shot[] shots = { new Shot(126, .31, .23),
+	// new Shot(131, .31, .161),
+	// new Shot(127, .35, .16),
+	// new Shot(137, .35, .101),
+	// new Shot(131, .8, .1),
+	// new Shot(134, .8, .06157),
+	// new Shot(136, .8, .04471),
+	// new Shot(137, .8, .031),
+	// new Shot(144, .8, .018)// to here)
+	// };
+
+	// .25 is the new .8
+	private static Shot[] shots = { new Shot(126, 0, .23),
+			new Shot(131, 0, .161),
+			new Shot(127, 0, .16),
+			new Shot(137, 0, .101),
+			new Shot(119, .35, .1),
+			new Shot(123, .35, .06157),
+			new Shot(128, .35, .04471),
+			new Shot(132, .35, .031),
+			new Shot(137, .35, .018),
+			new Shot(137, .35, .01),
+			new Shot(137, .35, .008),
+			new Shot(137, .35, .003),
 	};
 
 	public static VisionServer getInstance() {

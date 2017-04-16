@@ -1,5 +1,6 @@
-
 package org.usfirst.frc.team3309.subsystems.shooter;
+
+import java.util.ArrayList;
 
 import org.team3309.lib.ControlledSubsystem;
 import org.team3309.lib.actuators.TalonSRXMC;
@@ -8,6 +9,7 @@ import org.team3309.lib.controllers.statesandsignals.InputState;
 import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.RobotMap;
 import org.usfirst.frc.team3309.robot.Sensors;
+import org.usfirst.frc.team3309.subsystems.Elevator;
 import org.usfirst.frc.team3309.subsystems.Shooter;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
@@ -24,6 +26,16 @@ public class Flywheel extends ControlledSubsystem {
 
 	private double maxAccRPS = 60.0;
 	private double aimVelRPS = 0.0;
+	private double currentAimVelRPS = 0;
+	private ArrayList<Double> averageGoalRPSArray = new ArrayList<Double>();
+
+	public double getCurrentAimVelRPS() {
+		return currentAimVelRPS;
+	}
+
+	public void setCurrentAimVelRPS(double currentAimVelRPS) {
+		this.currentAimVelRPS = currentAimVelRPS;
+	}
 
 	private double aimAccRPS = 0.0;
 	private double curVel = 0;
@@ -31,6 +43,7 @@ public class Flywheel extends ControlledSubsystem {
 	private double offset = 0;
 	private boolean isPressedAlready = false;
 	private boolean isFirstFilter = true;
+	private double maxAcc = 3;
 	private NetworkTable table = NetworkTable.getTable("Flywheel");
 
 	/**
@@ -45,6 +58,8 @@ public class Flywheel extends ControlledSubsystem {
 		this.rightTalon.reverseOutput(true);
 		this.leftTalon.reverseSensor(true);
 
+		// leftTalon.nomi
+
 		this.leftTalon.enable();
 		this.rightTalon.enable();
 
@@ -52,6 +67,10 @@ public class Flywheel extends ControlledSubsystem {
 		NetworkTable.getTable("Climber").putNumber("k_TEST RPS", 140);
 		this.leftTalon.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		this.leftTalon.configEncoderCodesPerRev(12);
+		this.leftTalon.configPeakOutputVoltage(12, -12);
+		this.leftTalon.configNominalOutputVoltage(0, 0);
+		this.rightTalon.configPeakOutputVoltage(12, -12);
+		this.rightTalon.configNominalOutputVoltage(0, 0);
 	}
 
 	/**
@@ -73,12 +92,22 @@ public class Flywheel extends ControlledSubsystem {
 			this.rightTalon.changeControlMode(TalonControlMode.PercentVbus);
 			this.leftTalon.set(0);
 			this.rightTalon.set(0);
+			this.currentAimVelRPS = this.getRPS();
 		} else {
-
+			double acc = maxAcc;
+			if (this.curVel > 35) {
+				this.currentAimVelRPS = goal;
+			} else if (this.currentAimVelRPS < goal - 10) {
+				this.currentAimVelRPS += acc;
+			} else if (this.currentAimVelRPS > goal + 10) {
+				this.currentAimVelRPS -= acc;
+			} else {
+				this.currentAimVelRPS = this.aimVelRPS;
+			}
 			this.leftTalon.changeControlMode(TalonControlMode.Speed);
 			this.rightTalon.changeControlMode(TalonControlMode.Follower);
 			this.rightTalon.set(RobotMap.LEFT_SHOOTER_ID);
-			this.leftTalon.set(goal * 15);
+			this.leftTalon.set(currentAimVelRPS * 15.0 * (24.0 / 16.0));
 		}
 	}
 
@@ -94,24 +123,38 @@ public class Flywheel extends ControlledSubsystem {
 
 	@Override
 	public void updateAuto() {
+		maxAcc = 50;
 		curVel = this.getRPS();
 		if (Shooter.getInstance().isShouldBeShooting()) {
 			// aimVelRPS = 180;
-			if (VisionServer.getInstance().hasTargetsToAimAt()) {
-				aimVelRPS = VisionServer.getInstance().getRPS() + 7;
 
-				if (Math.abs(aimVelRPS - lastVisionRPS) > 10 && isFirstFilter) {
-					aimVelRPS = lastVisionRPS;
+			if (VisionServer.getInstance().hasTargetsToAimAt()) {
+				double curAimVelRPS = VisionServer.getInstance().getRPS();
+				// if (Math.abs(curAimVelRPS - lastVisionRPS) > 10 &&
+				// isFirstFilter) {
+				// curAimVelRPS = lastVisionRPS;
+				// }
+				averageGoalRPSArray.add(curAimVelRPS);
+				System.out.println("cur Vision val " + curAimVelRPS);
+				if (averageGoalRPSArray.size() > 50) {
+					averageGoalRPSArray.remove(0);
 				}
+				double sum = 0;
+				for (double x : averageGoalRPSArray) {
+					sum += x;
+				}
+				System.out.println("sume " + sum + " size " + averageGoalRPSArray.size());
+				aimVelRPS = ((double) sum) / ((double) averageGoalRPSArray.size());
 				isFirstFilter = false;
-				System.out.println("FLYWHEEL VISION AIM " + aimVelRPS);
+				System.out.println("FLYWHEEL VISION AIM " + aimVelRPS + " cur " + this.getRPS());
+				System.out.println("elevator " + Elevator.getInstance().getSpeed());
 				lastVisionRPS = aimVelRPS;
 			} else {
 				isFirstFilter = true;
 				aimVelRPS = lastVisionRPS;
 			}
 		} else if (Shooter.getInstance().isShouldBeSpinningUp()) {
-			aimVelRPS = 120;
+			aimVelRPS = 130;
 
 		} else {
 			aimVelRPS = 0;
@@ -124,7 +167,7 @@ public class Flywheel extends ControlledSubsystem {
 	@Override
 	public void updateTeleop() {
 		curVel = this.getRPS();
-
+		maxAcc = 70;
 		if (Controls.operatorController.getPOV() == 180 && !isPressedAlready) {
 			offset -= 1;
 			isPressedAlready = true;
@@ -136,6 +179,7 @@ public class Flywheel extends ControlledSubsystem {
 		} else {
 			isPressedAlready = false;
 		}
+		System.out.println(this.getRPS());
 		// Find our base aim vel
 		// System.out.println("constnats: " + ((FeedForwardWithPIDController)
 		// this.getController()).getkV() + " kP "
@@ -143,14 +187,37 @@ public class Flywheel extends ControlledSubsystem {
 		if (Controls.operatorController.getYButton() || Controls.driverController.getYButton()) {
 			this.testVel();
 		} else if (Controls.operatorController.getAButton()) {
-			aimVelRPS = 180;
+			aimVelRPS = 130;
+			this.leftTalon.configPeakOutputVoltage(7, -7);
+			this.rightTalon.configPeakOutputVoltage(7, -7);
+			Shooter.getInstance().setShouldBeShooting(false);
+			Shooter.getInstance().setShouldBeSpinningUp(true);
+			
 		} else if (Controls.operatorController.getBButton()) {
+			this.leftTalon.configPeakOutputVoltage(12, -12);
+			this.rightTalon.configPeakOutputVoltage(12, -12);
 			if (VisionServer.getInstance().hasTargetsToAimAt()) {
-				aimVelRPS = VisionServer.getInstance().getRPS();
 
-				if (Math.abs(aimVelRPS - lastVisionRPS) > 10 && isFirstFilter) {
-					aimVelRPS = lastVisionRPS;
+				double curAimVelRPS = VisionServer.getInstance().getRPS();
+				// if (Math.abs(curAimVelRPS - lastVisionRPS) > 10 &&
+				// isFirstFilter) {
+				// curAimVelRPS = lastVisionRPS;
+				// }
+				averageGoalRPSArray.add(curAimVelRPS);
+				System.out.println("cur Vision val " + curAimVelRPS);
+				if (averageGoalRPSArray.size() > 50) {
+					averageGoalRPSArray.remove(0);
 				}
+				double sum = 0;
+				for (double x : averageGoalRPSArray) {
+					sum += x;
+				}
+				System.out.println("sume " + sum + " size " + averageGoalRPSArray.size());
+				aimVelRPS = ((double) sum) / ((double) averageGoalRPSArray.size());
+				isFirstFilter = false;
+				System.out.println("FLYWHEEL VISION AIM " + aimVelRPS);
+				System.out.println("elevator " + Elevator.getInstance().getSpeed());
+				lastVisionRPS = aimVelRPS;
 				isFirstFilter = false;
 				System.out.println("FLYWHEEL VISION AIM " + aimVelRPS);
 				lastVisionRPS = aimVelRPS;
@@ -159,9 +226,12 @@ public class Flywheel extends ControlledSubsystem {
 				aimVelRPS = lastVisionRPS;
 			}
 		} else {
+			this.leftTalon.configPeakOutputVoltage(12, -12);
+			this.rightTalon.configPeakOutputVoltage(12, -12);
 			offset = 0;
 			aimVelRPS = 0;
 			aimAccRPS = 0;
+			averageGoalRPSArray = new ArrayList<Double>();
 		}
 		aimVelRPS += offset;
 
@@ -178,13 +248,17 @@ public class Flywheel extends ControlledSubsystem {
 	 * Raw power values
 	 */
 	public void manualControl() {
+		this.leftTalon.changeControlMode(TalonControlMode.PercentVbus);
+		this.rightTalon.changeControlMode(TalonControlMode.PercentVbus);
 		if (Controls.operatorController.getAButton()) {
 			this.setShooter(.05);
 		} else if (Controls.operatorController.getXButton()) {
 			this.setShooter(.5);
 		} else if (Controls.operatorController.getYButton()) {
 			this.setShooter(.55);
+			Shooter.getInstance().setShouldBeShooting(true);
 		} else {
+			Shooter.getInstance().setShouldBeShooting(false);
 			this.setShooter(0);
 		}
 	}
@@ -217,7 +291,7 @@ public class Flywheel extends ControlledSubsystem {
 
 			} else if (curVel > aimVelRPS + maxAccRPS) {
 				aimAccRPS = 0;
-				// aimVelRPS = curVel + maxAccRPS;
+				// aimVelRPS = curVel F+ maxAccRPS;
 			} else {
 				aimAccRPS = 0;
 			}
@@ -273,11 +347,12 @@ public class Flywheel extends ControlledSubsystem {
 		table.putNumber("goal", this.leftTalon.getSetpoint());
 		table.putNumber("rpm reading", leftTalon.getSpeed());
 		table.putNumber("banner", Sensors.rawRPS);
+		table.putNumber("rps goal", getAimVelRPS());
 	}
 
-	private double getRPS() {
+	public double getRPS() {
 		// System.out.println(Sensors.getFlywheelRPS());
-		return (this.leftTalon.getSpeed() * 4) / 60;
+		return ((this.leftTalon.getSpeed() * 4.0) / 60.0) * (16.0 / 24.0);
 	}
 
 	public double getAimVelRPS() {
@@ -297,9 +372,10 @@ public class Flywheel extends ControlledSubsystem {
 	}
 
 	public boolean isShooterInRange() {
-		if (this.getRPS() < aimVelRPS + 10 && this.getRPS() > aimVelRPS - 10)
+
+		if (this.getRPS() < aimVelRPS + 10 && this.getRPS() > aimVelRPS - 15)
 			return true;
-		return true;
+		return false;
 	}
 
 	private double getRPM() {
@@ -308,7 +384,10 @@ public class Flywheel extends ControlledSubsystem {
 
 	private void setShooter(double power) {
 		leftTalon.set(power);
-		rightTalon.set(power);
+		rightTalon.set(-power);
 	}
 
+	public void resetVisionVals() {
+		isFirstFilter = true;
+	}
 }

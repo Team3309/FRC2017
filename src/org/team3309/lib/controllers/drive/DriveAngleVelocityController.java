@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveAngleVelocityController extends Controller {
 
-	public PIDPositionController turningController = new PIDPositionController(37, .13, 17);
+	public PIDPositionController turningController = new PIDPositionController(37, .16, 17);
 	private KragerTimer doneTimer = new KragerTimer(.5);
 	protected double goalAngle = 0;
 	private boolean isCompletable = true;

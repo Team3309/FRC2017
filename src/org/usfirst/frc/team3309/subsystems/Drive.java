@@ -62,10 +62,10 @@ public class Drive extends ControlledSubsystem {
 		this.setController(new DriveCheezyDriveEquation());
 
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
-			isLowGear = false;
+			setLowGear();
 		} else
-			isLowGear = true;
-		shifter.set(isLowGear);
+			setHighGear();
+		// shifter.set(isLowGear);
 		OutputSignal output = getController().getOutputSignal(getInputState());
 		setLeftRight(output.getLeftMotor(), output.getRightMotor());
 	}
