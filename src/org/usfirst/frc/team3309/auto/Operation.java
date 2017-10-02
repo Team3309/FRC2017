@@ -9,6 +9,7 @@ public abstract class Operation extends RoutineBased {
 
 	public Operation() {
 		this.encoder = 0;
+			
 	}
 
 	public Operation(double counts) {

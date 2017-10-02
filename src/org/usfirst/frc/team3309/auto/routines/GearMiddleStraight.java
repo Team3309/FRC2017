@@ -25,7 +25,7 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 		this.spinUp();
 		Turret.getInstance().returnHome();
 		this.outtakeIntakeAndPivotGear();
-		this.driveEncoder(20500, 2.5);
+		this.driveEncoder(21000, 2);    // 20500
 		placeGear();
 		// this.spinUp();
 		KragerTimer.delayMS(250);
@@ -40,12 +40,12 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 		// this.setFuelIntake(1);
 
 		LinkedList<Operation> operations = new LinkedList<Operation>();
-		operations.add(new TurretTurnAndSurveyOperation(15000, 0));
+		operations.add(new TurretTurnAndSurveyOperation(10000, 0)); // 15000
 
 		LinkedList<VelocityChangePoint> changePoints1 = new LinkedList<VelocityChangePoint>();
 		// do a curvy path to the shooting locations
-		changePoints1.add(new VelocityChangePoint(3000, 0));
-		this.driveEncoder(25000, 9, changePoints1, operations);
+		changePoints1.add(new VelocityChangePoint(3000, 0)); 
+		this.driveEncoder(17000, 9, changePoints1, operations); // 25000
 		this.shoot();
 		Flywheel.getInstance().resetVisionVals();
 	}
@@ -55,7 +55,7 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 		this.spinUp();
 		Turret.getInstance().returnHome();
 		this.outtakeIntakeAndPivotGear();
-		this.driveEncoder(20500, 2.5);
+		this.driveEncoder(21000, 2);
 		placeGear();
 		// this.spinUp();
 		KragerTimer.delayMS(250);
@@ -70,12 +70,12 @@ public class GearMiddleStraight extends SteamworksAutoRoutine {
 		// this.setFuelIntake(1);
 
 		LinkedList<Operation> operations = new LinkedList<Operation>();
-		operations.add(new TurretTurnAndSurveyOperation(15000, 0));
+		operations.add(new TurretTurnAndSurveyOperation(10000, 0)); // 15000
 
 		LinkedList<VelocityChangePoint> changePoints1 = new LinkedList<VelocityChangePoint>();
 		// do a curvy path to the shooting locations
 		changePoints1.add(new VelocityChangePoint(3000, 0));
-		this.driveEncoder(25000, 9, changePoints1, operations);
+		this.driveEncoder(17000, 9, changePoints1, operations);  // 25000
 		this.shoot();
 		Flywheel.getInstance().resetVisionVals();
 	}

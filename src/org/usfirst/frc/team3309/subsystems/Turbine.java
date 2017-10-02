@@ -50,9 +50,9 @@ public class Turbine extends ControlledSubsystem {
 			// setHopper(1);
 			setHopper(1);
 
-		} else if (Controls.driverController.getXButton()) {
+		} else if (Controls.driverController.getXButton() || Controls.operatorController.getXButton()) {
 			setHopper(-500);
-			// setHopper(0);
+			// setHopper(0);,
 		} else {
 			setHopper(0);
 		}
@@ -106,10 +106,9 @@ public class Turbine extends ControlledSubsystem {
 			this.vibrate.set(1 * agitationFactor);
 			hopperMC.set(-power);
 		} else {
-
 			this.vibrate.set(0);
 			hopperMC.changeControlMode(TalonControlMode.PercentVbus);
-			hopperMC.set(-power);
+			hopperMC.set(power);
 		}
 	}
 

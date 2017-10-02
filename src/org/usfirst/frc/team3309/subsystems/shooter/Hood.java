@@ -23,6 +23,7 @@ public class Hood extends KragerSystem {
 
 	private Hood() {
 		super("Hood");
+		NetworkTable.getTable("Climber").putNumber("k_aim Hood Angle", 0);
 	}
 
 	/**
@@ -39,7 +40,7 @@ public class Hood extends KragerSystem {
 
 	public void updateTeleop() {
 		// Find aim angle
-		if (Controls.operatorController.getYButton()) {
+		if (Controls.operatorController.getYButton() || Controls.driverController.getYButton()) {
 			testPosControl();
 		} else if (Controls.operatorController.getBButton()) {
 			if (VisionServer.getInstance().hasTargetsToAimAt()) {
@@ -72,6 +73,9 @@ public class Hood extends KragerSystem {
 				isHoldingVisionAngle = true;
 
 				System.out.println("VISION HOOD " + goalAngle);
+				if (VisionServer.getInstance().getTarget().getHyp() < 0) {
+					goalAngle = .9;
+				}
 				lastVisionAngle = goalAngle;
 			} else {
 				goalAngle = lastVisionAngle;
@@ -80,11 +84,12 @@ public class Hood extends KragerSystem {
 			isHoldingVisionAngle = false;
 			this.setHood(0);
 		}
+
 		this.setHood(goalAngle);
 	}
 
 	public void testPosControl() {
-		goalAngle = NetworkTable.getTable("Climber").getNumber("k_aim Hood Angle", 20);
+		goalAngle = NetworkTable.getTable("Climber").getNumber("k_aim Hood Angle", 100);
 		NetworkTable.getTable("Climber").putNumber("k_aim Hood Angle", goalAngle);
 	}
 
@@ -92,7 +97,6 @@ public class Hood extends KragerSystem {
 	public void sendToSmartDash() {
 		table.putNumber("angle", getAngle());
 		table.putNumber("aim", goalAngle);
-
 	}
 
 	@Override

@@ -1,3 +1,4 @@
+
 package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.ControlledSubsystem;
@@ -30,7 +31,7 @@ public class Drive extends ControlledSubsystem {
 	 * its goal angle
 	 */
 	private static final double DRIVE_GYRO_LENIENCY = 5;
-	private static Drive drive;
+	
 	private TalonSRXMC right0 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_0_ID);
 	private TalonSRXMC right1 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_1_ID);
 	private TalonSRXMC right2 = new TalonSRXMC(RobotMap.DRIVE_RIGHT_2_ID);
@@ -43,6 +44,8 @@ public class Drive extends ControlledSubsystem {
 	private boolean isLowGear = true;
 	private boolean hasPIDBreakStarted = false;
 
+	private static Drive drive;
+	
 	public static Drive getInstance() {
 		if (drive == null)
 			drive = new Drive();
@@ -60,7 +63,6 @@ public class Drive extends ControlledSubsystem {
 	@Override
 	public void updateTeleop() {
 		this.setController(new DriveCheezyDriveEquation());
-
 		if (Controls.driverController.getBumper(Hand.kLeft)) {
 			setLowGear();
 		} else
@@ -72,7 +74,6 @@ public class Drive extends ControlledSubsystem {
 
 	public void changeToVelocityMode() {
 		right0.changeControlMode(TalonControlMode.Speed);
-
 		right1.changeControlMode(TalonControlMode.Follower);
 		right2.changeControlMode(TalonControlMode.Follower);
 		right1.set(RobotMap.DRIVE_RIGHT_0_ID);
@@ -116,9 +117,9 @@ public class Drive extends ControlledSubsystem {
 	@Override
 	public void sendToSmartDash() {
 		getController().sendToSmartDash();
+		
 		table.putNumber("current", right0.getOutputCurrent());
 		table.putNumber(this.getName() + " right pos", this.getRightPos());
-
 		table.putNumber(this.getName() + " left pos", this.getLeftPos());
 		table.putNumber(this.getName() + " right vel", this.getRightVel());
 		table.putNumber(this.getName() + " left vel", -this.getLeftVel());
@@ -141,7 +142,6 @@ public class Drive extends ControlledSubsystem {
 		this.setController(new DriveCheezyDriveEquation());
 		this.stopDrive();
 		this.right0.setVoltageRampRate(10);
-
 		this.right1.setVoltageRampRate(10);
 		this.right2.setVoltageRampRate(10);
 		this.left0.setVoltageRampRate(10);

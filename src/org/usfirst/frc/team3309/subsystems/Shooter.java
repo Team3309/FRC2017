@@ -2,6 +2,7 @@ package org.usfirst.frc.team3309.subsystems;
 
 import org.team3309.lib.KragerSystem;
 import org.team3309.lib.KragerTimer;
+import org.team3309.lib.controllers.drive.DriveEncodersController;
 import org.usfirst.frc.team3309.robot.Sensors;
 import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Hood;
@@ -41,8 +42,8 @@ public class Shooter extends KragerSystem {
 			startupTimer.reset();
 		}
 		if ((Flywheel.getInstance().isShooterInRange()
-				&& startupTimer.get() > 3)
-				|| (Flywheel.getInstance().getRPS() > Flywheel.getInstance().getAimVelRPS() - 5
+				&& startupTimer.get() > 4.5)
+				|| (Flywheel.getInstance().getRPS() > Flywheel.getInstance().getAimVelRPS() - 3
 						&& Flywheel.getInstance().getAimVelRPS() != 0)) {
 			if (!isTimerStarted) {
 				shootingTimer.start();
@@ -50,6 +51,8 @@ public class Shooter extends KragerSystem {
 			}
 
 			shouldBeShooting = true;
+			
+		
 
 		} else if (Sensors.getFlywheelRPS() != 0) {
 			shouldBeSpinningUp = true;

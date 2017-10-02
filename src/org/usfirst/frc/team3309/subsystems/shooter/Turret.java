@@ -258,7 +258,7 @@ public class Turret extends ControlledSubsystem {
 		currentState = TurretState.USING_VISION;
 		robotAngleWhenGoalLost = Sensors.getAngle();
 		goalAngle = newGoal;
-	}
+	}	
 
 	@Override
 	public void updateAuto() {

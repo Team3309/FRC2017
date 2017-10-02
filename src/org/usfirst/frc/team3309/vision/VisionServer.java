@@ -12,14 +12,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.team3309.lib.KragerMath;
-import org.usfirst.frc.team3309.driverstation.Controls;
 import org.usfirst.frc.team3309.robot.Sensors;
-import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.subsystems.shooter.Hood;
 import org.usfirst.frc.team3309.subsystems.shooter.Turret;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class VisionServer implements Runnable {
 
@@ -57,18 +52,56 @@ public class VisionServer implements Runnable {
 	// };
 
 	// .25 is the new .8
-	private static Shot[] shots = { new Shot(126, 0, .23),
-			new Shot(131, 0, .161),
-			new Shot(127, 0, .16),
-			new Shot(137, 0, .101),
-			new Shot(119, .35, .1),
-			new Shot(123, .35, .06157),
-			new Shot(128, .35, .04471),
-			new Shot(132, .35, .031),
-			new Shot(137, .35, .018),
-			new Shot(137, .35, .01),
-			new Shot(137, .35, .008),
-			new Shot(137, .35, .003),
+
+	// double goalRPS double goalHoodAngle, double hyp-raw
+
+	/*
+	 * private static Shot[] shots = { new Shot(124, 0, .23), new Shot(129, 0,
+	 * .161), new Shot(107, .4, .16), new Shot(109, .4, .101), new Shot(111, .4,
+	 * .1), new Shot(113, .4, .06157), new Shot(115, .4, .04471), new Shot(117,
+	 * .4, .031), new Shot(119, .4, .018), new Shot(121, .4, .01), new Shot(123,
+	 * .4, .008), new Shot(125, .4, .0031), new Shot(128, .4, .000001), new
+	 * Shot(145, .9, 0), new Shot(148, .9, -.2), new Shot(151, .9, -.4), new
+	 * Shot(154, .9, -.53), new Shot(157, .9, -2), };
+	 */
+
+	/*
+	 * private static Shot[] shots = { new Shot(108, 0.1, 0.26), new Shot(109,
+	 * 0.2, .21), new Shot(109, 0.3, 0.18), new Shot(109, 0.4, 0.16), new
+	 * Shot(110, 0.5, 0.14), new Shot(108, 0.6, 0.12), new Shot(108, 0.6, 0.10),
+	 * new Shot(110, 0.8, 0.09), new Shot(109, 1, 0.06), new Shot(110.5, 1,
+	 * 0.05), new Shot(111.25, 1, 0.04), new Shot(111.75, 1, 0.03), new
+	 * Shot(116.5, 1, 0.02), new Shot(120, 1, 0.01), new Shot(129, 1, 0) };
+	 */
+
+	private static Shot[] shots = {
+			new Shot(111, 0, .26),
+			new Shot(113, 0, .25),
+			new Shot(114, 0, .24),
+			new Shot(115, 0, .23),
+			new Shot(116, 0, .22),
+			new Shot(115, 0, .21),
+			new Shot(114, 0, .2),
+			new Shot(113, 0, .19),
+			new Shot(114, 0, .18),
+			new Shot(112, 0, .17),
+			new Shot(112, 0.05, .16),
+			new Shot(112.5, 0.05, .15),
+			new Shot(113, .05, .14),
+			new Shot(112.5, .1, .13),
+			new Shot(113, .15, .12),
+			new Shot(113.5, .2, .11),
+			new Shot(113.5, .3, .1),
+			new Shot(114, .3, .09),
+			new Shot(114, .3, .08),
+			new Shot(114.5, .4, .07),
+			new Shot(112.1, .45, .06), // new Shot(112.5, .45, .06),
+			new Shot(113.1, .5, .05), // new Shot(113, .5, .05),
+			new Shot(112.6, .5, .04), // new Shot(112.5, .5, .04),
+			new Shot(114.5, .65, .03),
+			new Shot(118, .9, .02), 
+			new Shot(121.5, 1, .01), // new Shot(120.5, 1, .01),
+			new Shot(132, 1, 0) // new Shot(130, 1, 0)
 	};
 
 	public static VisionServer getInstance() {
@@ -100,7 +133,6 @@ public class VisionServer implements Runnable {
 				JSONObject target = (JSONObject) targetObj;
 				double y = target.getDouble("y");
 				double z = target.getDouble("z");
-
 				targetInfos.add(new TargetInfo(y, z));
 			}
 			targets = targetInfos;
@@ -132,6 +164,7 @@ public class VisionServer implements Runnable {
 		}
 	}
 
+	@Override
 	public void run() {
 		while (true) {
 			if (serverSocket == null) {

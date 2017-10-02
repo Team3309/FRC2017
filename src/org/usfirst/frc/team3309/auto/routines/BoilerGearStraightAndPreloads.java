@@ -12,35 +12,47 @@ public class BoilerGearStraightAndPreloads extends SteamworksAutoRoutine {
 
 	@Override
 	public void redRoutine() throws TimedOutException, InterruptedException {
-		this.spinUp();
-		Turret.getInstance().returnHome();
-		this.outtakeIntakeAndPivotGear();
-		driveEncoder(UniversalAutoConstants.FORWARD_DISTANCE_TO_TURN_TOWARDS_PEG, 3);
-		turnToAngle(-UniversalAutoConstants.ANGLE_TO_TURN_TOWARDS_PEG, 5);
-		KragerTimer.delayMS(500);
-		driveEncoder(UniversalAutoConstants.FORWARD_DISTANCE_TO_PEG, 3);
-		placeGear();
-		Turret.getInstance().turnToAngleAndSurvey(-180);
-		driveEncoder(-15000, 1);
-		shoot();
-		KragerTimer.delayMS(5000);
-		this.stopShooting();
+
+		this.setFuelIntake(1);
+		GearIntake.getInstance().setGearIntakeRoller(.5);
+		KragerTimer.delayMS(250);
+		this.setFuelIntake(0);
+		GearIntake.getInstance().setGearIntakeRoller(1);
+		this.driveEncoder(12000, 1.25);
+		this.closeGearIntake();
+		this.pivotUpGearIntake();
+		KragerTimer.delayMS(250);
+		this.driveEncoder(-2000, 1.5);
+		GearIntake.getInstance().setGearIntakeRoller(.25);
+		this.driveEncoder(18000, 3);
+		this.placeGear();
+		this.driveEncoder(-10000, 2);
+		this.turnToAngle(78, 2);
+		KragerTimer.delayMS(150);
+		this.driveEncoder(32000, 2);
+		this.shoot();
+
 	}
 
 	@Override
 	public void blueRoutine() throws TimedOutException, InterruptedException {
-		this.spinUp();
-		Turret.getInstance().returnHome();
-		this.outtakeIntakeAndPivotGear();
-		driveEncoder(UniversalAutoConstants.FORWARD_DISTANCE_TO_TURN_TOWARDS_PEG, 3);
-		turnToAngle(UniversalAutoConstants.ANGLE_TO_TURN_TOWARDS_PEG + 5, 5);
-		KragerTimer.delayMS(500);
-		driveEncoder(UniversalAutoConstants.FORWARD_DISTANCE_TO_PEG, 3);
-		placeGear();
-		Turret.getInstance().turnToAngleAndSurvey(-180);
-		driveEncoder(-15000, 1);
-		shoot();
-		KragerTimer.delayMS(5000);
-		this.stopShooting();
+		this.setFuelIntake(1);
+		GearIntake.getInstance().setGearIntakeRoller(.5);
+		KragerTimer.delayMS(250);
+		this.setFuelIntake(0);
+		GearIntake.getInstance().setGearIntakeRoller(1);
+		this.driveEncoder(12000, 1.25);
+		this.closeGearIntake();
+		this.pivotUpGearIntake();
+		KragerTimer.delayMS(250);
+		this.driveEncoder(-2000, 1.5);
+		GearIntake.getInstance().setGearIntakeRoller(.25);
+		this.driveEncoder(18000, 3);
+		this.placeGear();
+		this.driveEncoder(-10000, 2);
+		this.turnToAngle(-78, 2);
+		KragerTimer.delayMS(150);
+		this.driveEncoder(32000, 2);
+		this.shoot();
 	}
 }

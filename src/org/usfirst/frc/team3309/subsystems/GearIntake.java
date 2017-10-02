@@ -56,7 +56,7 @@ public class GearIntake extends KragerSystem {
 		// boolean driverSelect = Controls.driverController.getBackButton();
 		boolean operatorRB = Controls.operatorController.getBumper(Hand.kRight);
 
-		if (operatorRB || Controls.operatorController.getXButton()) {
+		if (operatorRB) {
 			hasZippedInwards = false;
 			pivotUpGearIntake();
 		} else {
@@ -76,7 +76,7 @@ public class GearIntake extends KragerSystem {
 			if (this.isGearIntakeDown())
 				this.setGearIntakeRoller(0);
 			else
-				this.setGearIntakeRoller(.15);
+				this.setGearIntakeRoller(.25);
 		}
 
 		if (operatorLB) {
@@ -137,13 +137,11 @@ public class GearIntake extends KragerSystem {
 
 	@Override
 	public void manualControl() {
-
 		updateTeleop();
 	}
 
 	public void setGearIntakeRoller(double power) {
-
-		gearIntake.set(power);
+		gearIntake.set(-power);
 	}
 
 	public double getGearIntakeRollerPower() {

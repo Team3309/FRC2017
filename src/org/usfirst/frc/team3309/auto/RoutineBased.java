@@ -1,7 +1,6 @@
 package org.usfirst.frc.team3309.auto;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import org.team3309.lib.KragerTimer;
 import org.team3309.lib.controllers.Controller;
@@ -18,7 +17,6 @@ import org.usfirst.frc.team3309.subsystems.shooter.Flywheel;
 import org.usfirst.frc.team3309.vision.VisionServer;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class RoutineBased {
 
@@ -231,7 +229,7 @@ public class RoutineBased {
 		if (timeout.get() > 5)
 			return;
 		// KragerTimer.delayMS(200);
-		while (Flywheel.getInstance().getRPS() < Flywheel.getInstance().getAimVelRPS() - 5)
+		while (Flywheel.getInstance().getRPS() < Flywheel.getInstance().getAimVelRPS() - 3)
 			Shooter.getInstance().setShouldBeSpinningUp(true);
 		Shooter.getInstance().setShouldBeShooting(true);
 

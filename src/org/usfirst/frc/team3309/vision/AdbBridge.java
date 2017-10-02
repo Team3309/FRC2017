@@ -32,6 +32,7 @@ public class AdbBridge {
 	}
 
 	public boolean runCommand(String args) {
+		
 		Runtime r = Runtime.getRuntime();
 		String cmd = bin_location_.toString() + " " + args;
 

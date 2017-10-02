@@ -84,6 +84,7 @@ public class Elevator extends ControlledSubsystem {
 		table.putNumber(this.getName() + " Error", this.elevator.getError());
 		table.putNumber("el curren", elevator.getOutputCurrent());
 		table.putNumber("feedy curren", feedyWheel.getOutputCurrent());
+		table.putNumber("el enc vel ", this.elevator.getEncPosition());
 		// System.out.println("state " +
 		// this.elevator.isSensorPresent(FeedbackDevice.QuadEncoder));
 	}
@@ -95,7 +96,7 @@ public class Elevator extends ControlledSubsystem {
 		} else {
 			aimVel = 0;
 		}
-
+		this.elevator.changeControlMode(TalonControlMode.PercentVbus);
 		setElevator(aimVel);
 	}
 
