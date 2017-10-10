@@ -46,6 +46,10 @@ public class Drive extends ControlledSubsystem {
 
 	private static Drive drive;
 	
+	public void sketch() {
+		this.setLeftRight(0.1, 0.1);
+	}
+	
 	public static Drive getInstance() {
 		if (drive == null)
 			drive = new Drive();

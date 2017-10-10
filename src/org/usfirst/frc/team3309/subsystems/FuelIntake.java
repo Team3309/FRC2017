@@ -26,7 +26,8 @@ public class FuelIntake extends KragerSystem {
 		super("FuelIntake");
 		intakeTimer.start();
 	}
-
+	
+	
 	@Override
 	public void updateTeleop() {
 

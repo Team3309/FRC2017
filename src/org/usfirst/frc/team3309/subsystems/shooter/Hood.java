@@ -37,6 +37,7 @@ public class Hood extends KragerSystem {
 		}
 		return mHood;
 	}
+	
 
 	public void updateTeleop() {
 		// Find aim angle

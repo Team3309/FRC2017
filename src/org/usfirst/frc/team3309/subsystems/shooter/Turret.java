@@ -102,7 +102,7 @@ public class Turret extends ControlledSubsystem {
 		goalAngle = getAngle();
 		isSurvey = true;
 	}
-
+	
 	@Override
 	public void updateTeleop() {
 		if (!hasCalibratedSinceRobotInit) {

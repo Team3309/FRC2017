@@ -28,6 +28,8 @@ public class Climber extends KragerSystem {
 	private Climber() {
 		super("Climber");
 	}
+	
+	
 
 	@Override
 	public void updateTeleop() {

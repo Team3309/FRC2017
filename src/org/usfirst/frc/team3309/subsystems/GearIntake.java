@@ -48,6 +48,8 @@ public class GearIntake extends KragerSystem {
 		this.gearIntake.reverseOutput(true);
 		intakeTimer.start();
 	}
+	
+	
 
 	@Override
 	public void updateTeleop() {
@@ -76,7 +78,7 @@ public class GearIntake extends KragerSystem {
 			if (this.isGearIntakeDown())
 				this.setGearIntakeRoller(0);
 			else
-				this.setGearIntakeRoller(.25);
+				this.setGearIntakeRoller(.33);
 		}
 
 		if (operatorLB) {

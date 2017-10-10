@@ -38,6 +38,8 @@ public class Turbine extends ControlledSubsystem {
 		hopperMC.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
 		// hopperMC.configEncoderCodesPerRev(4096);
 	}
+	
+	
 
 	@Override
 	public void updateTeleop() {

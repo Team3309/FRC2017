@@ -46,6 +46,8 @@ public class Elevator extends ControlledSubsystem {
 	public void initTeleop() {
 		this.elevator.changeControlMode(TalonControlMode.Speed);
 	}
+	
+
 
 	@Override
 	public void updateTeleop() {

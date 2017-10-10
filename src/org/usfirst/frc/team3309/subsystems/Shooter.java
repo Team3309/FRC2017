@@ -32,9 +32,11 @@ public class Shooter extends KragerSystem {
 	}
 
 	Timer startupTimer = new Timer();
+	
 
 	@Override
 	public void updateTeleop() {
+		
 		if (Flywheel.getInstance().getAimVelRPS() != 0) {
 
 		} else {
